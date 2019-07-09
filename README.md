@@ -17,7 +17,7 @@
 3. In XCode, in the project navigator, select your project. Add `libRNFastOpenpgp.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
 4. Add `$(SRCROOT)/../node_modules/react-native-fast-openpgp/ios` to your main project `Build Settings` ➜ `Framework Search Path`
 
-![Required on ios](docs/ios-settings.png)
+![Required on ios](https://github.com/jerson/react-native-fast-openpgp/raw/master/docs/ios-settings.png)
 
 5. Run your project (`Cmd+R`)<
 
