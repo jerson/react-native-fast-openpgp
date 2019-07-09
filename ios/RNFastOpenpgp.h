@@ -5,6 +5,9 @@
 #import <React/RCTBridgeModule.h>
 #endif
 
+
+#import "openpgp/openpgp.h"
+
 @interface RNFastOpenpgp : NSObject <RCTBridgeModule>
 
 @end

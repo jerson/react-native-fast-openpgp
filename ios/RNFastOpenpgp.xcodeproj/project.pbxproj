@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		84FEE52422D4FD150041BC25 /* openpgp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84FEE52322D4FD150041BC25 /* openpgp.framework */; };
+		84FEE60A22D516930041BC25 /* openpgp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84FEE60922D516930041BC25 /* openpgp.framework */; };
 		B3E7B58A1CC2AC0600A0062D /* RNFastOpenpgp.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNFastOpenpgp.m */; };
 /* End PBXBuildFile section */
 
@@ -25,7 +25,7 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNFastOpenpgp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNFastOpenpgp.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		84FEE52322D4FD150041BC25 /* openpgp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = openpgp.framework; sourceTree = "<group>"; };
+		84FEE60922D516930041BC25 /* openpgp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = openpgp.framework; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNFastOpenpgp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNFastOpenpgp.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNFastOpenpgp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNFastOpenpgp.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -35,7 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84FEE52422D4FD150041BC25 /* openpgp.framework in Frameworks */,
+				84FEE60A22D516930041BC25 /* openpgp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,20 +53,39 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				84FEE52322D4FD150041BC25 /* openpgp.framework */,
 				B3E7B5881CC2AC0600A0062D /* RNFastOpenpgp.h */,
 				B3E7B5891CC2AC0600A0062D /* RNFastOpenpgp.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				84FEE53322D50ED00041BC25 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
+		84FEE53322D50ED00041BC25 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				84FEE60922D516930041BC25 /* openpgp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		84FEE60722D5162A0041BC25 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		58B511DA1A9E6C8500147676 /* RNFastOpenpgp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "RNFastOpenpgp" */;
 			buildPhases = (
+				84FEE60722D5162A0041BC25 /* Headers */,
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
 				58B511D91A9E6C8500147676 /* CopyFiles */,
@@ -219,9 +238,13 @@
 					"$(SRCROOT)/../../react-native/React/**",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"$(inherited)",
+				);
 				PRODUCT_NAME = RNFastOpenpgp;
 				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -239,9 +262,13 @@
 					"$(SRCROOT)/../../react-native/React/**",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"$(inherited)",
+				);
 				PRODUCT_NAME = RNFastOpenpgp;
 				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};

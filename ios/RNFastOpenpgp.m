@@ -1,6 +1,5 @@
 
 #import "RNFastOpenpgp.h"
-#import "openpgp/openpgp.h"
 
 @implementation RNFastOpenpgp
 
@@ -16,7 +15,7 @@ RCT_REMAP_METHOD(encrypt,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    
+   
     NSError *error;
     NSString * output = [OpenpgpNewOpenPGP() encrypt:message publicKey:publicKey error:&error];
     
