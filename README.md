@@ -10,13 +10,14 @@
 
 ### Manual installation
 
-
 #### iOS with CocoaPods
 
-1. In `Podfile` add 
+1. In `Podfile` add
 
-  	pod 'RNFastOpenpgp', :path => '../node_modules/react-native-fast-openpgp'
-  	pod 'OpenPGP', :path => '../node_modules/react-native-fast-openpgp/ios/native'
+```ruby
+pod 'RNFastOpenpgp', :path => '../node_modules/react-native-fast-openpgp'
+pod 'OpenPGP', :path => '../node_modules/react-native-fast-openpgp/ios/native'
+```
 
 2. run `pod install`
 

@@ -1,6 +1,6 @@
 {
   "name": "react-native-fast-openpgp",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,6 @@
   "author": "",
   "license": "",
   "peerDependencies": {
-    "react-native": "^0.41.2"
+    "react-native": "^0.59.1"
   }
 }
