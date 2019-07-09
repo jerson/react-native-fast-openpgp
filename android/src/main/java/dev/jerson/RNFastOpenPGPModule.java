@@ -26,9 +26,42 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void decode(String message, String privateKey, String passphrase, Promise promise) {
-        String result = instance.decode(message, privateKey, passphrase);
-        promise.resolve(result);
+    public void decrypt(String message, String privateKey, String passphrase, Promise promise) {
+        try {
+            String result = instance.decrypt(message, privateKey, passphrase);
+            promise.resolve(result);
+        } catch (Exception e) {
+            promise.reject(e);
+        }
     }
 
+    @ReactMethod
+    public void encrypt(String message, String publicKey, Promise promise) {
+        try {
+            String result = instance.encrypt(message, publicKey);
+            promise.resolve(result);
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void sign(String message, String publicKey, String privateKey, String passphrase, Promise promise) {
+        try {
+            String result = instance.sign(message, publicKey, privateKey, passphrase);
+            promise.resolve(result);
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void verify(String message, String signature, String publicKey, Promise promise) {
+        try {
+            Boolean result = instance.verify(signature, message, publicKey);
+            promise.resolve(result);
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
 }

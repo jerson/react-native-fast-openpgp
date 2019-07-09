@@ -1,4 +1,3 @@
-
 # react-native-fast-openpgp
 
 ## Getting started
@@ -11,7 +10,6 @@
 
 ### Manual installation
 
-
 #### iOS
 
 1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
@@ -22,24 +20,27 @@
 #### Android
 
 1. Open up `android/app/src/main/java/[...]/MainActivity.java`
-  - Add `import dev.jerson.RNFastOpenpgpPackage;` to the imports at the top of the file
-  - Add `new RNFastOpenpgpPackage()` to the list returned by the `getPackages()` method
-2. Append the following lines to `android/settings.gradle`:
-  	```
-  	include ':react-native-fast-openpgp'
-  	project(':react-native-fast-openpgp').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-fast-openpgp/android')
-  	```
-3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-  	```
-      compile project(':react-native-fast-openpgp')
-  	```
 
+- Add `import dev.jerson.RNFastOpenpgpPackage;` to the imports at the top of the file
+- Add `new RNFastOpenpgpPackage()` to the list returned by the `getPackages()` method
+
+2. Append the following lines to `android/settings.gradle`:
+   ```
+   include ':react-native-fast-openpgp'
+   project(':react-native-fast-openpgp').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-fast-openpgp/android')
+   ```
+3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
+   ```
+     compile project(':react-native-fast-openpgp')
+   ```
 
 ## Usage
-```javascript
-import RNFastOpenpgp from 'react-native-fast-openpgp';
 
-// TODO: What to do with the module?
-RNFastOpenpgp;
+```javascript
+import OpenPGP from "react-native-fast-openpgp";
+
+OpenPGP.decrypt(message, privateKey, passphrase);
+OpenPGP.encrypt(message, publicKey);
+OpenPGP.sign(message, publicKey, privateKey, passphrase);
+OpenPGP.verify(signature, message, publicKey);
 ```
-  
