@@ -28,12 +28,9 @@ android {
 
 repositories {
     mavenCentral()
-    flatDir{
-        dirs 'libs'
-    }
 }
 dependencies {
-    implementation 'openpgp:openpgp@aar'
+    implementation files('libs/openpgp.aar')
     implementation 'com.facebook.react:react-native:+'
 }
   
