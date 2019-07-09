@@ -9,9 +9,9 @@ Pod::Spec.new do |s|
   s.homepage     = ""
   s.license      = "MIT"
   s.author             = { "author" => "jeral17@gmail.com" }
-  s.platform     = :ios, ".0"
+  s.platform     = :ios, "8.0"
   s.source       = { :git => "https://github.com/jerson/react-native-fast-openpgp.git", :tag => "master" }
-  s.source_files  = "RNFastOpenpgp/**/*.{h,m}"
+  s.source_files  = "*.{h,m}"
   s.requires_arc = true
 
 
