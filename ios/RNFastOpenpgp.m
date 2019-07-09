@@ -1,7 +1,8 @@
 
 #import "RNFastOpenpgp.h"
+#import "openpgp/openpgp.h"
 
-@implementation RNFastOpenpgp
+@implementation RNFastOpenPGP
 
 - (dispatch_queue_t)methodQueue
 {

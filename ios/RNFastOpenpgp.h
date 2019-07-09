@@ -6,9 +6,8 @@
 #endif
 
 
-#import "openpgp/openpgp.h"
 
-@interface RNFastOpenpgp : NSObject <RCTBridgeModule>
+@interface RNFastOpenPGP : NSObject <RCTBridgeModule>
 
 @end
   
