@@ -3,7 +3,7 @@ import { NativeModules } from "react-native";
 const { RNFastOpenPGP } = NativeModules;
 
 const TAG = "[RNFastOpenPGP]";
-export default class Palette {
+export default class OpenPGP {
   static decrypt(message, privateKey, passphrase) {
     return RNFastOpenPGP.decrypt(message, privateKey, passphrase);
   }

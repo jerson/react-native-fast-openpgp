@@ -15,7 +15,11 @@
 1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
 2. Go to `node_modules` ➜ `react-native-fast-openpgp` and add `RNFastOpenpgp.xcodeproj`
 3. In XCode, in the project navigator, select your project. Add `libRNFastOpenpgp.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. Run your project (`Cmd+R`)<
+4. Add `$(SRCROOT)/../node_modules/react-native-fast-openpgp/ios` to your main project `Build Settings` ➜ `Framework Search Path`
+
+![Required on ios](docs/ios-settings.png)
+
+5. Run your project (`Cmd+R`)<
 
 #### Android
 
@@ -39,8 +43,8 @@
 ```javascript
 import OpenPGP from "react-native-fast-openpgp";
 
-OpenPGP.decrypt(message, privateKey, passphrase);
-OpenPGP.encrypt(message, publicKey);
-OpenPGP.sign(message, publicKey, privateKey, passphrase);
-OpenPGP.verify(signature, message, publicKey);
+const encoded = await OpenPGP.decrypt(message, privateKey, passphrase);
+const decoded = await OpenPGP.encrypt(message, publicKey);
+const signed = await OpenPGP.sign(message, publicKey, privateKey, passphrase);
+const booleanValue = !!(await OpenPGP.verify(signature, message, publicKey));
 ```
