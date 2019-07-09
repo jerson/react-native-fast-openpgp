@@ -1,6 +1,11 @@
+import { NativeModules } from "react-native";
 
-import { NativeModules } from 'react-native';
+const { RNFastOpenPGP } = NativeModules;
 
-const { RNFastOpenpgp } = NativeModules;
-
-export default RNFastOpenpgp;
+const TAG = "[RNFastOpenPGP]";
+export default class Palette {
+  static decode(message, privateKey, passphrase) {
+    __DEV__ && console.debug(TAG, "decode");
+    return RNFastOpenPGP.decode(message, privateKey, passphrase);
+  }
+}

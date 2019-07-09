@@ -31,6 +31,7 @@ repositories {
 }
 dependencies {
     implementation files('libs/openpgp.aar')
+    implementation files('libs/openpgp-sources.jar')
     implementation 'com.facebook.react:react-native:+'
 }
   

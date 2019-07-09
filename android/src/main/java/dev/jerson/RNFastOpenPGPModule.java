@@ -1,10 +1,12 @@
 package dev.jerson;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
 import openpgp.OpenPGP;
+import openpgp.Openpgp;
 
 public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
 
@@ -15,7 +17,7 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
         super(reactContext);
         this.reactContext = reactContext;
 
-        instance = new OpenPGP();
+        instance = Openpgp.newOpenPGP();
     }
 
     @Override
@@ -24,7 +26,9 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public String decode(String message, String privateKey, String passphrase) {
-        return instance.decode(message, privateKey, passphrase);
+    public void decode(String message, String privateKey, String passphrase, Promise promise) {
+        String result = instance.decode(message, privateKey, passphrase);
+        promise.resolve(result);
     }
+
 }
