@@ -1,12 +1,11 @@
 {
   "name": "react-native-fast-openpgp",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "cd ios && unzip openpgp.framework.zip",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "framework-fix": "cd ios/openpgp.framework iosframework=Openpgp && rm $framework Headers && mv Versions/A/{$framework,Headers} . && rm -rf Versions"
+    "postinstall": "cd ios/native && unzip openpgp.framework.zip",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "react-native"
