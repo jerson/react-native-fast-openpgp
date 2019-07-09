@@ -54,8 +54,8 @@ pod 'OpenPGP', :path => '../node_modules/react-native-fast-openpgp/ios/native'
 ```javascript
 import OpenPGP from "react-native-fast-openpgp";
 
-const encoded = await OpenPGP.decrypt(message, privateKey, passphrase);
-const decoded = await OpenPGP.encrypt(message, publicKey);
+const decoded = await OpenPGP.decrypt(message, privateKey, passphrase);
+const encoded = await OpenPGP.encrypt(message, publicKey);
 const signed = await OpenPGP.sign(message, publicKey, privateKey, passphrase);
 const booleanValue = !!(await OpenPGP.verify(signature, message, publicKey));
 ```
