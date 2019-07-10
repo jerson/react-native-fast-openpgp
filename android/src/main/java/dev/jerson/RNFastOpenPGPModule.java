@@ -56,7 +56,7 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void verify(String message, String signature, String publicKey, Promise promise) {
+    public void verify(String signature, String message, String publicKey, Promise promise) {
         try {
             Boolean result = instance.verify(signature, message, publicKey);
             promise.resolve(result);

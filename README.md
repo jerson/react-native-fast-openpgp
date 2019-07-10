@@ -60,6 +60,12 @@ const signed = await OpenPGP.sign(message, publicKey, privateKey, passphrase);
 const booleanValue = !!(await OpenPGP.verify(signature, message, publicKey));
 ```
 
-## Sample
+## Native Code
 
 https://github.com/jerson/react-native-fast-openpgp-sample
+
+## Sample
+
+the native library is made in Golang and build with gomobile for faster performance
+
+https://github.com/jerson/openpgp-mobile
