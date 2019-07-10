@@ -1,16 +1,22 @@
 {
   "name": "react-native-fast-openpgp",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "library for use openPGP",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jerson/react-native-fast-openpgp"
+  },
+  "keywords": [
+    "react-native",
+    "openpgp",
+    "fast"
+  ],
+  "author": "Gerson Alexander Pardo Gamez",
   "scripts": {
     "postinstall": "cd ios/native && unzip openpgp.framework.zip",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-    "react-native"
-  ],
-  "author": "",
   "license": "Apache2",
   "peerDependencies": {
     "react-native": "^0.59.1"
