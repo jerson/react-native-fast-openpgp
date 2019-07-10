@@ -76,8 +76,8 @@ RCT_REMAP_METHOD(verify,
 {
     
     NSError *error;
-    bool *result = NULL;
-    BOOL output = [OpenpgpNewOpenPGP() verify:signature message:message publicKey:publicKey ret0_:result error:&error];
+    BOOL ret0_;
+    BOOL output = [OpenpgpNewOpenPGP() verify:signature message:message publicKey:publicKey ret0_:&ret0_ error:&error];
     
     if(error!=nil){
         reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
@@ -85,8 +85,7 @@ RCT_REMAP_METHOD(verify,
         if(output){
             resolve(@"1");
         }else{
-            resolve(@"");
-            
+            resolve(NULL);
         }
     }
     
