@@ -1,7 +1,7 @@
 {
   "name": "react-native-fast-openpgp",
-  "version": "0.1.7",
-  "description": "",
+  "version": "0.1.8",
+  "description": "library for use openPGP",
   "main": "index.js",
   "scripts": {
     "postinstall": "cd ios/native && unzip openpgp.framework.zip",
@@ -11,7 +11,7 @@
     "react-native"
   ],
   "author": "",
-  "license": "",
+  "license": "Apache2",
   "peerDependencies": {
     "react-native": "^0.59.1"
   }

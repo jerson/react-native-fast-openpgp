@@ -4,40 +4,40 @@
 
 `$ npm install react-native-fast-openpgp --save`
 
-### Mostly automatic installation
+## Mostly automatic installation
 
 `$ react-native link react-native-fast-openpgp`
 
-### Manual installation
-
-#### iOS with CocoaPods
-
-1. In `Podfile` add
+on `iOS` is required to add this line to `Podfile`
 
 ```ruby
-pod 'RNFastOpenpgp', :path => '../node_modules/react-native-fast-openpgp'
-pod 'OpenPGP', :path => '../node_modules/react-native-fast-openpgp/ios/native'
+pod 'FastOpenpgp', :path => '../node_modules/react-native-fast-openpgp/ios/native'
 ```
 
-2. run `pod install`
+and then Run `pod install`
 
-#### iOS Normal
+## Manual installation
+
+### iOS
 
 1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
 2. Go to `node_modules` ➜ `react-native-fast-openpgp` and add `RNFastOpenpgp.xcodeproj`
 3. In XCode, in the project navigator, select your project. Add `libRNFastOpenpgp.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. Add `$(SRCROOT)/../node_modules/react-native-fast-openpgp/ios` to your main project `Build Settings` ➜ `Framework Search Path`
+4. In `Podfile` add
 
-![Required on ios](https://github.com/jerson/react-native-fast-openpgp/raw/master/docs/ios-settings.png)
+```ruby
+pod 'FastOpenpgp', :path => '../node_modules/react-native-fast-openpgp/ios/native'
+```
 
-5. Run your project (`Cmd+R`)<
+5. Run `pod install`
+6. Run your project (`Cmd+R`)<
 
-#### Android
+### Android
 
 1. Open up `android/app/src/main/java/[...]/MainActivity.java`
 
-- Add `import dev.jerson.RNFastOpenpgpPackage;` to the imports at the top of the file
-- Add `new RNFastOpenpgpPackage()` to the list returned by the `getPackages()` method
+- Add `import dev.jerson.RNFastOpenPGPPackage;` to the imports at the top of the file
+- Add `new RNFastOpenPGPPackage()` to the list returned by the `getPackages()` method
 
 2. Append the following lines to `android/settings.gradle`:
    ```

@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|  
-    s.name              = 'OpenPGP'
+    s.name              = 'FastOpenpgp'
     s.version           = '1.0.0'
-    s.summary           = 'OpenPGP native'
+    s.summary           = 'Openpgp native'
     s.homepage          = 'https://github.com/jerson/openpgp-mobile'
 
     s.author            = { 'Name' => 'me@jerson.dev' }

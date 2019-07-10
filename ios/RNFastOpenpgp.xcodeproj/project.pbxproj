@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		84CB4F5222D5463B00A87746 /* openpgp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84CB4F5122D5463B00A87746 /* openpgp.framework */; };
-		B3E7B58A1CC2AC0600A0062D /* RNFastOpenpgp.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNFastOpenpgp.m */; };
+		B3E7B58A1CC2AC0600A0062D /* RNFastOpenPGP.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNFastOpenPGP.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,8 +26,8 @@
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNFastOpenpgp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNFastOpenpgp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		84CB4F5122D5463B00A87746 /* openpgp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = openpgp.framework; path = native/openpgp.framework; sourceTree = "<group>"; };
-		B3E7B5881CC2AC0600A0062D /* RNFastOpenpgp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNFastOpenpgp.h; sourceTree = "<group>"; };
-		B3E7B5891CC2AC0600A0062D /* RNFastOpenpgp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNFastOpenpgp.m; sourceTree = "<group>"; };
+		B3E7B5881CC2AC0600A0062D /* RNFastOpenPGP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNFastOpenPGP.h; sourceTree = "<group>"; };
+		B3E7B5891CC2AC0600A0062D /* RNFastOpenPGP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNFastOpenPGP.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,8 +53,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				B3E7B5881CC2AC0600A0062D /* RNFastOpenpgp.h */,
-				B3E7B5891CC2AC0600A0062D /* RNFastOpenpgp.m */,
+				B3E7B5881CC2AC0600A0062D /* RNFastOpenPGP.h */,
+				B3E7B5891CC2AC0600A0062D /* RNFastOpenPGP.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				84FEE53322D50ED00041BC25 /* Frameworks */,
 			);
@@ -136,7 +136,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3E7B58A1CC2AC0600A0062D /* RNFastOpenpgp.m in Sources */,
+				B3E7B58A1CC2AC0600A0062D /* RNFastOpenPGP.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
