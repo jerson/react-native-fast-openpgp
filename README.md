@@ -46,7 +46,7 @@ pod 'FastOpenpgp', :path => '../node_modules/react-native-fast-openpgp/ios/nativ
    ```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
    ```
-     compile project(':react-native-fast-openpgp')
+     implementation project(':react-native-fast-openpgp')
    ```
 
 ## Usage
