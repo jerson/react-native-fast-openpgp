@@ -1,0 +1,5 @@
+android/build/
+ios/native/openpgp.framework
+!ios/native/openpgp.framework.zip
+docs/
+*.iml
