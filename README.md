@@ -59,3 +59,7 @@ const encoded = await OpenPGP.encrypt(message, publicKey);
 const signed = await OpenPGP.sign(message, publicKey, privateKey, passphrase);
 const booleanValue = !!(await OpenPGP.verify(signature, message, publicKey));
 ```
+
+## Sample
+
+https://github.com/jerson/react-native-fast-openpgp-sample
