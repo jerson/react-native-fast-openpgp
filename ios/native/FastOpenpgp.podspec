@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|  
     s.name              = 'FastOpenpgp'
-    s.version           = '1.0.0'
+    s.version           = '0.2.0'
     s.summary           = 'Openpgp native'
     s.homepage          = 'https://github.com/jerson/openpgp-mobile'
 
