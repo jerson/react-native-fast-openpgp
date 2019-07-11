@@ -82,8 +82,8 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
         if (map.hasKey("hash")) {
             options.setHash(map.getString("hash"));
         }
-        if (map.hasKey("rsabits")) {
-            options.setRSABits(map.getInt("rsabits"));
+        if (map.hasKey("RSABits")) {
+            options.setRSABits(map.getInt("RSABits"));
         }
         if (map.hasKey("compressionLevel")) {
             options.setCompressionLevel(map.getInt("compressionLevel"));

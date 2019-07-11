@@ -38,10 +38,15 @@ build/
 .gradle
 local.properties
 *.iml
+android/.project
+android/.settings
 
 # BUCK
 buck-out/
 \.buckd/
 *.keystore
+
+# Library
 openpgp.framework
 !openpgp.framework.zip
+lib/
