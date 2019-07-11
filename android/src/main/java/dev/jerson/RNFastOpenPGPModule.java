@@ -1,10 +1,12 @@
 package dev.jerson;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 
 import openpgp.KeyOptions;
 import openpgp.KeyPair;
@@ -135,10 +137,13 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void generate(String message, String passphrase, ReadableMap mapOptions, Promise promise) {
+    public void generate(ReadableMap mapOptions, Promise promise) {
         try {
             Options options = this.getOptions(mapOptions);
-            KeyPair result = instance.generate(options);
+            KeyPair keyPair = instance.generate(options);
+            WritableMap result = Arguments.createMap();
+            result.putString("publicKey", keyPair.getPublicKey());
+            result.putString("privateKey", keyPair.getPrivateKey());
             promise.resolve(result);
         } catch (Exception e) {
             promise.reject(e);
