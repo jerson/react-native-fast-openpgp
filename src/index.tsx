@@ -49,14 +49,14 @@ export default class OpenPGP {
   static decryptSymmetric(
     message: string,
     passphrase: string,
-    options: KeyOptions
+    options?: KeyOptions
   ): Promise<string> {
     return RNFastOpenPGP.decryptSymmetric(message, passphrase, options);
   }
   static encryptSymmetric(
     message: string,
     passphrase: string,
-    options: KeyOptions
+    options?: KeyOptions
   ): Promise<string> {
     return RNFastOpenPGP.encryptSymmetric(message, passphrase, options);
   }
