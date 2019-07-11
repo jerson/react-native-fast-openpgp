@@ -73,6 +73,10 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
 
     private KeyOptions getKeyOptions(ReadableMap map) {
         KeyOptions options = new KeyOptions();
+
+        if (map == null) {
+            return options;
+        }
         if (map.hasKey("cipher")) {
             options.setCipher(map.getString("cipher"));
         }
@@ -94,6 +98,9 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     private Options getOptions(ReadableMap map) {
         Options options = new Options();
 
+        if (map == null) {
+            return options;
+        }
         if (map.hasKey("comment")) {
             options.setComment(map.getString("comment"));
         }
