@@ -1,4 +1,7 @@
 android/build/
+android/.gradle
+.project
+.settings
 ios/native/openpgp.framework
 !ios/native/openpgp.framework.zip
 docs/
