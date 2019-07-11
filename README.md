@@ -54,10 +54,31 @@ pod 'FastOpenpgp', :path => '../node_modules/react-native-fast-openpgp/ios/nativ
 ```javascript
 import OpenPGP from "react-native-fast-openpgp";
 
-const decoded = await OpenPGP.decrypt(message, privateKey, passphrase);
-const encoded = await OpenPGP.encrypt(message, publicKey);
-const signed = await OpenPGP.sign(message, publicKey, privateKey, passphrase);
-const booleanValue = !!(await OpenPGP.verify(signature, message, publicKey));
+interface KeyOptions {
+  cipher?: "aes128" | "aes192" | "aes256";
+  compression?: "none" | "zlib" | "zip";
+  hash?: "sha256" | "sha224" | "sha384" | "sha512";
+  RSABits?: 2048 | 4096 | 1024;
+  compressionLevel?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+}
+interface Options {
+  comment?: string;
+  email?: string;
+  name?: string;
+  keyOptions?: KeyOptions;
+}
+interface KeyPair {
+  publicKey: string;
+  privateKey: string;
+}
+
+const decrypted = await OpenPGP.decrypt(message: string, privateKey: string, passphrase: string): Promise<string>;
+const encrypted = await OpenPGP.encrypt(message: string, publicKey: string): Promise<string>;
+const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
+const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string): Promise<boolean>;
+const decryptedSymmetric = await OpenPGP.decryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
+const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
+const generated = await OpenPGP.generate(options: Options): Promise<KeyPair>;
 ```
 
 ## Sample
