@@ -110,6 +110,9 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
         if (map.hasKey("name")) {
             options.setName(map.getString("name"));
         }
+        if (map.hasKey("passphrase")) {
+            options.setPassphrase(map.getString("passphrase"));
+        }
         if (map.hasKey("keyOptions")) {
             ReadableMap keyOptions = map.getMap("keyOptions");
             if (keyOptions != null) {

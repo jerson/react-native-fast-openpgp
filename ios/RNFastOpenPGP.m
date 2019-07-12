@@ -49,6 +49,9 @@
     if(map[@"comment"]){
         [options setComment:map[@"comment"]];
     }
+    if(map[@"passphrase"]){
+        [options setPassphrase:map[@"passphrase"]];
+    }
     if(map[@"keyOptions"]){
         [options setKeyOptions:[self getKeyOptions:map[@"keyOptions"]]];
     }

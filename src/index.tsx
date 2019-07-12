@@ -13,6 +13,7 @@ interface Options {
   comment?: string;
   email?: string;
   name?: string;
+  passphrase?: string;
   keyOptions?: KeyOptions;
 }
 interface KeyPair {
