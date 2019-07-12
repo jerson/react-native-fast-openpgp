@@ -22,7 +22,7 @@
     "watch": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "license": "Apache-2.0",
+  "license": "MIT",
   "peerDependencies": {
     "react": "*",
     "react-native": ">=0.46"
