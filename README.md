@@ -81,6 +81,14 @@ const decryptedSymmetric = await OpenPGP.decryptSymmetric(message: string, passp
 const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
 const generated = await OpenPGP.generate(options: Options): Promise<KeyPair>;
 ```
+## ProGuard
+
+Add this lines to `proguard-rules.pro` for proguard support 
+
+```proguard
+-keep class go.** { *; }
+-keep class openpgp.** { *; }
+```
 
 ## Sample
 
