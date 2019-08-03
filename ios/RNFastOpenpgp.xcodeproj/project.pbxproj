@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		84CB4F5222D5463B00A87746 /* openpgp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84CB4F5122D5463B00A87746 /* openpgp.framework */; };
+		84CB4F5222D5463B00A87746 /* Openpgp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84CB4F5122D5463B00A87746 /* Openpgp.framework */; };
 		B3E7B58A1CC2AC0600A0062D /* RNFastOpenPGP.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNFastOpenPGP.m */; };
 /* End PBXBuildFile section */
 
@@ -25,7 +25,7 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNFastOpenpgp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNFastOpenpgp.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		84CB4F5122D5463B00A87746 /* openpgp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = openpgp.framework; path = native/openpgp.framework; sourceTree = "<group>"; };
+		84CB4F5122D5463B00A87746 /* Openpgp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Openpgp.framework; path = native/Openpgp.framework; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNFastOpenPGP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNFastOpenPGP.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNFastOpenPGP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNFastOpenPGP.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -35,7 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84CB4F5222D5463B00A87746 /* openpgp.framework in Frameworks */,
+				84CB4F5222D5463B00A87746 /* Openpgp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,7 +63,7 @@
 		84FEE53322D50ED00041BC25 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				84CB4F5122D5463B00A87746 /* openpgp.framework */,
+				84CB4F5122D5463B00A87746 /* Openpgp.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
