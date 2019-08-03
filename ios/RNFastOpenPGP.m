@@ -1,6 +1,6 @@
 
 #import "RNFastOpenPGP.h"
-#import "openpgp/openpgp.h"
+#import "Openpgp/Openpgp.h"
 
 @implementation RNFastOpenPGP
 

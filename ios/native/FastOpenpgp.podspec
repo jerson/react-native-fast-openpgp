@@ -11,5 +11,5 @@ Pod::Spec.new do |s|
     s.source            = { :http => 'https://github.com/jerson/openpgp-mobile' }
 
     s.ios.deployment_target = '8.0'
-    s.ios.vendored_frameworks = 'openpgp.framework'
+    s.ios.vendored_frameworks = 'Openpgp.framework'
 end  
