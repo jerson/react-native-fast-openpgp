@@ -69,7 +69,7 @@ RCT_REMAP_METHOD(encrypt,
 {
    
     NSError *error;
-    NSString * output = [OpenpgpNewOpenPGP() encrypt:message publicKey:publicKey error:&error];
+    NSString * output = [OpenpgpNewFastOpenPGP() encrypt:message publicKey:publicKey error:&error];
     
     if(error!=nil){
         reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
@@ -88,7 +88,7 @@ RCT_REMAP_METHOD(decrypt,
 {
     
     NSError *error;
-    NSString * output = [OpenpgpNewOpenPGP() decrypt:message privateKey:privateKey passphrase:passphrase error:&error];
+    NSString * output = [OpenpgpNewFastOpenPGP() decrypt:message privateKey:privateKey passphrase:passphrase error:&error];
     
     if(error!=nil){
         reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
@@ -108,7 +108,7 @@ RCT_REMAP_METHOD(sign,
 {
     
     NSError *error;
-    NSString * output = [OpenpgpNewOpenPGP() sign:message publicKey:publicKey privateKey:privateKey passphrase:passphrase error:&error];
+    NSString * output = [OpenpgpNewFastOpenPGP() sign:message publicKey:publicKey privateKey:privateKey passphrase:passphrase error:&error];
     
     if(error!=nil){
         reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
@@ -128,7 +128,7 @@ RCT_REMAP_METHOD(verify,
     
     NSError *error;
     BOOL ret0_;
-    BOOL output = [OpenpgpNewOpenPGP() verify:signature message:message publicKey:publicKey ret0_:&ret0_ error:&error];
+    BOOL output = [OpenpgpNewFastOpenPGP() verify:signature message:message publicKey:publicKey ret0_:&ret0_ error:&error];
     
     if(error!=nil){
         reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
@@ -153,7 +153,7 @@ RCT_REMAP_METHOD(decryptSymmetric,
     
     OpenpgpKeyOptions *options = [self getKeyOptions:map];
     NSError *error;
-    NSString * output = [OpenpgpNewOpenPGP() decryptSymmetric:message passphrase:passphrase options:options error:&error];
+    NSString * output = [OpenpgpNewFastOpenPGP() decryptSymmetric:message passphrase:passphrase options:options error:&error];
     
     if(error!=nil){
         reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
@@ -174,7 +174,7 @@ RCT_REMAP_METHOD(encryptSymmetric,
     
     OpenpgpKeyOptions *options = [self getKeyOptions:map];
     NSError *error;
-    NSString * output = [OpenpgpNewOpenPGP() encryptSymmetric:message passphrase:passphrase options:options error:&error];
+    NSString * output = [OpenpgpNewFastOpenPGP() encryptSymmetric:message passphrase:passphrase options:options error:&error];
     
     if(error!=nil){
         reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
@@ -193,7 +193,7 @@ RCT_REMAP_METHOD(generate,
     
     OpenpgpOptions * options = [self getOptions:map];
     NSError *error;
-    OpenpgpKeyPair * output = [OpenpgpNewOpenPGP() generate:options error:&error];
+    OpenpgpKeyPair * output = [OpenpgpNewFastOpenPGP() generate:options error:&error];
     
     if(error!=nil){
         reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);

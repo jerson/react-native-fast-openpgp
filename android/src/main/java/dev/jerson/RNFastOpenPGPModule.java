@@ -10,20 +10,20 @@ import com.facebook.react.bridge.WritableMap;
 
 import openpgp.KeyOptions;
 import openpgp.KeyPair;
-import openpgp.OpenPGP;
+import openpgp.FastOpenPGP;
 import openpgp.Openpgp;
 import openpgp.Options;
 
 public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
-    private final OpenPGP instance;
+    private final FastOpenPGP instance;
 
     public RNFastOpenPGPModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
 
-        instance = Openpgp.newOpenPGP();
+        instance = Openpgp.newFastOpenPGP();
     }
 
     @Override

@@ -18,7 +18,6 @@ Pod::Spec.new do |s|
 
   s.dependency "React"
   s.dependency "FastOpenpgp"
-  s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO' }
 
   #s.subspec "FastOpenpgp" do |o|
   #o.name              = 'FastOpenpgp'
