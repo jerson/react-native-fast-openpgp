@@ -3,10 +3,29 @@ import { NativeModules } from "react-native";
 const { RNFastOpenPGP } = NativeModules;
 
 export interface KeyOptions {
+  /**
+   * required
+   */
+  RSABits: 2048 | 4096 | 1024;
+
+  /**
+   * default: aes128
+   */
   cipher?: "aes128" | "aes192" | "aes256";
+
+  /**
+   * default: none
+   */
   compression?: "none" | "zlib" | "zip";
+
+  /**
+   * default: sha256
+   */
   hash?: "sha256" | "sha224" | "sha384" | "sha512";
-  RSABits?: 2048 | 4096 | 1024;
+
+  /**
+   * default: 0
+   */
   compressionLevel?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 }
 export interface Options {
