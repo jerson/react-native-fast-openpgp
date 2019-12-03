@@ -6,7 +6,7 @@ export interface KeyOptions {
   /**
    * default: 2048
    */
-  RSABits: 2048 | 4096 | 1024;
+  RSABits?: 2048 | 4096 | 1024;
 
   /**
    * default: aes128
