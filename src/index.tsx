@@ -4,7 +4,7 @@ const { RNFastOpenPGP } = NativeModules;
 
 export interface KeyOptions {
   /**
-   * required
+   * default: 2048
    */
   RSABits: 2048 | 4096 | 1024;
 
