@@ -1,4 +1,6 @@
 # react-native-fast-openpgp
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjerson%2Freact-native-fast-openpgp.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjerson%2Freact-native-fast-openpgp?ref=badge_shield)
+
 
 ## Getting started
 
@@ -99,3 +101,7 @@ https://github.com/jerson/react-native-fast-openpgp-sample
 the native library is made in Golang and build with gomobile for faster performance
 
 https://github.com/jerson/openpgp-mobile
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjerson%2Freact-native-fast-openpgp.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjerson%2Freact-native-fast-openpgp?ref=badge_large)
