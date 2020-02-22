@@ -15,15 +15,8 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/jerson/react-native-fast-openpgp.git", :tag => "v#{s.version}" }
   s.source_files  = 'ios/*.{h,m}'
   s.requires_arc = true
-
   s.dependency "React"
-  s.dependency "FastOpenpgp"
-
-  #s.subspec "FastOpenpgp" do |o|
-  #o.name              = 'FastOpenpgp'
-  #o.platform          = :ios
-  #o.ios.deployment_target = '8.0'
-  #o.ios.vendored_frameworks = 'ios/native/openpgp.framework'
-  #end
-  
+  s.preserve_paths = 'ios/Openpgp.framework'
+  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework Openpgp' }
+  s.vendored_frameworks = 'ios/Openpgp.framework'
 end

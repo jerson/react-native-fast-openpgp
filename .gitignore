@@ -47,6 +47,6 @@ buck-out/
 *.keystore
 
 # Library
-openpgp.framework
-!openpgp.framework.zip
+Openpgp.framework
+!Openpgp.framework.zip
 lib/

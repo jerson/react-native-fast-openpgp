@@ -8,14 +8,6 @@
 
 `$ react-native link react-native-fast-openpgp`
 
-on `iOS` is required to add this line to `Podfile`
-
-```ruby
-pod 'FastOpenpgp', :path => '../node_modules/react-native-fast-openpgp/ios/native'
-```
-
-and then Run `pod install`
-
 ## Manual installation
 
 ### iOS
@@ -23,14 +15,7 @@ and then Run `pod install`
 1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
 2. Go to `node_modules` ➜ `react-native-fast-openpgp` and add `RNFastOpenpgp.xcodeproj`
 3. In XCode, in the project navigator, select your project. Add `libRNFastOpenpgp.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. In `Podfile` add
-
-```ruby
-pod 'FastOpenpgp', :path => '../node_modules/react-native-fast-openpgp/ios/native'
-```
-
-5. Run `pod install`
-6. Run your project (`Cmd+R`)<
+4. Run your project (`Cmd+R`)<
 
 ### Android
 
@@ -81,9 +66,10 @@ const decryptedSymmetric = await OpenPGP.decryptSymmetric(message: string, passp
 const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
 const generated = await OpenPGP.generate(options: Options): Promise<KeyPair>;
 ```
+
 ## ProGuard
 
-Add this lines to `proguard-rules.pro` for proguard support 
+Add this lines to `proguard-rules.pro` for proguard support
 
 ```proguard
 -keep class go.** { *; }

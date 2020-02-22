@@ -2,8 +2,8 @@ android/build/
 android/.gradle
 .project
 .settings
-ios/native/openpgp.framework
-!ios/native/openpgp.framework.zip
+Openpgp.framework
+!Openpgp.framework.zip
 docs/
 src/
 !android/src

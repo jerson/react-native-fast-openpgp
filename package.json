@@ -1,6 +1,6 @@
 {
   "name": "react-native-fast-openpgp",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "library for use openPGP",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -16,7 +16,7 @@
   ],
   "author": "Gerson Alexander Pardo Gamez  <me@jerson.dev>",
   "scripts": {
-    "postinstall": "cd ios/native && extract-zip Openpgp.framework.zip",
+    "postinstall": "cd ios && extract-zip Openpgp.framework.zip",
     "prepare": "npm run build",
     "build": "tsc",
     "watch": "tsc --watch",
