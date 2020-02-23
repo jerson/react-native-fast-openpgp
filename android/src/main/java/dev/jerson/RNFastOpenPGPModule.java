@@ -1,5 +1,6 @@
 package dev.jerson;
 
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -32,43 +33,59 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void decrypt(String message, String privateKey, String passphrase, Promise promise) {
-        try {
-            String result = instance.decrypt(message, privateKey, passphrase);
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject(e);
-        }
+    public void decrypt(final String message, final String privateKey, final String passphrase, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    String result = instance.decrypt(message, privateKey, passphrase);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
     }
 
     @ReactMethod
-    public void encrypt(String message, String publicKey, Promise promise) {
-        try {
-            String result = instance.encrypt(message, publicKey);
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject(e);
-        }
+    public void encrypt(final String message, final String publicKey, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    String result = instance.encrypt(message, publicKey);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
     }
 
     @ReactMethod
-    public void sign(String message, String publicKey, String privateKey, String passphrase, Promise promise) {
-        try {
-            String result = instance.sign(message, publicKey, privateKey, passphrase);
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject(e);
-        }
+    public void sign(final String message, final String publicKey, final String privateKey, final String passphrase, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    String result = instance.sign(message, publicKey, privateKey, passphrase);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
     }
 
     @ReactMethod
-    public void verify(String signature, String message, String publicKey, Promise promise) {
-        try {
-            Boolean result = instance.verify(signature, message, publicKey);
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject(e);
-        }
+    public void verify(final String signature, final String message, final String publicKey, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Boolean result = instance.verify(signature, message, publicKey);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
     }
 
     private KeyOptions getKeyOptions(ReadableMap map) {
@@ -124,39 +141,51 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void decryptSymmetric(String message, String passphrase, ReadableMap mapOptions, Promise promise) {
+    public void decryptSymmetric(final String message, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    String result = instance.decryptSymmetric(message, passphrase, options);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
 
-        try {
-            KeyOptions options = this.getKeyOptions(mapOptions);
-            String result = instance.decryptSymmetric(message, passphrase, options);
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject(e);
-        }
     }
 
     @ReactMethod
-    public void encryptSymmetric(String message, String passphrase, ReadableMap mapOptions, Promise promise) {
-        try {
-            KeyOptions options = this.getKeyOptions(mapOptions);
-            String result = instance.encryptSymmetric(message, passphrase, options);
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject(e);
-        }
+    public void encryptSymmetric(final String message, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    String result = instance.encryptSymmetric(message, passphrase, options);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
     }
 
     @ReactMethod
-    public void generate(ReadableMap mapOptions, Promise promise) {
-        try {
-            Options options = this.getOptions(mapOptions);
-            KeyPair keyPair = instance.generate(options);
-            WritableMap result = Arguments.createMap();
-            result.putString("publicKey", keyPair.getPublicKey());
-            result.putString("privateKey", keyPair.getPrivateKey());
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject(e);
-        }
+    public void generate(final ReadableMap mapOptions, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Options options = getOptions(mapOptions);
+                    KeyPair keyPair = instance.generate(options);
+                    WritableMap result = Arguments.createMap();
+                    result.putString("publicKey", keyPair.getPublicKey());
+                    result.putString("privateKey", keyPair.getPrivateKey());
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
     }
 }
