@@ -7,13 +7,21 @@
 @import Openpgp;
 #endif
 
-@implementation RNFastOpenPGP
+@implementation RNFastOpenPGP{
+    OpenpgpFastOpenPGP *_instance;
+}
+
+- (OpenpgpFastOpenPGP *) instance {
+    if ( _instance == nil ) {
+        _instance = OpenpgpNewFastOpenPGP();
+    }
+    return _instance;
+}
 
 - (dispatch_queue_t)methodQueue
 {
     return dispatch_queue_create("fast-openpgp", DISPATCH_QUEUE_SERIAL);
 }
-
 
 - (OpenpgpKeyOptions *)getKeyOptions:(NSDictionary *)map
 {
@@ -74,7 +82,7 @@ RCT_REMAP_METHOD(encrypt,
 {
     @try {
         NSError *error;
-        NSString * output = [OpenpgpNewFastOpenPGP() encrypt:message publicKey:publicKey error:&error];
+        NSString * output = [[self instance] encrypt:message publicKey:publicKey error:&error];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
@@ -96,7 +104,7 @@ RCT_REMAP_METHOD(decrypt,
 {
     @try {
         NSError *error;
-        NSString * output = [OpenpgpNewFastOpenPGP() decrypt:message privateKey:privateKey passphrase:passphrase error:&error];
+        NSString * output = [[self instance] decrypt:message privateKey:privateKey passphrase:passphrase error:&error];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
@@ -119,7 +127,7 @@ RCT_REMAP_METHOD(sign,
 {
     @try {
         NSError *error;
-        NSString * output = [OpenpgpNewFastOpenPGP() sign:message publicKey:publicKey privateKey:privateKey passphrase:passphrase error:&error];
+        NSString * output = [[self instance] sign:message publicKey:publicKey privateKey:privateKey passphrase:passphrase error:&error];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
@@ -142,7 +150,7 @@ RCT_REMAP_METHOD(verify,
     @try {
         NSError *error;
         BOOL ret0_;
-        BOOL output = [OpenpgpNewFastOpenPGP() verify:signature message:message publicKey:publicKey ret0_:&ret0_ error:&error];
+        BOOL output = [[self instance] verify:signature message:message publicKey:publicKey ret0_:&ret0_ error:&error];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
@@ -166,7 +174,7 @@ RCT_REMAP_METHOD(decryptSymmetric,
     @try {
         OpenpgpKeyOptions *options = [self getKeyOptions:map];
         NSError *error;
-        NSString * output = [OpenpgpNewFastOpenPGP() decryptSymmetric:message passphrase:passphrase options:options error:&error];
+        NSString * output = [[self instance] decryptSymmetric:message passphrase:passphrase options:options error:&error];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
@@ -190,7 +198,7 @@ RCT_REMAP_METHOD(encryptSymmetric,
     @try {
         OpenpgpKeyOptions *options = [self getKeyOptions:map];
         NSError *error;
-        NSString * output = [OpenpgpNewFastOpenPGP() encryptSymmetric:message passphrase:passphrase options:options error:&error];
+        NSString * output = [[self instance] encryptSymmetric:message passphrase:passphrase options:options error:&error];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
@@ -212,7 +220,7 @@ RCT_REMAP_METHOD(generate,
     @try {
         OpenpgpOptions * options = [self getOptions:map];
         NSError *error;
-        OpenpgpKeyPair * output = [OpenpgpNewFastOpenPGP() generate:options error:&error];
+        OpenpgpKeyPair * output = [[self instance] generate:options error:&error];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
