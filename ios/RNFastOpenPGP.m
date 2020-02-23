@@ -11,7 +11,7 @@
 
 - (dispatch_queue_t)methodQueue
 {
-    return dispatch_get_main_queue();
+    return dispatch_queue_create("fast-openpgp", DISPATCH_QUEUE_SERIAL);
 }
 
 
@@ -72,16 +72,19 @@ RCT_REMAP_METHOD(encrypt,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-   
-    NSError *error;
-    NSString * output = [OpenpgpNewFastOpenPGP() encrypt:message publicKey:publicKey error:&error];
-    
-    if(error!=nil){
-        reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
-    }else{
-        resolve(output);
+    @try {
+        NSError *error;
+        NSString * output = [OpenpgpNewFastOpenPGP() encrypt:message publicKey:publicKey error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
+        }else{
+            resolve(output);
+        }
     }
-    
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
 }
 
 RCT_REMAP_METHOD(decrypt,
@@ -91,16 +94,19 @@ RCT_REMAP_METHOD(decrypt,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    
-    NSError *error;
-    NSString * output = [OpenpgpNewFastOpenPGP() decrypt:message privateKey:privateKey passphrase:passphrase error:&error];
-    
-    if(error!=nil){
-        reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
-    }else{
-        resolve(output);
+    @try {
+        NSError *error;
+        NSString * output = [OpenpgpNewFastOpenPGP() decrypt:message privateKey:privateKey passphrase:passphrase error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
+        }else{
+            resolve(output);
+        }
     }
-    
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
 }
 
 RCT_REMAP_METHOD(sign,
@@ -111,16 +117,19 @@ RCT_REMAP_METHOD(sign,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    
-    NSError *error;
-    NSString * output = [OpenpgpNewFastOpenPGP() sign:message publicKey:publicKey privateKey:privateKey passphrase:passphrase error:&error];
-    
-    if(error!=nil){
-        reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
-    }else{
-        resolve(output);
+    @try {
+        NSError *error;
+        NSString * output = [OpenpgpNewFastOpenPGP() sign:message publicKey:publicKey privateKey:privateKey passphrase:passphrase error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
+        }else{
+            resolve(output);
+        }
     }
-    
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
 }
 
 RCT_REMAP_METHOD(verify,
@@ -130,21 +139,20 @@ RCT_REMAP_METHOD(verify,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    
-    NSError *error;
-    BOOL ret0_;
-    BOOL output = [OpenpgpNewFastOpenPGP() verify:signature message:message publicKey:publicKey ret0_:&ret0_ error:&error];
-    
-    if(error!=nil){
-        reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
-    }else{
-        if(output){
-            resolve(@"1");
+    @try {
+        NSError *error;
+        BOOL ret0_;
+        BOOL output = [OpenpgpNewFastOpenPGP() verify:signature message:message publicKey:publicKey ret0_:&ret0_ error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
         }else{
-            resolve(NULL);
+            resolve([NSNumber numberWithBool:output]);
         }
     }
-    
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
 }
 
 
@@ -155,17 +163,20 @@ RCT_REMAP_METHOD(decryptSymmetric,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    
-    OpenpgpKeyOptions *options = [self getKeyOptions:map];
-    NSError *error;
-    NSString * output = [OpenpgpNewFastOpenPGP() decryptSymmetric:message passphrase:passphrase options:options error:&error];
-    
-    if(error!=nil){
-        reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
-    }else{
-        resolve(output);
+    @try {
+        OpenpgpKeyOptions *options = [self getKeyOptions:map];
+        NSError *error;
+        NSString * output = [OpenpgpNewFastOpenPGP() decryptSymmetric:message passphrase:passphrase options:options error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
+        }else{
+            resolve(output);
+        }
     }
-    
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
 }
 
 
@@ -176,17 +187,20 @@ RCT_REMAP_METHOD(encryptSymmetric,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    
-    OpenpgpKeyOptions *options = [self getKeyOptions:map];
-    NSError *error;
-    NSString * output = [OpenpgpNewFastOpenPGP() encryptSymmetric:message passphrase:passphrase options:options error:&error];
-    
-    if(error!=nil){
-        reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
-    }else{
-        resolve(output);
+    @try {
+        OpenpgpKeyOptions *options = [self getKeyOptions:map];
+        NSError *error;
+        NSString * output = [OpenpgpNewFastOpenPGP() encryptSymmetric:message passphrase:passphrase options:options error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
+        }else{
+            resolve(output);
+        }
     }
-    
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
 }
 
 
@@ -195,20 +209,23 @@ RCT_REMAP_METHOD(generate,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    
-    OpenpgpOptions * options = [self getOptions:map];
-    NSError *error;
-    OpenpgpKeyPair * output = [OpenpgpNewFastOpenPGP() generate:options error:&error];
-    
-    if(error!=nil){
-        reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
-    }else{
-        resolve(@{
-                  @"publicKey":output.publicKey,
-                  @"privateKey":output.privateKey,
-                });
+    @try {
+        OpenpgpOptions * options = [self getOptions:map];
+        NSError *error;
+        OpenpgpKeyPair * output = [OpenpgpNewFastOpenPGP() generate:options error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
+        }else{
+            resolve(@{
+                      @"publicKey":output.publicKey,
+                      @"privateKey":output.privateKey,
+                    });
+        }
     }
-    
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
 }
 
 @end
