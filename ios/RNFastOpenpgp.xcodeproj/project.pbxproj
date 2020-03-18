@@ -25,7 +25,7 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNFastOpenpgp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNFastOpenpgp.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		84CB4F5122D5463B00A87746 /* Openpgp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Openpgp.framework; path = native/Openpgp.framework; sourceTree = "<group>"; };
+		84CB4F5122D5463B00A87746 /* Openpgp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Openpgp.framework; path = Openpgp.framework; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNFastOpenPGP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNFastOpenPGP.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNFastOpenPGP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNFastOpenPGP.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
