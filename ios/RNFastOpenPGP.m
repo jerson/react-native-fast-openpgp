@@ -38,12 +38,14 @@
     if(map[@"hash"]){
         [options setHash:map[@"hash"]];
     }
+    
     if(map[@"RSABits"]){
-        [options setRsaBits:[map[@"RSABits"] longValue]];
+        [options setRSABitsFromString:[NSString stringWithFormat:@"%.0f",[map[@"RSABits"] floatValue]]];
     }
     if(map[@"compressionLevel"]){
-        [options setCompressionLevel:[map[@"compressionLevel"] longValue]];
+        [options setCompressionLevelFromString:[NSString stringWithFormat:@"%.0f",[map[@"compressionLevel"] floatValue]]];
     }
+    
     return options;
 }
 
