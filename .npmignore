@@ -8,3 +8,6 @@ docs/
 src/
 !android/src
 *.iml
+.idea
+.gradle
+local.properties
