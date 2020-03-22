@@ -1,5 +1,3 @@
-android/build/
-android/.gradle
 .project
 .settings
 Openpgp.framework
@@ -7,6 +5,7 @@ Openpgp.framework
 docs/
 src/
 !android/src
+build/
 *.iml
 .idea
 .gradle
