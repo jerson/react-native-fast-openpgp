@@ -1,10 +1,13 @@
-.project
-.settings
 Openpgp.framework
 !Openpgp.framework.zip
+Rsa.framework
+!Rsa.framework.zip
+xcuserdata
+.project
+.settings
+!android/src
 docs/
 src/
-!android/src
 build/
 *.iml
 .idea
