@@ -67,6 +67,32 @@ const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passp
 const generated = await OpenPGP.generate(options: Options): Promise<KeyPair>;
 ```
 
+### Encrypt with multiple keys
+
+```javascript
+const publicKeys = `
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQENBF0Tpe0BCADm+ja4vMKuodkQEhLm/092M/6gt4TaKwzv8QcA53/FrM3g8wab
+D4m65Neoc7DBEdvzgK9IUMpwG5N0t+0pfWLhs8AZdMxE7RbP
+=kbtq
+-----END PGP PUBLIC KEY BLOCK-----
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQENBF0Tpe0BCADm+ja4vMKuodkQEhLm/092M/6gt4TaKwzv8QcA53/FrM3g8wab
+D4m65Neoc7DBEdvzgK9IUMpwG5N0t+0pfWLhs8AZdMxE7RbP
+=kbtq
+-----END PGP PUBLIC KEY BLOCK-----
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQENBF0Tpe0BCADm+ja4vMKuodkQEhLm/092M/6gt4TaKwzv8QcA53/FrM3g8wab
+D4m65Neoc7DBEdvzgK9IUMpwG5N0t+0pfWLhs8AZdMxE7RbP
+=kbtq
+-----END PGP PUBLIC KEY BLOCK-----
+`;
+const encrypted = await OpenPGP.encrypt("sample text" publicKeys);
+```
+
 ## Android
 ### ProGuard
 
