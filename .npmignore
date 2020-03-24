@@ -11,3 +11,4 @@ build/
 .idea
 .gradle
 local.properties
+.github
