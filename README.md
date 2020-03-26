@@ -103,7 +103,12 @@ Add this lines to `android/app/proguard-rules.pro` for proguard support
 
 ## Sample
 
-https://github.com/jerson/react-native-fast-openpgp-sample
+inside `example` dir you can run
+
+```bash
+npm start
+npm run android
+```
 
 ## Native Code
 
