@@ -250,7 +250,7 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
                     KeyOptions options = getKeyOptions(mapOptions);
                     byte[] result = instance.decryptSymmetricBytes(readFile(inputFile), passphrase, options);
                     writeFile(result, outputFile);
-                    promise.resolve(result);
+                    promise.resolve(outputFile);
                 } catch (Exception e) {
                     promise.reject(e);
                 }
@@ -282,7 +282,7 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
                     KeyOptions options = getKeyOptions(mapOptions);
                     byte[] result = instance.encryptSymmetricBytes(readFile(inputFile), passphrase, options);
                     writeFile(result, outputFile);
-                    promise.resolve(result);
+                    promise.resolve(outputFile);
                 } catch (Exception e) {
                     promise.reject(e);
                 }
