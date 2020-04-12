@@ -97,6 +97,32 @@ RCT_REMAP_METHOD(encrypt,
     }
 }
 
+// thanks to @jdmunro
+RCT_REMAP_METHOD(encryptFile,
+                 encryptFileWith: (NSString *)inputFile
+                 outputFile: (NSString *)outputFile
+                 publicKey: (NSString *)publicKey
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        NSError *error;
+        NSData *dataFromFile = [NSData dataWithContentsOfFile:inputFile];
+        NSData *output = [[self instance] encryptBytes:dataFromFile publicKey:publicKey error:&error];
+        
+        [output writeToFile:outputFile atomically:YES];
+        
+        if (error != nil) {
+            reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
+        } else {
+            resolve(nil);
+        }
+    }
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
+}
+
 RCT_REMAP_METHOD(decrypt,
                  decryptWith: (NSString *)message
                  privateKey: (NSString *)privateKey
@@ -112,6 +138,32 @@ RCT_REMAP_METHOD(decrypt,
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
         }else{
             resolve(output);
+        }
+    }
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
+}
+
+RCT_REMAP_METHOD(decryptFile,
+                 decryptFileWith: (NSString *)inputFile
+                 outputFile: (NSString *)outputFile
+                 privateKey: (NSString *)privateKey
+                 passphrase: (NSString *)passphrase
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        NSError *error;
+        NSData *dataFromFile = [NSData dataWithContentsOfFile:inputFile];
+        NSData *output = [[self instance] decryptBytes:dataFromFile privateKey:privateKey passphrase:passphrase error:&error];
+        
+        [output writeToFile:outputFile atomically:YES];
+        
+        if (error != nil) {
+            reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
+        } else {
+            resolve(nil);
         }
     }
     @catch (NSException * e) {
@@ -142,6 +194,30 @@ RCT_REMAP_METHOD(sign,
     }
 }
 
+RCT_REMAP_METHOD(signFile,
+                 signFileWith: (NSString *)inputFile
+                 publicKey: (NSString *)publicKey
+                 privateKey: (NSString *)privateKey
+                 passphrase: (NSString *)passphrase
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        NSError *error;
+        NSData *dataFromFile = [NSData dataWithContentsOfFile:inputFile];
+        NSString * output = [[self instance] signBytes:dataFromFile publicKey:publicKey privateKey:privateKey passphrase:passphrase error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
+        }else{
+            resolve(output);
+        }
+    }
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
+}
+
 RCT_REMAP_METHOD(verify,
                  signWith: (NSString *)signature
                  message: (NSString *)message
@@ -153,6 +229,30 @@ RCT_REMAP_METHOD(verify,
         NSError *error;
         BOOL ret0_;
         BOOL output = [[self instance] verify:signature message:message publicKey:publicKey ret0_:&ret0_ error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
+        }else{
+            resolve([NSNumber numberWithBool:output]);
+        }
+    }
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
+}
+
+RCT_REMAP_METHOD(verifyFile,
+                 verifyFileWith: (NSString *)signature
+                 message: (NSString *)inputFile
+                 publicKey: (NSString *)publicKey
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        NSError *error;
+        BOOL ret0_;
+        NSData *dataFromFile = [NSData dataWithContentsOfFile:inputFile];
+        BOOL output = [[self instance] verifyBytes:signature message:dataFromFile publicKey:publicKey ret0_:&ret0_ error:&error];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
@@ -190,6 +290,33 @@ RCT_REMAP_METHOD(decryptSymmetric,
 }
 
 
+RCT_REMAP_METHOD(decryptSymmetricFile,
+                  decryptSymmetricFileWith: (NSString *)inputFile
+                  outputFile: (NSString *)outputFile
+                  passphrase: (NSString *)passphrase
+                  options:(NSDictionary *)map
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        OpenpgpKeyOptions *options = [self getKeyOptions:map];
+        NSError *error;
+        NSData *dataFromFile = [NSData dataWithContentsOfFile:inputFile];
+        NSData * output = [[self instance] decryptSymmetricBytes:dataFromFile passphrase:passphrase options:options error:&error];
+        [output writeToFile:outputFile atomically:YES];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
+        }else{
+            resolve(output);
+        }
+    }
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
+}
+
+
 RCT_REMAP_METHOD(encryptSymmetric,
                  encryptSymmetricWith: (NSString *)message
                  passphrase: (NSString *)passphrase
@@ -201,6 +328,33 @@ RCT_REMAP_METHOD(encryptSymmetric,
         OpenpgpKeyOptions *options = [self getKeyOptions:map];
         NSError *error;
         NSString * output = [[self instance] encryptSymmetric:message passphrase:passphrase options:options error:&error];
+        
+        if(error!=nil){
+            reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
+        }else{
+            resolve(output);
+        }
+    }
+    @catch (NSException * e) {
+        reject(@"exception", e.reason, nil);
+    }
+}
+
+
+RCT_REMAP_METHOD(encryptSymmetricFile,
+                 encryptSymmetricFileWith: (NSString *)inputFile
+                 outputFile: (NSString *)outputFile
+                 passphrase: (NSString *)passphrase
+                 options:(NSDictionary *)map
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        OpenpgpKeyOptions *options = [self getKeyOptions:map];
+        NSError *error;
+        NSData *dataFromFile = [NSData dataWithContentsOfFile:inputFile];
+        NSData * output = [[self instance] encryptSymmetricBytes:dataFromFile passphrase:passphrase options:options error:&error];
+        [output writeToFile:outputFile atomically:YES];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
