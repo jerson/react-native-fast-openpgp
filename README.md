@@ -59,12 +59,17 @@ interface KeyPair {
 }
 
 const decrypted = await OpenPGP.decrypt(message: string, privateKey: string, passphrase: string): Promise<string>;
-const decrypted = await OpenPGP.decryptFile(inputFile: string, outputFile: string, privateKey: string, passphrase: string): Promise<string>;
+const outputFile = await OpenPGP.decryptFile(inputFile: string, outputFile: string, privateKey: string, passphrase: string): Promise<string>;
 const encrypted = await OpenPGP.encrypt(message: string, publicKey: string): Promise<string>;
+const outputFile = await OpenPGP.encryptFile(inputFile: string, outputFile: string, publicKey: string): Promise<string>;
 const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
+const signed = await OpenPGP.signFile(inputFile: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
 const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string): Promise<boolean>;
+const verified = await OpenPGP.verifyFile(signature: string, inputFile: string, publicKey: string): Promise<boolean>;
 const decryptedSymmetric = await OpenPGP.decryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
+const outputFile = await OpenPGP.decryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, options?: KeyOptions): Promise<string>;
 const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
+const outputFile = await OpenPGP.encryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, options?: KeyOptions): Promise<string>;
 const generated = await OpenPGP.generate(options: Options): Promise<KeyPair>;
 ```
 
