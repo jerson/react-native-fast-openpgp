@@ -205,7 +205,7 @@ RCT_REMAP_METHOD(signFile,
     @try {
         NSError *error;
         NSData *dataFromFile = [NSData dataWithContentsOfFile:inputFile];
-        NSString * output = [[self instance] signBytes:dataFromFile publicKey:publicKey privateKey:privateKey passphrase:passphrase error:&error];
+        NSString * output = [[self instance] signBytesToString:dataFromFile publicKey:publicKey privateKey:privateKey passphrase:passphrase error:&error];
         
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
