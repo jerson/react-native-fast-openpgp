@@ -36,6 +36,7 @@
 
 ## Usage
 
+### Types
 ```javascript
 import OpenPGP from "react-native-fast-openpgp";
 
@@ -57,25 +58,65 @@ interface KeyPair {
   publicKey: string;
   privateKey: string;
 }
+```
+
+### Encrypt methods
+```javascript
+import OpenPGP from "react-native-fast-openpgp";
+
+const encrypted = await OpenPGP.encrypt(message: string, publicKey: string): Promise<string>;
+const outputFile = await OpenPGP.encryptFile(inputFile: string, outputFile: string, publicKey: string): Promise<string>;
+
+const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
+const outputFile = await OpenPGP.encryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, options?: KeyOptions): Promise<string>;
+```
+
+### Decrypt methods
+```javascript
+import OpenPGP from "react-native-fast-openpgp";
 
 const decrypted = await OpenPGP.decrypt(message: string, privateKey: string, passphrase: string): Promise<string>;
 const outputFile = await OpenPGP.decryptFile(inputFile: string, outputFile: string, privateKey: string, passphrase: string): Promise<string>;
-const encrypted = await OpenPGP.encrypt(message: string, publicKey: string): Promise<string>;
-const outputFile = await OpenPGP.encryptFile(inputFile: string, outputFile: string, publicKey: string): Promise<string>;
-const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
-const signed = await OpenPGP.signFile(inputFile: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
-const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string): Promise<boolean>;
-const verified = await OpenPGP.verifyFile(signature: string, inputFile: string, publicKey: string): Promise<boolean>;
+
 const decryptedSymmetric = await OpenPGP.decryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
 const outputFile = await OpenPGP.decryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, options?: KeyOptions): Promise<string>;
-const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
-const outputFile = await OpenPGP.encryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, options?: KeyOptions): Promise<string>;
+```
+
+### Sign and Verify methods
+```javascript
+import OpenPGP from "react-native-fast-openpgp";
+
+const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
+const signed = await OpenPGP.signFile(inputFile: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
+
+const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string): Promise<boolean>;
+const verified = await OpenPGP.verifyFile(signature: string, inputFile: string, publicKey: string): Promise<boolean>;
+```
+
+### Sign and Verify methods
+```javascript
+import OpenPGP from "react-native-fast-openpgp";
+
+const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
+const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string): Promise<boolean>;
+
+const signed = await OpenPGP.signFile(inputFile: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
+const verified = await OpenPGP.verifyFile(signature: string, inputFile: string, publicKey: string): Promise<boolean>;
+```
+
+
+### Generate
+```javascript
+import OpenPGP from "react-native-fast-openpgp";
+
 const generated = await OpenPGP.generate(options: Options): Promise<KeyPair>;
 ```
 
 ### Encrypt with multiple keys
 
 ```javascript
+import OpenPGP from "react-native-fast-openpgp";
+
 const publicKeys = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mQENBF0Tpe0BCADm+ja4vMKuodkQEhLm/092M/6gt4TaKwzv8QcA53/FrM3g8wab
