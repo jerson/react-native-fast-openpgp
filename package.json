@@ -1,6 +1,6 @@
 {
   "name": "react-native-fast-openpgp",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "library for use openPGP",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
