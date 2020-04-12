@@ -79,12 +79,11 @@ export default class OpenPGP {
   }
   static signFile(
     inputFile: string,
-    outputFile: string,
     publicKey: string,
     privateKey: string,
     passphrase: string
   ): Promise<string> {
-    return RNFastOpenPGP.signFile(inputFile, outputFile, publicKey, privateKey, passphrase);
+    return RNFastOpenPGP.signFile(inputFile, publicKey, privateKey, passphrase);
   }
   static verify(
     signature: string,
