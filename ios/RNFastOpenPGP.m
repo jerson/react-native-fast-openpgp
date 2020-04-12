@@ -115,7 +115,7 @@ RCT_REMAP_METHOD(encryptFile,
         if (error != nil) {
             reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
         } else {
-            resolve(nil);
+            resolve(outputFile);
         }
     }
     @catch (NSException * e) {
@@ -163,7 +163,7 @@ RCT_REMAP_METHOD(decryptFile,
         if (error != nil) {
             reject([NSString stringWithFormat:@"%ld",[error code]], [error description],error);
         } else {
-            resolve(nil);
+            resolve(outputFile);
         }
     }
     @catch (NSException * e) {
@@ -308,7 +308,7 @@ RCT_REMAP_METHOD(decryptSymmetricFile,
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
         }else{
-            resolve(output);
+            resolve(outputFile);
         }
     }
     @catch (NSException * e) {
@@ -359,7 +359,7 @@ RCT_REMAP_METHOD(encryptSymmetricFile,
         if(error!=nil){
             reject([NSString stringWithFormat:@"%ld",(long)[error code]], [error description],error);
         }else{
-            resolve(output);
+            resolve(outputFile);
         }
     }
     @catch (NSException * e) {

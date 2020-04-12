@@ -25,12 +25,12 @@
 - Add `new RNFastOpenPGPPackage()` to the list returned by the `getPackages()` method
 
 2. Append the following lines to `android/settings.gradle`:
-   ```
+   ```groovy
    include ':react-native-fast-openpgp'
    project(':react-native-fast-openpgp').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-fast-openpgp/android')
    ```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-   ```
+   ```groovy
      implementation project(':react-native-fast-openpgp')
    ```
 
@@ -59,6 +59,7 @@ interface KeyPair {
 }
 
 const decrypted = await OpenPGP.decrypt(message: string, privateKey: string, passphrase: string): Promise<string>;
+const decrypted = await OpenPGP.decryptFile(inputFile: string, outputFile: string, privateKey: string, passphrase: string): Promise<string>;
 const encrypted = await OpenPGP.encrypt(message: string, publicKey: string): Promise<string>;
 const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
 const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string): Promise<boolean>;
@@ -114,4 +115,4 @@ npm run android
 
 the native library is made in Golang and build with gomobile for faster performance
 
-https://github.com/jerson/openpgp-mobile
+<https://github.com/jerson/openpgp-mobile>
