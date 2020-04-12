@@ -9,6 +9,14 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
 import openpgp.KeyOptions;
 import openpgp.KeyPair;
 import openpgp.FastOpenPGP;
@@ -32,12 +40,40 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
         return "RNFastOpenPGP";
     }
 
+
+    private byte[] readFile(String filePath) throws IOException {
+        File file = new File(filePath);
+        int size = (int) file.length();
+        byte[] bytes = new byte[size];
+
+        BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+        buf.read(bytes, 0, bytes.length);
+        buf.close();
+
+        return bytes;
+    }
+
     @ReactMethod
     public void decrypt(final String message, final String privateKey, final String passphrase, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
                     String result = instance.decrypt(message, privateKey, passphrase);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
+    }
+
+    @ReactMethod
+    public void decryptFile(final String filePath, final String privateKey, final String passphrase, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+
+                    String result = instance.decryptBytes(readFile(filePath), privateKey, passphrase);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -61,6 +97,20 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void encryptFile(final String filePath, final String publicKey, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    String result = instance.encryptBytes(readFile(filePath), publicKey);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
+    }
+
+    @ReactMethod
     public void sign(final String message, final String publicKey, final String privateKey, final String passphrase, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
@@ -75,11 +125,39 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void signFile(final String filePath, final String publicKey, final String privateKey, final String passphrase, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    String result = instance.signBytes(readFile(filePath), publicKey, privateKey, passphrase);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
+    }
+
+    @ReactMethod
     public void verify(final String signature, final String message, final String publicKey, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
                     Boolean result = instance.verify(signature, message, publicKey);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
+    }
+
+    @ReactMethod
+    public void verifyFile(final String signature, final String filePath, final String publicKey, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Boolean result = instance.verifyBytes(signature, readFile(filePath), publicKey);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -157,6 +235,22 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void decryptSymmetricFile(final String filePath, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    String result = instance.decryptSymmetricBytes(readFile(filePath), passphrase, options);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
+
+    }
+
+    @ReactMethod
     public void encryptSymmetric(final String message, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
@@ -170,6 +264,22 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
             }
         }).start();
     }
+
+    @ReactMethod
+    public void encryptSymmetricFile(final String filePath, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    String result = instance.encryptSymmetricBytes(readFile(filePath), passphrase, options);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        }).start();
+    }
+
 
     @ReactMethod
     public void generate(final ReadableMap mapOptions, final Promise promise) {
