@@ -137,7 +137,7 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    String result = instance.signBytes(readFile(inputFile), publicKey, privateKey, passphrase);
+                    String result = instance.signBytesToString(readFile(inputFile), publicKey, privateKey, passphrase);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
