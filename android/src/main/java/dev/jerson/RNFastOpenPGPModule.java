@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -41,8 +42,8 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
 
-    private byte[] readFile(String filePath) throws IOException {
-        File file = new File(filePath);
+    private byte[] readFile(String inputFile) throws IOException {
+        File file = new File(inputFile);
         int size = (int) file.length();
         byte[] bytes = new byte[size];
 
@@ -51,6 +52,12 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
         buf.close();
 
         return bytes;
+    }
+
+    private void writeFile(byte[] data, String inputFile) throws IOException {
+        FileOutputStream out = new FileOutputStream(inputFile);
+        out.write(data);
+        out.close();
     }
 
     @ReactMethod
@@ -68,13 +75,13 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void decryptFile(final String filePath, final String privateKey, final String passphrase, final Promise promise) {
+    public void decryptFile(final String inputFile, final String outputFile, final String privateKey, final String passphrase, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-
-                    String result = instance.decryptBytes(readFile(filePath), privateKey, passphrase);
-                    promise.resolve(result);
+                    byte[] result = instance.decryptBytes(readFile(inputFile), privateKey, passphrase);
+                    writeFile(result, outputFile);
+                    promise.resolve(outputFile);
                 } catch (Exception e) {
                     promise.reject(e);
                 }
@@ -97,12 +104,13 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void encryptFile(final String filePath, final String publicKey, final Promise promise) {
+    public void encryptFile(final String inputFile, final String outputFile, final String publicKey, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    String result = instance.encryptBytes(readFile(filePath), publicKey);
-                    promise.resolve(result);
+                    byte[] result = instance.encryptBytes(readFile(inputFile), publicKey);
+                    writeFile(result, outputFile);
+                    promise.resolve(outputFile);
                 } catch (Exception e) {
                     promise.reject(e);
                 }
@@ -125,11 +133,11 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void signFile(final String filePath, final String publicKey, final String privateKey, final String passphrase, final Promise promise) {
+    public void signFile(final String inputFile, final String publicKey, final String privateKey, final String passphrase, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    String result = instance.signBytes(readFile(filePath), publicKey, privateKey, passphrase);
+                    String result = instance.signBytes(readFile(inputFile), publicKey, privateKey, passphrase);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -153,11 +161,11 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void verifyFile(final String signature, final String filePath, final String publicKey, final Promise promise) {
+    public void verifyFile(final String signature, final String inputFile, final String publicKey, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    Boolean result = instance.verifyBytes(signature, readFile(filePath), publicKey);
+                    Boolean result = instance.verifyBytes(signature, readFile(inputFile), publicKey);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -235,12 +243,13 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void decryptSymmetricFile(final String filePath, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
+    public void decryptSymmetricFile(final String inputFile, final String outputFile, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
                     KeyOptions options = getKeyOptions(mapOptions);
-                    String result = instance.decryptSymmetricBytes(readFile(filePath), passphrase, options);
+                    byte[] result = instance.decryptSymmetricBytes(readFile(inputFile), passphrase, options);
+                    writeFile(result, outputFile);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -266,12 +275,13 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void encryptSymmetricFile(final String filePath, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
+    public void encryptSymmetricFile(final String inputFile, final String outputFile, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
                     KeyOptions options = getKeyOptions(mapOptions);
-                    String result = instance.encryptSymmetricBytes(readFile(filePath), passphrase, options);
+                    byte[] result = instance.encryptSymmetricBytes(readFile(inputFile), passphrase, options);
+                    writeFile(result, outputFile);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);

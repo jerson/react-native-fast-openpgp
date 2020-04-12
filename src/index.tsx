@@ -49,11 +49,12 @@ export default class OpenPGP {
     return RNFastOpenPGP.decrypt(message, privateKey, passphrase);
   }
   static decryptFile(
-    filePath: string,
+    inputFile: string,
+    outputFile: string,
     privateKey: string,
     passphrase: string
   ): Promise<string> {
-    return RNFastOpenPGP.decryptFile(filePath, privateKey, passphrase);
+    return RNFastOpenPGP.decryptFile(inputFile, outputFile, privateKey, passphrase);
   }
   static encrypt(
     message: string, 
@@ -62,10 +63,11 @@ export default class OpenPGP {
     return RNFastOpenPGP.encrypt(message, publicKey);
   }
   static encryptFile(
-    filePath: string, 
+    inputFile: string, 
+    outputFile: string,
     publicKey: string
   ): Promise<string> {
-    return RNFastOpenPGP.encryptFile(filePath, publicKey);
+    return RNFastOpenPGP.encryptFile(inputFile, outputFile, publicKey);
   }
   static sign(
     message: string,
@@ -76,12 +78,13 @@ export default class OpenPGP {
     return RNFastOpenPGP.sign(message, publicKey, privateKey, passphrase);
   }
   static signFile(
-    filePath: string,
+    inputFile: string,
+    outputFile: string,
     publicKey: string,
     privateKey: string,
     passphrase: string
   ): Promise<string> {
-    return RNFastOpenPGP.signFile(filePath, publicKey, privateKey, passphrase);
+    return RNFastOpenPGP.signFile(inputFile, outputFile, publicKey, privateKey, passphrase);
   }
   static verify(
     signature: string,
@@ -92,10 +95,10 @@ export default class OpenPGP {
   }
   static verifyFile(
     signature: string,
-    filePath: string,
+    inputFile: string,
     publicKey: string
   ): Promise<boolean> {
-    return RNFastOpenPGP.verifyFile(signature, filePath, publicKey);
+    return RNFastOpenPGP.verifyFile(signature, inputFile, publicKey);
   }
   static decryptSymmetric(
     message: string,
@@ -105,11 +108,12 @@ export default class OpenPGP {
     return RNFastOpenPGP.decryptSymmetric(message, passphrase, options);
   }
   static decryptSymmetricFile(
-    filePath: string,
+    inputFile: string,
+    outputFile: string,
     passphrase: string,
     options?: KeyOptions
   ): Promise<string> {
-    return RNFastOpenPGP.decryptSymmetricFile(filePath, passphrase, options);
+    return RNFastOpenPGP.decryptSymmetricFile(inputFile, outputFile, passphrase, options);
   }
   static encryptSymmetric(
     message: string,
@@ -119,11 +123,12 @@ export default class OpenPGP {
     return RNFastOpenPGP.encryptSymmetric(message, passphrase, options);
   }
   static encryptSymmetricFile(
-    filePath: string,
+    inputFile: string,
+    outputFile: string,
     passphrase: string,
     options?: KeyOptions
   ): Promise<string> {
-    return RNFastOpenPGP.encryptSymmetricFile(filePath, passphrase, options);
+    return RNFastOpenPGP.encryptSymmetricFile(inputFile, outputFile, passphrase, options);
   }
   static generate(options: Options): Promise<KeyPair> {
     return RNFastOpenPGP.generate(options);
