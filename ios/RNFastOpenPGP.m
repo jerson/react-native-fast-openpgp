@@ -219,7 +219,7 @@ RCT_REMAP_METHOD(signFile,
 }
 
 RCT_REMAP_METHOD(verify,
-                 signWith: (NSString *)signature
+                 verifyWith: (NSString *)signature
                  message: (NSString *)message
                  publicKey: (NSString *)publicKey
                  resolver:(RCTPromiseResolveBlock)resolve
