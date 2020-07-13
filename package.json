@@ -16,7 +16,7 @@
   ],
   "author": "Gerson Alexander Pardo Gamez  <jeral17@gmail.com>",
   "scripts": {
-    "postinstall": "cd ios && extract-zip Openpgp.framework.zip",
+    "postinstall": "cd ios && rm -rf Openpgp.framework && extract-zip Openpgp.framework.zip",
     "prepare": "npm run build",
     "build": "tsc",
     "watch": "tsc --watch",
