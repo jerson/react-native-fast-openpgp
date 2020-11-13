@@ -30,8 +30,8 @@ repositories {
     mavenCentral() 
 }
 dependencies {
-    implementation files('libs/openpgp.aar')
-    implementation files('libs/openpgp-sources.jar')
+    implementation files('libs/Openpgp.aar')
+    implementation files('libs/Openpgp-sources.jar')
     implementation 'com.facebook.react:react-native:+'
 }
   
