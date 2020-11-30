@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+#######################################################
+# Usage:                                              #
+# ./upgrade_bridge_libs.sh                            #
+#                                                     #
+# or custom version:                                  #
+# VERSION=v0.1.1 ./upgrade_bridge_libs.sh             #
+#######################################################
 
 REPO="jerson/openpgp-mobile"
 NAME="gomobile_openpgp"
@@ -6,6 +13,10 @@ FRAMEWORK="Openpgp"
 PLATFORMS=("android_aar" "ios_framework")
 OUTPUT_DIRS=("android/libs" "ios")
 OUTPUT_SUB_DIRS=("" "")
+
+#######################################################
+# you shouldn't edit below this line                  #
+#######################################################
 
 
 echo "Get latest release"
@@ -15,7 +26,8 @@ get_version() {
   echo "$RELEASE_PAYLOAD" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
 }
 
-VERSION=$(get_version $REPO)
+LATEST_VERSION=$(get_version $REPO)
+VERSION=${VERSION:-$LATEST_VERSION}
 
 rm -rf ios/${FRAMEWORK}.framework.zip ios/${FRAMEWORK}.framework
 
