@@ -18,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 
+import openpgp.Entity;
+import openpgp.FileHints;
 import openpgp.KeyOptions;
 import openpgp.KeyPair;
 import openpgp.FastOpenPGP;
@@ -26,12 +28,10 @@ import openpgp.Options;
 
 public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
 
-    private final ReactApplicationContext reactContext;
     private final FastOpenPGP instance;
 
     public RNFastOpenPGPModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        this.reactContext = reactContext;
 
         instance = Openpgp.newFastOpenPGP();
     }
@@ -61,11 +61,12 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void decrypt(final String message, final String privateKey, final String passphrase, final Promise promise) {
+    public void decrypt(final String message, final String privateKey, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    String result = instance.decrypt(message, privateKey, passphrase);
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    String result = instance.decrypt(message, privateKey, passphrase, options);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -75,11 +76,12 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void decryptFile(final String inputFile, final String outputFile, final String privateKey, final String passphrase, final Promise promise) {
+    public void decryptFile(final String inputFile, final String outputFile, final String privateKey, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    byte[] result = instance.decryptBytes(readFile(inputFile), privateKey, passphrase);
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    byte[] result = instance.decryptBytes(readFile(inputFile), privateKey, passphrase, options);
                     writeFile(result, outputFile);
                     promise.resolve(outputFile);
                 } catch (Exception e) {
@@ -90,11 +92,14 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void encrypt(final String message, final String publicKey, final Promise promise) {
+    public void encrypt(final String message, final String publicKey, final ReadableMap mapEntity, final ReadableMap mapFileHints, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    String result = instance.encrypt(message, publicKey);
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    FileHints fileHints = getFileHints(mapFileHints);
+                    Entity signedEntity = getEntity(mapEntity);
+                    String result = instance.encrypt(message, publicKey, signedEntity, fileHints, options);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -104,11 +109,14 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void encryptFile(final String inputFile, final String outputFile, final String publicKey, final Promise promise) {
+    public void encryptFile(final String inputFile, final String outputFile, final String publicKey, final ReadableMap mapEntity, final ReadableMap mapFileHints, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    byte[] result = instance.encryptBytes(readFile(inputFile), publicKey);
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    FileHints fileHints = getFileHints(mapFileHints);
+                    Entity signedEntity = getEntity(mapEntity);
+                    byte[] result = instance.encryptBytes(readFile(inputFile), publicKey, signedEntity, fileHints, options);
                     writeFile(result, outputFile);
                     promise.resolve(outputFile);
                 } catch (Exception e) {
@@ -119,11 +127,12 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void sign(final String message, final String publicKey, final String privateKey, final String passphrase, final Promise promise) {
+    public void sign(final String message, final String publicKey, final String privateKey, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    String result = instance.sign(message, publicKey, privateKey, passphrase);
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    String result = instance.sign(message, publicKey, privateKey, passphrase, options);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -133,11 +142,12 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void signFile(final String inputFile, final String publicKey, final String privateKey, final String passphrase, final Promise promise) {
+    public void signFile(final String inputFile, final String publicKey, final String privateKey, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    String result = instance.signBytesToString(readFile(inputFile), publicKey, privateKey, passphrase);
+                    KeyOptions options = getKeyOptions(mapOptions);
+                    String result = instance.signBytesToString(readFile(inputFile), publicKey, privateKey, passphrase, options);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -174,58 +184,6 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
         }).start();
     }
 
-    private KeyOptions getKeyOptions(ReadableMap map) {
-        KeyOptions options = new KeyOptions();
-
-        if (map == null) {
-            return options;
-        }
-        if (map.hasKey("cipher")) {
-            options.setCipher(map.getString("cipher"));
-        }
-        if (map.hasKey("compression")) {
-            options.setCompression(map.getString("compression"));
-        }
-        if (map.hasKey("hash")) {
-            options.setHash(map.getString("hash"));
-        }
-        if (map.hasKey("RSABits")) {
-            options.setRSABits(map.getInt("RSABits"));
-        }
-        if (map.hasKey("compressionLevel")) {
-            options.setCompressionLevel(map.getInt("compressionLevel"));
-        }
-        return options;
-    }
-
-    private Options getOptions(ReadableMap map) {
-        Options options = new Options();
-
-        if (map == null) {
-            return options;
-        }
-        if (map.hasKey("comment")) {
-            options.setComment(map.getString("comment"));
-        }
-        if (map.hasKey("email")) {
-            options.setEmail(map.getString("email"));
-        }
-        if (map.hasKey("name")) {
-            options.setName(map.getString("name"));
-        }
-        if (map.hasKey("passphrase")) {
-            options.setPassphrase(map.getString("passphrase"));
-        }
-        if (map.hasKey("keyOptions")) {
-            ReadableMap keyOptions = map.getMap("keyOptions");
-            if (keyOptions != null) {
-                options.setKeyOptions(this.getKeyOptions(keyOptions));
-            }
-        }
-
-        return options;
-    }
-
     @ReactMethod
     public void decryptSymmetric(final String message, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
@@ -260,12 +218,13 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void encryptSymmetric(final String message, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
+    public void encryptSymmetric(final String message, final String passphrase, final ReadableMap mapFileHints, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
+                    FileHints fileHints = getFileHints(mapFileHints);
                     KeyOptions options = getKeyOptions(mapOptions);
-                    String result = instance.encryptSymmetric(message, passphrase, options);
+                    String result = instance.encryptSymmetric(message, passphrase, fileHints, options);
                     promise.resolve(result);
                 } catch (Exception e) {
                     promise.reject(e);
@@ -275,12 +234,13 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void encryptSymmetricFile(final String inputFile, final String outputFile, final String passphrase, final ReadableMap mapOptions, final Promise promise) {
+    public void encryptSymmetricFile(final String inputFile, final String outputFile, final String passphrase, final ReadableMap mapFileHints, final ReadableMap mapOptions, final Promise promise) {
         new Thread(new Runnable() {
             public void run() {
                 try {
+                    FileHints fileHints = getFileHints(mapFileHints);
                     KeyOptions options = getKeyOptions(mapOptions);
-                    byte[] result = instance.encryptSymmetricBytes(readFile(inputFile), passphrase, options);
+                    byte[] result = instance.encryptSymmetricBytes(readFile(inputFile), passphrase, fileHints, options);
                     writeFile(result, outputFile);
                     promise.resolve(outputFile);
                 } catch (Exception e) {
@@ -307,5 +267,97 @@ public class RNFastOpenPGPModule extends ReactContextBaseJavaModule {
                 }
             }
         }).start();
+    }
+
+    private FileHints getFileHints(ReadableMap map) {
+        FileHints options = new FileHints();
+
+        if (map == null) {
+            return options;
+        }
+        if (map.hasKey("fileName")) {
+            options.setFileName(map.getString("fileName"));
+        }
+        if (map.hasKey("isBinary")) {
+            options.setIsBinary(map.getBoolean("isBinary"));
+        }
+        if (map.hasKey("modTime")) {
+            options.setModTime(map.getString("modTime"));
+        }
+        return options;
+    }
+
+    private Entity getEntity(ReadableMap map) {
+        Entity options = new Entity();
+
+        if (map == null) {
+            return null;
+        }
+        if (map.hasKey("publicKey")) {
+            options.setPublicKey(map.getString("publicKey"));
+        }
+        if (map.hasKey("privateKey")) {
+            options.setPrivateKey(map.getString("privateKey"));
+        }
+        if (map.hasKey("passphrase")) {
+            options.setPassphrase(map.getString("passphrase"));
+        }
+        return options;
+    }
+
+    private KeyOptions getKeyOptions(ReadableMap map) {
+        KeyOptions options = new KeyOptions();
+
+        if (map == null) {
+            return options;
+        }
+        if (map.hasKey("cipher")) {
+            options.setCipher(map.getString("cipher"));
+        }
+        if (map.hasKey("compression")) {
+            options.setCompression(map.getString("compression"));
+        }
+        if (map.hasKey("hash")) {
+            options.setHash(map.getString("hash"));
+        }
+        if (map.hasKey("RSABits")) {
+            options.setRSABits(map.getInt("RSABits"));
+        }
+        // this is just in case
+        if (map.hasKey("rsaBits")) {
+            options.setRSABits(map.getInt("rsaBits"));
+        }
+        if (map.hasKey("compressionLevel")) {
+            options.setCompressionLevel(map.getInt("compressionLevel"));
+        }
+        return options;
+    }
+
+    private Options getOptions(ReadableMap map) {
+        Options options = new Options();
+
+        if (map == null) {
+            return options;
+        }
+        if (map.hasKey("comment")) {
+            options.setComment(map.getString("comment"));
+        }
+        if (map.hasKey("email")) {
+            options.setEmail(map.getString("email"));
+        }
+        if (map.hasKey("name")) {
+            options.setName(map.getString("name"));
+        }
+        if (map.hasKey("passphrase")) {
+            options.setPassphrase(map.getString("passphrase"));
+        }
+        if (map.hasKey("keyOptions")) {
+            ReadableMap keyOptions = map.getMap("keyOptions");
+            if (keyOptions != null) {
+                options.setKeyOptions(this.getKeyOptions(keyOptions));
+            }
+        }
+
+        return options;
     }
 }
