@@ -1,36 +1,68 @@
 package com.reactnativefastopenpgp
 
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.Promise
+import androidx.annotation.NonNull
+import com.facebook.react.bridge.*
 
-class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
-    override fun getName(): String {
-        return "FastOpenpgp"
-    }
+internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
-    // Example method
-    // See https://reactnative.dev/docs/native-modules-android
-    @ReactMethod
-    fun multiply(a: Int, b: Int, promise: Promise) {
-    
-      promise.resolve(nativeMultiply(a, b));
-    
-    }
+    external fun initialize(jsiPtr: Long);
+    external fun destruct();
+    external fun callJSI(jsiPtr: Long, name: String, payload: ByteArray): ByteArray;
+    external fun call(name: String, payload: ByteArray): ByteArray;
 
-    
-    external fun nativeMultiply(a: Int, b: Int): Int;
-
-    companion object
-    {
-
-        // Used to load the 'native-lib' library on application startup.
-        init
-        {
-            System.loadLibrary("cpp")
+    companion object {
+        init {
+            System.loadLibrary("fast-openpgp")
         }
     }
-    
+
+    @ReactMethod
+    fun callJSI(name: String, payload: ReadableArray, promise: Promise) {
+        Thread {
+            try {
+                val bytes = ByteArray(payload.size()) { pos -> payload.getInt(pos).toByte() }
+                val result = callJSI(this.reactApplicationContext.javaScriptContextHolder.get(), name, bytes)
+                val resultList = Arguments.createArray()
+                for (i in result.indices) {
+                    resultList.pushInt(result.get(i).toInt())
+                }
+                promise.resolve(resultList)
+            } catch (e: Exception) {
+                promise.reject(e)
+            }
+        }.start()
+    }
+
+    @ReactMethod
+    fun call(name: String, payload: ReadableArray, promise: Promise) {
+        Thread {
+            try {
+                val bytes = ByteArray(payload.size()) { pos -> payload.getInt(pos).toByte() }
+                val result = call(name, bytes)
+
+                val resultList = Arguments.createArray()
+                for (i in result.indices) {
+                    resultList.pushInt(result.get(i).toInt())
+                }
+                promise.resolve(resultList)
+            } catch (e: Exception) {
+                promise.reject(e)
+            }
+        }.start()
+    }
+
+    @NonNull
+    override fun getName(): String {
+        return "FastOpenPGP"
+    }
+
+    override fun initialize() {
+        super.initialize()
+        initialize(this.reactApplicationContext.javaScriptContextHolder.get())
+    }
+
+    override fun onCatalystInstanceDestroy() {
+        destruct();
+    }
 }

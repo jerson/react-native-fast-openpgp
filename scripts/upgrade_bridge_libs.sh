@@ -8,16 +8,15 @@
 #######################################################
 
 REPO="jerson/openpgp-mobile"
-NAME="gomobile_openpgp"
-FRAMEWORK="Openpgp"
-PLATFORMS=("android_aar" "ios_framework")
-OUTPUT_DIRS=("android/libs" "ios")
+NAME="libopenpgp_bridge"
+PLATFORMS=("android" "ios" )
+OUTPUT_DIRS=("android/src/main" "ios")
 OUTPUT_SUB_DIRS=("" "")
+OUTPUT_STRIP_DIRS=(1 1)
 
 #######################################################
 # you shouldn't edit below this line                  #
 #######################################################
-
 
 echo "Get latest release"
 RELEASE_PAYLOAD=$(curl --silent "https://api.github.com/repos/$REPO/releases/latest")
@@ -28,8 +27,6 @@ get_version() {
 
 LATEST_VERSION=$(get_version $REPO)
 VERSION=${VERSION:-$LATEST_VERSION}
-
-rm -rf ios/${FRAMEWORK}.framework.zip ios/${FRAMEWORK}.framework
 
 echo "Using: $VERSION"
 echo "--------------------------------------------"
@@ -46,19 +43,13 @@ do
   echo "Downloading: $FILE_URL to $OUTPUT_DIR"
 
   mkdir -p "$OUTPUT_DIR"
-  wget -c "$FILE_URL" -O - | tar --strip-components=1 -xz -C "$OUTPUT_DIR" "$OUTPUT_SUB_DIR"
+  wget -c "$FILE_URL" -O - | tar --strip-components="$OUTPUT_STRIP_DIR" -xz -C "$OUTPUT_DIR" "$OUTPUT_SUB_DIR"
 
   INDEX=${INDEX}+1
 
   echo "Updated"
   echo "--------------------------------------------"
 done
-
 #
 echo "All updated"
-
-echo "Compress framework"
-cd ios && \
-   zip --symlinks -r ${FRAMEWORK}.framework.zip ${FRAMEWORK}.framework && \
-   rm -rf ${FRAMEWORK}.framework
 

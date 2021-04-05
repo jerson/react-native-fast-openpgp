@@ -1,18 +1,27 @@
 import * as React from 'react';
 
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Button } from 'react-native';
 import FastOpenpgp from 'react-native-fast-openpgp';
 
 export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
 
-  React.useEffect(() => {
-    FastOpenpgp.multiply(3, 7).then(setResult);
+  const sampleFn = async () => {
+    try {
+      const sample = await FastOpenpgp.sample();
+      console.log("FastOpenpgp result in example",sample);
+    } catch (e) {
+      console.warn("FastOpenpgp sample in example",e);
+    }
+  };
+ /* React.useEffect(() => {
+    sampleFn();
   }, []);
-
+*/
   return (
     <View style={styles.container}>
       <Text>Result: {result}</Text>
+      <Button onPress={sampleFn} title="dd" />
     </View>
   );
 }
