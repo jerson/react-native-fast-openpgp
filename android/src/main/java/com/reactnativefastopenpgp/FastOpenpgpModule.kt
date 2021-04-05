@@ -25,7 +25,7 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactC
                 val result = callJSI(this.reactApplicationContext.javaScriptContextHolder.get(), name, bytes)
                 val resultList = Arguments.createArray()
                 for (i in result.indices) {
-                    resultList.pushInt(result.get(i).toInt())
+                    resultList.pushInt(result[i].toInt())
                 }
                 promise.resolve(resultList)
             } catch (e: Exception) {
@@ -43,7 +43,7 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactC
 
                 val resultList = Arguments.createArray()
                 for (i in result.indices) {
-                    resultList.pushInt(result.get(i).toInt())
+                    resultList.pushInt(result[i].toInt())
                 }
                 promise.resolve(resultList)
             } catch (e: Exception) {

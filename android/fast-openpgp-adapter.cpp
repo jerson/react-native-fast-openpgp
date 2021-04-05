@@ -29,19 +29,17 @@ Java_com_reactnativefastopenpgp_FastOpenpgpModule_call(JNIEnv *env, jobject thiz
 
     auto nameChar = const_cast<char *>(nameConstChar);
     auto response = OpenPGPBridgeCall(nameChar, payloadBytes, size);
-    //env->ReleaseStringUTFChars(name, nameConstChar);
+    env->ReleaseStringUTFChars(name, nameConstChar);
 
     if (response->error != nullptr) {
         auto error = response->error;
-       // free(response);
         jclass Exception = env->FindClass("java/lang/Exception");
         env->ThrowNew(Exception, error);
         return nullptr;
     }
 
     auto result = env->NewByteArray(response->size);
-    memcpy(result, response->message, response->size);
- //   free(response);
+    env->SetByteArrayRegion(result, 0, response->size, (jbyte*) response->message);
     return result;
 }
 
@@ -76,6 +74,6 @@ Java_com_reactnativefastopenpgp_FastOpenpgpModule_callJSI(JNIEnv *env, jobject t
     auto byteResult = response.asObject(*runtime).getArrayBuffer(*runtime);
     auto sizeResult = byteResult.size(*runtime);
     auto result = env->NewByteArray(sizeResult);
-    memcpy(result, byteResult.data(*runtime), sizeResult);
+    env->SetByteArrayRegion(result, 0,  sizeResult, (jbyte*) byteResult.data(*runtime));
     return result;
 }

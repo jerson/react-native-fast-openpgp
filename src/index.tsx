@@ -15,7 +15,7 @@ export default class OpenPGP {
     model.KeyOptions.addCompression(builder, model.Compression.ZLIB);
     model.KeyOptions.addCompressionLevel(builder, 9);
     model.KeyOptions.addHash(builder, model.Hash.SHA512);
-    model.KeyOptions.addRsaBits(builder, 1024);
+    model.KeyOptions.addRsaBits(builder, 2048);
     const offsetKeyOptions = model.KeyOptions.endKeyOptions(builder);
 
     const name = builder.createString('sample');
@@ -53,7 +53,7 @@ export default class OpenPGP {
      // result = await FastOpenPGPJSI.callPromise('generate', buff);
      // result = FastOpenPGPJSI.callSync('generate', buff);
       result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
-      //result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
+     // result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
 
       if (typeof result == 'string') {
        throw new Error('result string: ' +result)
