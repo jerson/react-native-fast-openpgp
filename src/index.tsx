@@ -48,18 +48,20 @@ export default class OpenPGP {
     console.log('buff size', buff.byteLength);
     console.log('bugpay', buff);
     console.log('bugpayss', bytes.toString() + '');
-    var result: BridgeResponse = '';
+    var result: BridgeResponseJSI = '';
     try {
      // result = await FastOpenPGPJSI.callPromise('generate', buff);
-     // result = FastOpenPGPJSI.callSync('generate', buff);
-      result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
+      result = FastOpenPGPJSI.callSync('generate', buff);
+     // result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
      // result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
 
       if (typeof result == 'string') {
        throw new Error('result string: ' +result)
       }
 
-      const rawResponse = new Uint8Array(result, 0, result.byteLength);
+      console.log(typeof result)
+      console.log("result.byteLengt", result.length)
+      const rawResponse = new Uint8Array(result, 0, result.length || result.byteLength);
 
       const responseBuffer = new flatbuffers.ByteBuffer(rawResponse);
       const response = model.KeyPairResponse.getRootAsKeyPairResponse(
