@@ -1,11 +1,8 @@
 import { NativeModules } from 'react-native';
 
-const FastOpenPGPNativeModules = NativeModules.FastOpenPGP;
-
-const FastOpenPGPJSI = FastOpenPGP;
-
 import { model } from './model/bridge_generated';
 import * as flatbuffers from './flatbuffers/flatbuffers';
+
 export default class OpenPGP {
   static async sample(): Promise<any> {
     const builder = new flatbuffers.Builder(0);
@@ -43,25 +40,29 @@ export default class OpenPGP {
       bytes.byteLength + bytes.byteOffset
     );
 
+    const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef).FastOpenPGP;
+
     console.log(FastOpenPGPNativeModules);
-    console.log(FastOpenPGPJSI);
+    console.log(Object.keys(global));
+    console.log(typeof global.FastOpenPGPCallPromise);
+    console.log(typeof global.FastOpenPGPCallSync);
     console.log('buff size', buff.byteLength);
     console.log('bugpay', buff);
     console.log('bugpayss', bytes.toString() + '');
-    var result: BridgeResponseJSI = '';
+    var result: BridgeResponseNativeModules = '';
     try {
-     // result = await FastOpenPGPJSI.callPromise('generate', buff);
-      result = FastOpenPGPJSI.callSync('generate', buff);
-     // result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
-     // result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
-
+      result = await global.FastOpenPGPCallPromise('generate', buff);
+    //  result = global.FastOpenPGPCallSync('generate', buff);
+    //  result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
+   //  result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
+ 
       if (typeof result == 'string') {
        throw new Error('result string: ' +result)
       }
 
       console.log(typeof result)
-      console.log("result.byteLengt", result.length)
-      const rawResponse = new Uint8Array(result, 0, result.length || result.byteLength);
+    //  console.log("result.byteLengt", result.length)
+      const rawResponse = new Uint8Array(result, 0, result.byteLength);
 
       const responseBuffer = new flatbuffers.ByteBuffer(rawResponse);
       const response = model.KeyPairResponse.getRootAsKeyPairResponse(

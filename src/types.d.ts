@@ -1,5 +1,5 @@
 /**
- * `Array`: returned by NativeModules due to lack of ByteArray support on it
+ * `Array`: returned by NativeModules due to lack of ByteArray support
  * 
  * @see `FastOpenPGPNativeModules.callJSI`
  * @see `FastOpenPGPNativeModules.call`
@@ -22,19 +22,11 @@ type BridgeResponseJSI = ArrayBuffer | string
  * @see `BridgeResponseJSI`
  */
 type BridgeResponse = BridgeResponseNativeModules | BridgeResponseJSI
-interface FastOpenPGPJSI {
-  /**
-   * this method use `JSI`, but will return a `Promise` in order to use an async way,
-   * at this moment is no real Async but in the future will be.
-   * FIXME: implement real promise here
-   */
-  callPromise(name: string, payload: ArrayBuffer): Promise<BridgeResponseJSI>;
-  /**
-   * this method use `JSI`, and will use in a Sync way,
-   * be careful if the method that you are using is a complex one like generate a new Key
-   */
-  callSync(name: string, payload: ArrayBuffer): BridgeResponseJSI;
-}
+
+
+/**
+ * Contains all method available inside of `NativeModules`
+ */
 interface FastOpenPGPNativeModules {
   /**
    * this method use `NativeModules` but also will send `JSI` reference to use same thread
@@ -48,15 +40,30 @@ interface FastOpenPGPNativeModules {
   call(name: string, payload: Array): Promise<BridgeResponseNativeModules>;
 }
 
-interface NativeModules {
+interface NativeModulesDef {
   FastOpenPGP:FastOpenPGPNativeModules
 }
 
-declare const FastOpenPGP: FastOpenPGPJSI
+interface Global{
+  // for now we are not going to use this way because of hermes on release mode only
+  // FastOpenPGP:FastOpenPGPJSI
+  /**
+   * this method use `JSI`, but will return a `Promise` in order to use an async way,
+   * at this moment is no real Async but in the future will be.
+   * TODO: implement real promise here
+   */
+  FastOpenPGPCallPromise(name: string, payload: ArrayBuffer): Promise<BridgeResponseJSI>;
+  /**
+   * this method use `JSI`, and will use in a Sync way,
+   * be careful if the method that you are using is a complex one like generate a new Key
+   */
+   FastOpenPGPCallSync(name: string, payload: ArrayBuffer): BridgeResponseJSI;
+}
 
+declare const global: Global;
 declare const module: any;
 
-declare module "react-native" {
-  export default module;
-  export const NativeModules: NativeModules;
-}
+//declare module "react-native" {
+//  export default module;
+//  export const NativeModules: NativeModules;
+//}

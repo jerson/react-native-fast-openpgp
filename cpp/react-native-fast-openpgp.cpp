@@ -72,7 +72,7 @@ namespace fastOpenPGP {
                                                              "payload not an ArrayBuffer"));
                     }
 
-                    auto response =  call(runtime, nameString, obj);
+                    auto response = call(runtime, nameString, obj);
                     if (response.isString()) {
                         // here in the future maybe we can throw an exception...
                         return response;
@@ -160,11 +160,15 @@ namespace fastOpenPGP {
         );
 
 
-        auto object = jsi::Object(jsiRuntime);
-        object.setProperty(jsiRuntime, "callPromise", bridgeCallPromise);
-        object.setProperty(jsiRuntime, "callSync", bridgeCallSync);
-
-        jsiRuntime.global().setProperty(jsiRuntime, "FastOpenPGP", std::move(object));
+        // for now im not sure why, but create an object don't work with hermes release, but debug yes
+//        auto object = jsi::Object(jsiRuntime);
+//        object.setProperty(jsiRuntime, "callPromise", std::move(bridgeCallPromise));
+//        object.setProperty(jsiRuntime, "callSync", std::move(bridgeCallSync));
+//        jsiRuntime.global().setProperty(jsiRuntime, "FastOpenPGP", std::move(object));
+        jsiRuntime.global().setProperty(jsiRuntime, "FastOpenPGPCallPromise",
+                                        std::move(bridgeCallPromise));
+        jsiRuntime.global().setProperty(jsiRuntime, "FastOpenPGPCallSync",
+                                        std::move(bridgeCallSync));
 
     }
 
