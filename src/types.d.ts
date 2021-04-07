@@ -62,8 +62,3 @@ interface Global{
 
 declare const global: Global;
 declare const module: any;
-
-//declare module "react-native" {
-//  export default module;
-//  export const NativeModules: NativeModules;
-//}
