@@ -185,6 +185,34 @@ export default class OpenPGP {
     }
   }
 
+  private static async call(
+    name: string,
+    bytes: Uint8Array
+  ): Promise<BridgeResponse> {
+   
+    //  result = await global.FastOpenPGPCallPromise('generate', buff);
+    //  result = global.FastOpenPGPCallSync('generate', buff);
+    //  result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
+    //  result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
+    var result;
+    try {
+      /*const buff = bytes.buffer.slice(
+        bytes.byteOffset,
+        bytes.byteLength + bytes.byteOffset
+      );*/
+
+      //result = await global.FastOpenPGPCallPromise(name, buff);
+       result = await FastOpenPGPNativeModules.call(name, Array.from(bytes));
+      if (typeof result == 'string') {
+        throw new Error(result);
+      }
+    } catch (e) {
+      throw e;
+    }
+
+    return result;
+  }
+
   static async decrypt(
     message: string,
     privateKey: string,
@@ -796,34 +824,6 @@ export default class OpenPGP {
     return model.Options.endOptions(builder);
   }
 
-  private static async call(
-    name: string,
-    bytes: Uint8Array
-  ): Promise<BridgeResponse> {
-    /**
-     * 
-    const buff = bytes.buffer.slice(
-      bytes.byteOffset,
-      bytes.byteLength + bytes.byteOffset
-    );
-     */
-    //  result = await global.FastOpenPGPCallPromise('generate', buff);
-    //  result = global.FastOpenPGPCallSync('generate', buff);
-    //  result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
-    //  result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
-    var result;
-    try {
-      result = await FastOpenPGPNativeModules.call(name, Array.from(bytes));
-      if (typeof result == 'string') {
-        throw new Error(result);
-      }
-    } catch (e) {
-      throw e;
-    }
-
-    return result;
-  }
-
   private static _responseBuffer(result: BridgeResponse) {
     var rawResponse;
     if (result.hasOwnProperty('length')) {
@@ -842,11 +842,11 @@ export default class OpenPGP {
       this._responseBuffer(result)
     );
     const error = response.error();
-    if (error != null) {
+    if (error) {
       throw new Error(error);
     }
     const output = response.output();
-    if (output == null) {
+    if (!output) {
       throw new Error('empty output');
     }
 
@@ -861,10 +861,10 @@ export default class OpenPGP {
       this._responseBuffer(result)
     );
     const error = response.error();
-    if (error != null) {
+    if (error) {
       throw new Error(error);
     }
-    return response.outputut() || '';
+    return response.output() || '';
   }
 
   private static _boolResponse(result: BridgeResponse): boolean {
@@ -872,7 +872,7 @@ export default class OpenPGP {
       this._responseBuffer(result)
     );
     const error = response.error();
-    if (error != null) {
+    if (error) {
       throw new Error(error);
     }
     return response.output();
