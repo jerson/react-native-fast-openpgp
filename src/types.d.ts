@@ -4,7 +4,7 @@
  * @see `FastOpenPGPNativeModules.callJSI`
  * @see `FastOpenPGPNativeModules.call`
  */
-type BridgeResponseNativeModules = Array 
+type BridgeResponseNativeModules = Array<number> 
 
 /**
  * `ArrayBuffer`: returned only by pure JSI implementation
@@ -32,12 +32,12 @@ interface FastOpenPGPNativeModules {
    * this method use `NativeModules` but also will send `JSI` reference to use same thread
    * but it runs in a separated thread also.
    */
-  callJSI(name: string, payload: Array): Promise<BridgeResponseNativeModules>;
+  callJSI(name: string, payload: Array<number>): Promise<BridgeResponseNativeModules>;
   /**
    * this method use `NativeModules` in a more traditional way
    * using `JNI` on android in order to call shared a library.
    */
-  call(name: string, payload: Array): Promise<BridgeResponseNativeModules>;
+  call(name: string, payload: Array<number>): Promise<BridgeResponseNativeModules>;
 }
 
 interface NativeModulesDef {

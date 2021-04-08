@@ -107,21 +107,6 @@ export interface FileHints {
 }
 
 export default class OpenPGP {
-  private static async call(name: string, bytes: Uint8Array) {
-    /**
-     * 
-    const buff = bytes.buffer.slice(
-      bytes.byteOffset,
-      bytes.byteLength + bytes.byteOffset
-    );
-     */
-    //  result = await global.FastOpenPGPCallPromise('generate', buff);
-    //  result = global.FastOpenPGPCallSync('generate', buff);
-    //  result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
-    //  result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
-
-    return FastOpenPGPNativeModules.call(name, Array.from(bytes));
-  }
   static async sample(): Promise<any> {
     const builder = new flatbuffers.Builder(0);
 
@@ -165,7 +150,7 @@ export default class OpenPGP {
     console.log('buff size', buff.byteLength);
     console.log('bugpay', buff);
     console.log('bugpayss', bytes.toString() + '');
-    var result: BridgeResponseNativeModules = '';
+    var result: BridgeResponse = '';
     try {
       result = await global.FastOpenPGPCallPromise('generate', buff);
       //  result = global.FastOpenPGPCallSync('generate', buff);
@@ -200,7 +185,7 @@ export default class OpenPGP {
     }
   }
 
-  static decrypt(
+  static async decrypt(
     message: string,
     privateKey: string,
     passphrase: string,
@@ -235,9 +220,10 @@ export default class OpenPGP {
     const offset = model.DecryptRequest.endDecryptRequest(builder);
     builder.finish(offset);
 
-    return this.call('decrypt', builder.asUint8Array());
+    const result = await this.call('decrypt', builder.asUint8Array());
+    return this._stringResponse(result);
   }
-  static decryptFile(
+  static async decryptFile(
     inputFile: string,
     outputFile: string,
     privateKey: string,
@@ -272,9 +258,10 @@ export default class OpenPGP {
     const offset = model.DecryptRequest.endDecryptRequest(builder);
     builder.finish(offset);
 
-    return this.call('decryptFile', builder.asUint8Array());
+    const result = await this.call('decryptFile', builder.asUint8Array());
+    return this._stringResponse(result);
   }
-  static encrypt(
+  static async encrypt(
     message: string,
     publicKey: string,
     signedEntity?: Entity,
@@ -308,9 +295,10 @@ export default class OpenPGP {
     const offset = model.EncryptRequest.endEncryptRequest(builder);
     builder.finish(offset);
 
-    return this.call('encrypt', builder.asUint8Array());
+    const result = await this.call('encrypt', builder.asUint8Array());
+    return this._stringResponse(result);
   }
-  static encryptFile(
+  static async encryptFile(
     inputFile: string,
     outputFile: string,
     publicKey: string,
@@ -344,9 +332,10 @@ export default class OpenPGP {
     const offset = model.EncryptRequest.endEncryptRequest(builder);
     builder.finish(offset);
 
-    return this.call('encryptFile', builder.asUint8Array());
+    const result = await this.call('encryptFile', builder.asUint8Array());
+    return this._stringResponse(result);
   }
-  static sign(
+  static async sign(
     message: string,
     publicKey: string,
     privateKey: string,
@@ -388,9 +377,10 @@ export default class OpenPGP {
     const offset = model.SignRequest.endSignRequest(builder);
     builder.finish(offset);
 
-    return this.call('sign', builder.asUint8Array());
+    const result = await this.call('sign', builder.asUint8Array());
+    return this._stringResponse(result);
   }
-  static signFile(
+  static async signFile(
     inputFile: string,
     publicKey: string,
     privateKey: string,
@@ -432,9 +422,10 @@ export default class OpenPGP {
     const offset = model.SignRequest.endSignRequest(builder);
     builder.finish(offset);
 
-    return this.call('signFile', builder.asUint8Array());
+    const result = await this.call('signFile', builder.asUint8Array());
+    return this._stringResponse(result);
   }
-  static verify(
+  static async verify(
     signature: string,
     message: string,
     publicKey: string
@@ -465,9 +456,10 @@ export default class OpenPGP {
     const offset = model.VerifyRequest.endVerifyRequest(builder);
     builder.finish(offset);
 
-    return this.call('verify', builder.asUint8Array());
+    const result = await this.call('verify', builder.asUint8Array());
+    return this._boolResponse(result);
   }
-  static verifyFile(
+  static async verifyFile(
     signature: string,
     inputFile: string,
     publicKey: string
@@ -498,9 +490,10 @@ export default class OpenPGP {
     const offset = model.VerifyRequest.endVerifyRequest(builder);
     builder.finish(offset);
 
-    return this.call('verifyFile', builder.asUint8Array());
+    const result = await this.call('verifyFile', builder.asUint8Array());
+    return this._boolResponse(result);
   }
-  static decryptSymmetric(
+  static async decryptSymmetric(
     message: string,
     passphrase: string,
     options?: KeyOptions
@@ -532,9 +525,10 @@ export default class OpenPGP {
     );
     builder.finish(offset);
 
-    return this.call('decryptSymmetric', builder.asUint8Array());
+    const result = await this.call('decryptSymmetric', builder.asUint8Array());
+    return this._stringResponse(result);
   }
-  static decryptSymmetricFile(
+  static async decryptSymmetricFile(
     inputFile: string,
     outputFile: string,
     passphrase: string,
@@ -564,9 +558,13 @@ export default class OpenPGP {
     );
     builder.finish(offset);
 
-    return this.call('decryptSymmetricFile', builder.asUint8Array());
+    const result = await this.call(
+      'decryptSymmetricFile',
+      builder.asUint8Array()
+    );
+    return this._stringResponse(result);
   }
-  static encryptSymmetric(
+  static async encryptSymmetric(
     message: string,
     passphrase: string,
     fileHints?: FileHints,
@@ -601,10 +599,11 @@ export default class OpenPGP {
     );
     builder.finish(offset);
 
-    return this.call('encryptSymmetric', builder.asUint8Array());
+    const result = await this.call('encryptSymmetric', builder.asUint8Array());
+    return this._stringResponse(result);
   }
 
-  static encryptSymmetricFile(
+  static async encryptSymmetricFile(
     inputFile: string,
     outputFile: string,
     passphrase: string,
@@ -638,9 +637,14 @@ export default class OpenPGP {
     );
     builder.finish(offset);
 
-    return this.call('encryptSymmetricFile', builder.asUint8Array());
+    const result = await this.call(
+      'encryptSymmetricFile',
+      builder.asUint8Array()
+    );
+
+    return this._stringResponse(result);
   }
-  static generate(options: Options): Promise<KeyPair> {
+  static async generate(options: Options): Promise<KeyPair> {
     const builder = new flatbuffers.Builder(0);
     const optionsOffset = this._options(builder, options);
     model.GenerateRequest.startGenerateRequest(builder);
@@ -648,7 +652,9 @@ export default class OpenPGP {
     const offset = model.GenerateRequest.endGenerateRequest(builder);
     builder.finish(offset);
 
-    return this.call('generate', builder.asUint8Array());
+    const result = await this.call('generate', builder.asUint8Array());
+
+    return this._keyPairResponse(result);
   }
 
   private static _entity(
@@ -788,5 +794,87 @@ export default class OpenPGP {
     model.Options.addKeyOptions(builder, keyOffset);
 
     return model.Options.endOptions(builder);
+  }
+
+  private static async call(
+    name: string,
+    bytes: Uint8Array
+  ): Promise<BridgeResponse> {
+    /**
+     * 
+    const buff = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteLength + bytes.byteOffset
+    );
+     */
+    //  result = await global.FastOpenPGPCallPromise('generate', buff);
+    //  result = global.FastOpenPGPCallSync('generate', buff);
+    //  result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
+    //  result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
+    var result;
+    try {
+      result = await FastOpenPGPNativeModules.call(name, Array.from(bytes));
+      if (typeof result == 'string') {
+        throw new Error(result);
+      }
+    } catch (e) {
+      throw e;
+    }
+
+    return result;
+  }
+
+  private static _responseBuffer(result: BridgeResponse) {
+    var rawResponse;
+    if (result.hasOwnProperty('length')) {
+      const resultArray = result as BridgeResponseNativeModules;
+      rawResponse = new Uint8Array(resultArray);
+    } else {
+      const resultBytes = (result as BridgeResponseJSI) as ArrayBuffer;
+      rawResponse = new Uint8Array(resultBytes, 0, resultBytes.byteLength);
+    }
+
+    return new flatbuffers.ByteBuffer(rawResponse);
+  }
+
+  private static _keyPairResponse(result: BridgeResponse): KeyPair {
+    const response = model.KeyPairResponse.getRootAsKeyPairResponse(
+      this._responseBuffer(result)
+    );
+    const error = response.error();
+    if (error != null) {
+      throw new Error(error);
+    }
+    const output = response.output();
+    if (output == null) {
+      throw new Error('empty output');
+    }
+
+    return {
+      privateKey: output.privateKey() || '',
+      publicKey: output.publicKey() || '',
+    } as KeyPair;
+  }
+
+  private static _stringResponse(result: BridgeResponse): string {
+    const response = model.StringResponse.getRootAsStringResponse(
+      this._responseBuffer(result)
+    );
+    const error = response.error();
+    if (error != null) {
+      throw new Error(error);
+    }
+    return response.outputut() || '';
+  }
+
+  private static _boolResponse(result: BridgeResponse): boolean {
+    const response = model.BoolResponse.getRootAsBoolResponse(
+      this._responseBuffer(result)
+    );
+    const error = response.error();
+    if (error != null) {
+      throw new Error(error);
+    }
+    return response.output();
   }
 }
