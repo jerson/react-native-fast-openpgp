@@ -29,7 +29,7 @@ export interface KeyOptions {
    * If zero, then 2048 bit keys are created.
    * @default 2048
    */
-  RSABits?: number;
+  rsaBits?: number;
 
   /**
    * Cipher is the cipher to be used.
@@ -86,131 +86,72 @@ export interface KeyPair {
 export interface Entity {
   publicKey: string;
   privateKey: string;
-  passphrase: string;
+  passphrase?: string;
 }
 export interface FileHints {
   /**
    * IsBinary can be set to hint that the contents are binary data.
    */
-  isBinary: boolean;
+  isBinary?: boolean;
   /**
    * FileName hints at the name of the file that should be written. It's
    * truncated to 255 bytes if longer. It may be empty to suggest that the
    * file should not be written to disk. It may be equal to "_CONSOLE" to
    * suggest the data should not be written to disk.
    */
-  fileName: string;
+  fileName?: string;
   /**
    * ModTime format allowed: RFC3339, contains the modification time of the file, or the zero time if not applicable.
    */
-  modTime: string;
+  modTime?: string;
 }
 
 export default class OpenPGP {
-  static async sample(): Promise<any> {
-    const builder = new flatbuffers.Builder(0);
-
-    model.KeyOptions.startKeyOptions(builder);
-    model.KeyOptions.addCipher(builder, model.Cipher.AES256);
-    model.KeyOptions.addCompression(builder, model.Compression.ZLIB);
-    model.KeyOptions.addCompressionLevel(builder, 9);
-    model.KeyOptions.addHash(builder, model.Hash.SHA512);
-    model.KeyOptions.addRsaBits(builder, 2048);
-    const offsetKeyOptions = model.KeyOptions.endKeyOptions(builder);
-
-    const name = builder.createString('sample');
-    const comment = builder.createString('sample');
-    const passphrase = builder.createString('sample');
-    const email = builder.createString('sample@sample.com');
-
-    model.Options.startOptions(builder);
-    model.Options.addName(builder, name);
-    model.Options.addComment(builder, comment);
-    model.Options.addEmail(builder, email);
-    model.Options.addPassphrase(builder, passphrase);
-    model.Options.addKeyOptions(builder, offsetKeyOptions);
-    const offsetOptions = model.Options.endOptions(builder);
-
-    model.GenerateRequest.startGenerateRequest(builder);
-    model.GenerateRequest.addOptions(builder, offsetOptions);
-    const offset = model.GenerateRequest.endGenerateRequest(builder);
-    builder.finish(offset);
-
-    const bytes = builder.asUint8Array();
-
-    const buff = bytes.buffer.slice(
-      bytes.byteOffset,
-      bytes.byteLength + bytes.byteOffset
-    );
-
-    console.log(FastOpenPGPNativeModules);
-    console.log(Object.keys(global));
-    console.log(typeof global.FastOpenPGPCallPromise);
-    console.log(typeof global.FastOpenPGPCallSync);
-    console.log('buff size', buff.byteLength);
-    console.log('bugpay', buff);
-    console.log('bugpayss', bytes.toString() + '');
-    var result: BridgeResponse = '';
-    try {
-      result = await global.FastOpenPGPCallPromise('generate', buff);
-      //  result = global.FastOpenPGPCallSync('generate', buff);
-      //  result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
-      //  result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
-
-      if (typeof result == 'string') {
-        throw new Error('result string: ' + result);
-      }
-
-      console.log(typeof result);
-      //  console.log("result.byteLengt", result.length)
-      const rawResponse = new Uint8Array(result, 0, result.byteLength);
-
-      const responseBuffer = new flatbuffers.ByteBuffer(rawResponse);
-      const response = model.KeyPairResponse.getRootAsKeyPairResponse(
-        responseBuffer
-      );
-      const error = response.error();
-      if (error != null) {
-        throw new Error('after getr response:' + error);
-      }
-      const output = response.output();
-      if (output == null) {
-        throw new Error('empty output');
-      }
-      // console.log('privateKey', output.privateKey());
-      console.log('publicKey', output.publicKey());
-    } catch (e) {
-      console.warn('exce', e);
-      return;
-    }
-  }
+  /**
+   * for now we recommend use this in false because is sync
+   */
+  static useJSI = false;
 
   private static async call(
     name: string,
     bytes: Uint8Array
-  ): Promise<BridgeResponse> {
-   
-    //  result = await global.FastOpenPGPCallPromise('generate', buff);
-    //  result = global.FastOpenPGPCallSync('generate', buff);
-    //  result =  await FastOpenPGPNativeModules.call('generate', Array.from(bytes));
-    //  result =  await FastOpenPGPNativeModules.callJSI('generate', Array.from(bytes));
-    var result;
+  ): Promise<flatbuffers.ByteBuffer> {
     try {
-      /*const buff = bytes.buffer.slice(
-        bytes.byteOffset,
-        bytes.byteLength + bytes.byteOffset
-      );*/
+      let result: BridgeResponse;
+      if (this.useJSI) {
+        const buff = bytes.buffer.slice(
+          bytes.byteOffset,
+          bytes.byteLength + bytes.byteOffset
+        );
 
-      //result = await global.FastOpenPGPCallPromise(name, buff);
-       result = await FastOpenPGPNativeModules.call(name, Array.from(bytes));
-      if (typeof result == 'string') {
-        throw new Error(result);
+        result = await global.FastOpenPGPCallPromise(name, buff);
+        if (typeof result === 'string') {
+          throw new Error(result);
+        }
+      } else {
+        result = await FastOpenPGPNativeModules.call(name, Array.from(bytes));
       }
+
+      return this._responseBuffer(result);
     } catch (e) {
       throw e;
     }
+  }
 
-    return result;
+  private static _responseBuffer(result: BridgeResponse) {
+    if (!result) {
+      throw new Error('empty result');
+    }
+    var rawResponse;
+    if (result.hasOwnProperty('length')) {
+      const resultArray = result as BridgeResponseNativeModules;
+      rawResponse = new Uint8Array(resultArray);
+    } else {
+      const resultBytes = (result as BridgeResponseJSI) as ArrayBuffer;
+      rawResponse = new Uint8Array(resultBytes, 0, resultBytes.byteLength);
+    }
+
+    return new flatbuffers.ByteBuffer(rawResponse);
   }
 
   static async decrypt(
@@ -220,31 +161,17 @@ export default class OpenPGP {
     options?: KeyOptions
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
-    let messageOffset, passphraseOffset, privateKeyOffset;
 
-    if (message) {
-      messageOffset = builder.createString(message);
-    }
-    if (passphrase) {
-      passphraseOffset = builder.createString(passphrase);
-    }
-    if (privateKey) {
-      privateKeyOffset = builder.createString(privateKey);
-    }
+    const messageOffset = builder.createString(message);
+    const passphraseOffset = builder.createString(passphrase);
+    const privateKeyOffset = builder.createString(privateKey);
 
     const optionsOffset = this._keyOptions(builder, options);
     model.DecryptRequest.startDecryptRequest(builder);
     model.DecryptRequest.addOptions(builder, optionsOffset);
-
-    if (typeof messageOffset !== 'undefined') {
-      model.DecryptRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof passphraseOffset !== 'undefined') {
-      model.DecryptRequest.addPassphrase(builder, passphraseOffset);
-    }
-    if (typeof privateKeyOffset !== 'undefined') {
-      model.DecryptRequest.addPrivateKey(builder, privateKeyOffset);
-    }
+    model.DecryptRequest.addMessage(builder, messageOffset);
+    model.DecryptRequest.addPassphrase(builder, passphraseOffset);
+    model.DecryptRequest.addPrivateKey(builder, privateKeyOffset);
     const offset = model.DecryptRequest.endDecryptRequest(builder);
     builder.finish(offset);
 
@@ -259,30 +186,19 @@ export default class OpenPGP {
     options?: KeyOptions
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
-    let messageOffset, passphraseOffset, privateKeyOffset;
 
-    messageOffset = builder.createString([inputFile, outputFile].join('|'));
-
-    if (passphrase) {
-      passphraseOffset = builder.createString(passphrase);
-    }
-    if (privateKey) {
-      privateKeyOffset = builder.createString(privateKey);
-    }
+    const messageOffset = builder.createString(
+      [inputFile, outputFile].join('|')
+    );
+    const passphraseOffset = builder.createString(passphrase);
+    const privateKeyOffset = builder.createString(privateKey);
 
     const optionsOffset = this._keyOptions(builder, options);
     model.DecryptRequest.startDecryptRequest(builder);
     model.DecryptRequest.addOptions(builder, optionsOffset);
-
-    if (typeof messageOffset !== 'undefined') {
-      model.DecryptRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof passphraseOffset !== 'undefined') {
-      model.DecryptRequest.addPassphrase(builder, passphraseOffset);
-    }
-    if (typeof privateKeyOffset !== 'undefined') {
-      model.DecryptRequest.addPrivateKey(builder, privateKeyOffset);
-    }
+    model.DecryptRequest.addMessage(builder, messageOffset);
+    model.DecryptRequest.addPassphrase(builder, passphraseOffset);
+    model.DecryptRequest.addPrivateKey(builder, privateKeyOffset);
     const offset = model.DecryptRequest.endDecryptRequest(builder);
     builder.finish(offset);
 
@@ -297,14 +213,9 @@ export default class OpenPGP {
     options?: KeyOptions
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
-    let messageOffset, publicKeyOffset;
 
-    if (message) {
-      messageOffset = builder.createString(message);
-    }
-    if (publicKey) {
-      publicKeyOffset = builder.createString(publicKey);
-    }
+    const messageOffset = builder.createString(message);
+    const publicKeyOffset = builder.createString(publicKey);
 
     const optionsOffset = this._keyOptions(builder, options);
     const fileHintsOffset = this._fileHints(builder, fileHints);
@@ -313,13 +224,9 @@ export default class OpenPGP {
     model.EncryptRequest.addOptions(builder, optionsOffset);
     model.EncryptRequest.addFileHints(builder, fileHintsOffset);
     model.EncryptRequest.addSigned(builder, signedEntityOffset);
+    model.EncryptRequest.addMessage(builder, messageOffset);
+    model.EncryptRequest.addPublicKey(builder, publicKeyOffset);
 
-    if (typeof messageOffset !== 'undefined') {
-      model.EncryptRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof publicKeyOffset !== 'undefined') {
-      model.EncryptRequest.addPublicKey(builder, publicKeyOffset);
-    }
     const offset = model.EncryptRequest.endEncryptRequest(builder);
     builder.finish(offset);
 
@@ -335,13 +242,11 @@ export default class OpenPGP {
     options?: KeyOptions
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
-    let messageOffset, publicKeyOffset;
 
-    messageOffset = builder.createString([inputFile, outputFile].join('|'));
-
-    if (publicKey) {
-      publicKeyOffset = builder.createString(publicKey);
-    }
+    const messageOffset = builder.createString(
+      [inputFile, outputFile].join('|')
+    );
+    const publicKeyOffset = builder.createString(publicKey);
 
     const optionsOffset = this._keyOptions(builder, options);
     const fileHintsOffset = this._fileHints(builder, fileHints);
@@ -350,13 +255,9 @@ export default class OpenPGP {
     model.EncryptRequest.addOptions(builder, optionsOffset);
     model.EncryptRequest.addFileHints(builder, fileHintsOffset);
     model.EncryptRequest.addSigned(builder, signedEntityOffset);
+    model.EncryptRequest.addMessage(builder, messageOffset);
+    model.EncryptRequest.addPublicKey(builder, publicKeyOffset);
 
-    if (typeof messageOffset !== 'undefined') {
-      model.EncryptRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof publicKeyOffset !== 'undefined') {
-      model.EncryptRequest.addPublicKey(builder, publicKeyOffset);
-    }
     const offset = model.EncryptRequest.endEncryptRequest(builder);
     builder.finish(offset);
 
@@ -371,37 +272,19 @@ export default class OpenPGP {
     options?: KeyOptions
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
-    let messageOffset, publicKeyOffset, privateKeyOffset, passphraseOffset;
 
-    if (message) {
-      messageOffset = builder.createString(message);
-    }
-    if (publicKey) {
-      publicKeyOffset = builder.createString(publicKey);
-    }
-    if (privateKey) {
-      privateKeyOffset = builder.createString(privateKey);
-    }
-    if (passphrase) {
-      passphraseOffset = builder.createString(passphrase);
-    }
+    const messageOffset = builder.createString(message);
+    const publicKeyOffset = builder.createString(publicKey);
+    const privateKeyOffset = builder.createString(privateKey);
+    const passphraseOffset = builder.createString(passphrase);
 
     const optionsOffset = this._keyOptions(builder, options);
     model.SignRequest.startSignRequest(builder);
     model.SignRequest.addOptions(builder, optionsOffset);
-
-    if (typeof messageOffset !== 'undefined') {
-      model.SignRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof publicKeyOffset !== 'undefined') {
-      model.SignRequest.addPublicKey(builder, publicKeyOffset);
-    }
-    if (typeof privateKeyOffset !== 'undefined') {
-      model.SignRequest.addPrivateKey(builder, privateKeyOffset);
-    }
-    if (typeof passphraseOffset !== 'undefined') {
-      model.SignRequest.addPassphrase(builder, passphraseOffset);
-    }
+    model.SignRequest.addMessage(builder, messageOffset);
+    model.SignRequest.addPublicKey(builder, publicKeyOffset);
+    model.SignRequest.addPrivateKey(builder, privateKeyOffset);
+    model.SignRequest.addPassphrase(builder, passphraseOffset);
     const offset = model.SignRequest.endSignRequest(builder);
     builder.finish(offset);
 
@@ -416,37 +299,19 @@ export default class OpenPGP {
     options?: KeyOptions
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
-    let inputFileOffset, publicKeyOffset, privateKeyOffset, passphraseOffset;
 
-    if (inputFile) {
-      inputFileOffset = builder.createString(inputFile);
-    }
-    if (publicKey) {
-      publicKeyOffset = builder.createString(publicKey);
-    }
-    if (privateKey) {
-      privateKeyOffset = builder.createString(privateKey);
-    }
-    if (passphrase) {
-      passphraseOffset = builder.createString(passphrase);
-    }
+    const inputFileOffset = builder.createString(inputFile);
+    const publicKeyOffset = builder.createString(publicKey);
+    const privateKeyOffset = builder.createString(privateKey);
+    const passphraseOffset = builder.createString(passphrase);
 
     const optionsOffset = this._keyOptions(builder, options);
     model.SignRequest.startSignRequest(builder);
     model.SignRequest.addOptions(builder, optionsOffset);
-
-    if (typeof inputFileOffset !== 'undefined') {
-      model.SignRequest.addMessage(builder, inputFileOffset);
-    }
-    if (typeof publicKeyOffset !== 'undefined') {
-      model.SignRequest.addPublicKey(builder, publicKeyOffset);
-    }
-    if (typeof privateKeyOffset !== 'undefined') {
-      model.SignRequest.addPrivateKey(builder, privateKeyOffset);
-    }
-    if (typeof passphraseOffset !== 'undefined') {
-      model.SignRequest.addPassphrase(builder, passphraseOffset);
-    }
+    model.SignRequest.addMessage(builder, inputFileOffset);
+    model.SignRequest.addPublicKey(builder, publicKeyOffset);
+    model.SignRequest.addPrivateKey(builder, privateKeyOffset);
+    model.SignRequest.addPassphrase(builder, passphraseOffset);
     const offset = model.SignRequest.endSignRequest(builder);
     builder.finish(offset);
 
@@ -459,28 +324,15 @@ export default class OpenPGP {
     publicKey: string
   ): Promise<boolean> {
     const builder = new flatbuffers.Builder(0);
-    let messageOffset, publicKeyOffset, signatureOffset;
 
-    if (message) {
-      messageOffset = builder.createString(message);
-    }
-    if (publicKey) {
-      publicKeyOffset = builder.createString(publicKey);
-    }
-    if (signature) {
-      signatureOffset = builder.createString(signature);
-    }
+    const messageOffset = builder.createString(message);
+    const publicKeyOffset = builder.createString(publicKey);
+    const signatureOffset = builder.createString(signature);
+
     model.VerifyRequest.startVerifyRequest(builder);
-
-    if (typeof messageOffset !== 'undefined') {
-      model.VerifyRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof publicKeyOffset !== 'undefined') {
-      model.VerifyRequest.addPublicKey(builder, publicKeyOffset);
-    }
-    if (typeof signatureOffset !== 'undefined') {
-      model.VerifyRequest.addSignature(builder, signatureOffset);
-    }
+    model.VerifyRequest.addMessage(builder, messageOffset);
+    model.VerifyRequest.addPublicKey(builder, publicKeyOffset);
+    model.VerifyRequest.addSignature(builder, signatureOffset);
     const offset = model.VerifyRequest.endVerifyRequest(builder);
     builder.finish(offset);
 
@@ -493,28 +345,15 @@ export default class OpenPGP {
     publicKey: string
   ): Promise<boolean> {
     const builder = new flatbuffers.Builder(0);
-    let inputFileOffset, publicKeyOffset, signatureOffset;
 
-    if (inputFile) {
-      inputFileOffset = builder.createString(inputFile);
-    }
-    if (publicKey) {
-      publicKeyOffset = builder.createString(publicKey);
-    }
-    if (signature) {
-      signatureOffset = builder.createString(signature);
-    }
+    const inputFileOffset = builder.createString(inputFile);
+    const publicKeyOffset = builder.createString(publicKey);
+    const signatureOffset = builder.createString(signature);
+
     model.VerifyRequest.startVerifyRequest(builder);
-
-    if (typeof inputFileOffset !== 'undefined') {
-      model.VerifyRequest.addMessage(builder, inputFileOffset);
-    }
-    if (typeof publicKeyOffset !== 'undefined') {
-      model.VerifyRequest.addPublicKey(builder, publicKeyOffset);
-    }
-    if (typeof signatureOffset !== 'undefined') {
-      model.VerifyRequest.addSignature(builder, signatureOffset);
-    }
+    model.VerifyRequest.addMessage(builder, inputFileOffset);
+    model.VerifyRequest.addPublicKey(builder, publicKeyOffset);
+    model.VerifyRequest.addSignature(builder, signatureOffset);
     const offset = model.VerifyRequest.endVerifyRequest(builder);
     builder.finish(offset);
 
@@ -528,26 +367,15 @@ export default class OpenPGP {
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
 
-    let messageOffset, passphraseOffset;
-
-    if (message) {
-      messageOffset = builder.createString(message);
-    }
-
-    if (passphrase) {
-      passphraseOffset = builder.createString(passphrase);
-    }
+    const messageOffset = builder.createString(message);
+    const passphraseOffset = builder.createString(passphrase);
 
     const optionsOffset = this._keyOptions(builder, options);
     model.DecryptSymmetricRequest.startDecryptSymmetricRequest(builder);
     model.DecryptSymmetricRequest.addOptions(builder, optionsOffset);
+    model.DecryptSymmetricRequest.addMessage(builder, messageOffset);
+    model.DecryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
 
-    if (typeof messageOffset !== 'undefined') {
-      model.DecryptSymmetricRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof passphraseOffset !== 'undefined') {
-      model.DecryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
-    }
     const offset = model.DecryptSymmetricRequest.endDecryptSymmetricRequest(
       builder
     );
@@ -564,23 +392,17 @@ export default class OpenPGP {
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
 
-    let messageOffset, passphraseOffset;
-
-    messageOffset = builder.createString([inputFile, outputFile].join('|'));
-    if (passphrase) {
-      passphraseOffset = builder.createString(passphrase);
-    }
+    const messageOffset = builder.createString(
+      [inputFile, outputFile].join('|')
+    );
+    const passphraseOffset = builder.createString(passphrase);
 
     const optionsOffset = this._keyOptions(builder, options);
     model.DecryptSymmetricRequest.startDecryptSymmetricRequest(builder);
     model.DecryptSymmetricRequest.addOptions(builder, optionsOffset);
+    model.DecryptSymmetricRequest.addMessage(builder, messageOffset);
+    model.DecryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
 
-    if (typeof messageOffset !== 'undefined') {
-      model.DecryptSymmetricRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof passphraseOffset !== 'undefined') {
-      model.DecryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
-    }
     const offset = model.DecryptSymmetricRequest.endDecryptSymmetricRequest(
       builder
     );
@@ -600,28 +422,17 @@ export default class OpenPGP {
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
 
-    let messageOffset, passphraseOffset;
-
-    if (message) {
-      messageOffset = builder.createString(message);
-    }
-
-    if (passphrase) {
-      passphraseOffset = builder.createString(passphrase);
-    }
+    const messageOffset = builder.createString(message);
+    const passphraseOffset = builder.createString(passphrase);
 
     const optionsOffset = this._keyOptions(builder, options);
     const fileHintsOffset = this._fileHints(builder, fileHints);
     model.EncryptSymmetricRequest.startEncryptSymmetricRequest(builder);
     model.EncryptSymmetricRequest.addOptions(builder, optionsOffset);
     model.EncryptSymmetricRequest.addFileHints(builder, fileHintsOffset);
+    model.EncryptSymmetricRequest.addMessage(builder, messageOffset);
+    model.EncryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
 
-    if (typeof messageOffset !== 'undefined') {
-      model.EncryptSymmetricRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof passphraseOffset !== 'undefined') {
-      model.EncryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
-    }
     const offset = model.EncryptSymmetricRequest.endEncryptSymmetricRequest(
       builder
     );
@@ -640,26 +451,19 @@ export default class OpenPGP {
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
 
-    let messageOffset, passphraseOffset;
-
-    messageOffset = builder.createString([inputFile, outputFile].join('|'));
-
-    if (passphrase) {
-      passphraseOffset = builder.createString(passphrase);
-    }
+    const messageOffset = builder.createString(
+      [inputFile, outputFile].join('|')
+    );
+    const passphraseOffset = builder.createString(passphrase);
 
     const optionsOffset = this._keyOptions(builder, options);
     const fileHintsOffset = this._fileHints(builder, fileHints);
     model.EncryptSymmetricRequest.startEncryptSymmetricRequest(builder);
     model.EncryptSymmetricRequest.addOptions(builder, optionsOffset);
     model.EncryptSymmetricRequest.addFileHints(builder, fileHintsOffset);
+    model.EncryptSymmetricRequest.addMessage(builder, messageOffset);
+    model.EncryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
 
-    if (typeof messageOffset !== 'undefined') {
-      model.EncryptSymmetricRequest.addMessage(builder, messageOffset);
-    }
-    if (typeof passphraseOffset !== 'undefined') {
-      model.EncryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
-    }
     const offset = model.EncryptSymmetricRequest.endEncryptSymmetricRequest(
       builder
     );
@@ -694,28 +498,21 @@ export default class OpenPGP {
       return model.Entity.endEntity(builder);
     }
 
-    let passphraseOffset, privateKeyOffset, publicKeyOffset;
+    let passphraseOffset;
 
     if (options.passphrase) {
       passphraseOffset = builder.createString(options.passphrase);
     }
-    if (options.privateKey) {
-      privateKeyOffset = builder.createString(options.privateKey);
-    }
-    if (options.publicKey) {
-      publicKeyOffset = builder.createString(options.publicKey);
-    }
+    const privateKeyOffset = builder.createString(options.privateKey);
+    const publicKeyOffset = builder.createString(options.publicKey);
 
     model.Entity.startEntity(builder);
     if (typeof passphraseOffset !== 'undefined') {
       model.Entity.addPassphrase(builder, passphraseOffset);
     }
-    if (typeof privateKeyOffset !== 'undefined') {
-      model.Entity.addPrivateKey(builder, privateKeyOffset);
-    }
-    if (typeof publicKeyOffset !== 'undefined') {
-      model.Entity.addPublicKey(builder, publicKeyOffset);
-    }
+    model.Entity.addPrivateKey(builder, privateKeyOffset);
+    model.Entity.addPublicKey(builder, publicKeyOffset);
+
     return model.Entity.endEntity(builder);
   }
 
@@ -773,8 +570,8 @@ export default class OpenPGP {
     if (typeof options.hash !== 'undefined') {
       model.KeyOptions.addHash(builder, options.hash);
     }
-    if (typeof options.RSABits !== 'undefined') {
-      model.KeyOptions.addRsaBits(builder, options.RSABits);
+    if (typeof options.rsaBits !== 'undefined') {
+      model.KeyOptions.addRsaBits(builder, options.rsaBits);
     }
     return model.KeyOptions.endKeyOptions(builder);
   }
@@ -824,26 +621,11 @@ export default class OpenPGP {
     return model.Options.endOptions(builder);
   }
 
-  private static _responseBuffer(result: BridgeResponse) {
-    var rawResponse;
-    if (result.hasOwnProperty('length')) {
-      const resultArray = result as BridgeResponseNativeModules;
-      rawResponse = new Uint8Array(resultArray);
-    } else {
-      const resultBytes = (result as BridgeResponseJSI) as ArrayBuffer;
-      rawResponse = new Uint8Array(resultBytes, 0, resultBytes.byteLength);
-    }
-
-    return new flatbuffers.ByteBuffer(rawResponse);
-  }
-
-  private static _keyPairResponse(result: BridgeResponse): KeyPair {
-    const response = model.KeyPairResponse.getRootAsKeyPairResponse(
-      this._responseBuffer(result)
-    );
+  private static _keyPairResponse(result: flatbuffers.ByteBuffer): KeyPair {
+    const response = model.KeyPairResponse.getRootAsKeyPairResponse(result);
     const error = response.error();
     if (error) {
-      throw new Error(error);
+      throw new Error('keyPairResponse: ' + error);
     }
     const output = response.output();
     if (!output) {
@@ -856,24 +638,20 @@ export default class OpenPGP {
     } as KeyPair;
   }
 
-  private static _stringResponse(result: BridgeResponse): string {
-    const response = model.StringResponse.getRootAsStringResponse(
-      this._responseBuffer(result)
-    );
+  private static _stringResponse(result: flatbuffers.ByteBuffer): string {
+    const response = model.StringResponse.getRootAsStringResponse(result);
     const error = response.error();
     if (error) {
-      throw new Error(error);
+      throw new Error('stringResponse: ' + error);
     }
     return response.output() || '';
   }
 
-  private static _boolResponse(result: BridgeResponse): boolean {
-    const response = model.BoolResponse.getRootAsBoolResponse(
-      this._responseBuffer(result)
-    );
+  private static _boolResponse(result: flatbuffers.ByteBuffer): boolean {
+    const response = model.BoolResponse.getRootAsBoolResponse(result);
     const error = response.error();
     if (error) {
-      throw new Error(error);
+      throw new Error('boolResponse: ' + error);
     }
     return response.output();
   }
