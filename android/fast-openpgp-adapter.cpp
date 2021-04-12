@@ -19,20 +19,22 @@ Java_com_reactnativefastopenpgp_FastOpenpgpModule_destruct(JNIEnv *env, jobject 
 }
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_reactnativefastopenpgp_FastOpenpgpModule_call(JNIEnv *env, jobject thiz,
+Java_com_reactnativefastopenpgp_FastOpenpgpModule_callNative(JNIEnv *env, jobject thiz,
                                                        jstring name, jbyteArray payload) {
 
-    jboolean iscopy;
-    auto nameConstChar = env->GetStringUTFChars(name, &iscopy);
-    auto payloadBytes = env->GetByteArrayElements(payload, &iscopy);
+    auto nameConstChar = env->GetStringUTFChars(name, nullptr);
+    auto payloadBytes = env->GetByteArrayElements(payload, nullptr);
     auto size = env->GetArrayLength(payload);
 
     auto nameChar = const_cast<char *>(nameConstChar);
     auto response = OpenPGPBridgeCall(nameChar, payloadBytes, size);
+
     env->ReleaseStringUTFChars(name, nameConstChar);
+    env->ReleaseByteArrayElements(payload, payloadBytes, 0);
 
     if (response->error != nullptr) {
         auto error = response->error;
+        free(response);
         jclass Exception = env->FindClass("java/lang/Exception");
         env->ThrowNew(Exception, error);
         return nullptr;
@@ -40,6 +42,7 @@ Java_com_reactnativefastopenpgp_FastOpenpgpModule_call(JNIEnv *env, jobject thiz
 
     auto result = env->NewByteArray(response->size);
     env->SetByteArrayRegion(result, 0, response->size, (jbyte*) response->message);
+    free(response);
     return result;
 }
 
@@ -49,18 +52,19 @@ JNIEXPORT jbyteArray JNICALL
 Java_com_reactnativefastopenpgp_FastOpenpgpModule_callJSI(JNIEnv *env, jobject thiz, jlong jsi_ptr,
                                                           jstring name, jbyteArray payload) {
     auto runtime = reinterpret_cast<jsi::Runtime *>(jsi_ptr);
-    jboolean iscopy;
-    auto nameConstChar = env->GetStringUTFChars(name, &iscopy);
+    auto nameConstChar = env->GetStringUTFChars(name, nullptr);
+    auto payloadBytes = env->GetByteArrayElements(payload, nullptr);
+    auto size = env->GetArrayLength(payload);
+
     auto nameValue = jsi::String::createFromAscii(*runtime, nameConstChar);
     env->ReleaseStringUTFChars(name, nameConstChar);
 
-    auto payloadArray = env->GetByteArrayElements(payload, &iscopy);
-    int size = env->GetArrayLength(payload);
 
     auto arrayBuffer = runtime->global().getPropertyAsFunction(*runtime, "ArrayBuffer");
     jsi::Object o = arrayBuffer.callAsConstructor(*runtime, size).getObject(*runtime);
     jsi::ArrayBuffer payloadValue = o.getArrayBuffer(*runtime);
-    memcpy(payloadValue.data(*runtime), payloadArray, size);
+    memcpy(payloadValue.data(*runtime), payloadBytes, size);
+    env->ReleaseByteArrayElements(payload, payloadBytes, 0);
 
     auto response = fastOpenPGP::call(*runtime, nameValue, payloadValue);
 

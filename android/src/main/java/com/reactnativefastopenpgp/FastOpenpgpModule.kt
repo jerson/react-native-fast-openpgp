@@ -9,7 +9,7 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactC
     external fun initialize(jsiPtr: Long);
     external fun destruct();
     external fun callJSI(jsiPtr: Long, name: String, payload: ByteArray): ByteArray;
-    external fun call(name: String, payload: ByteArray): ByteArray;
+    external fun callNative(name: String, payload: ByteArray): ByteArray;
 
     companion object {
         init {
@@ -22,11 +22,12 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactC
         Thread {
             try {
                 val bytes = ByteArray(payload.size()) { pos -> payload.getInt(pos).toByte() }
-                val result = callJSI(this.reactApplicationContext.javaScriptContextHolder.get(), name, bytes)
+                var result = callJSI(this.reactApplicationContext.javaScriptContextHolder.get(), name, bytes)
                 val resultList = Arguments.createArray()
                 for (i in result.indices) {
                     resultList.pushInt(result[i].toInt())
                 }
+                result = ByteArray(0);
                 promise.resolve(resultList)
             } catch (e: Exception) {
                 promise.reject(e)
@@ -39,12 +40,12 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactC
         Thread {
             try {
                 val bytes = ByteArray(payload.size()) { pos -> payload.getInt(pos).toByte() }
-                val result = call(name, bytes)
-
+                var result = callNative(name, bytes)
                 val resultList = Arguments.createArray()
                 for (i in result.indices) {
                     resultList.pushInt(result[i].toInt())
                 }
+                result = ByteArray(0);
                 promise.resolve(resultList)
             } catch (e: Exception) {
                 promise.reject(e)

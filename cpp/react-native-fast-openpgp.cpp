@@ -33,15 +33,15 @@ namespace fastOpenPGP {
                 runtime,
                 "ArrayBuffer"
         );
-        jsi::Object o = arrayBuffer.callAsConstructor(
+        jsi::Object result = arrayBuffer.callAsConstructor(
                 runtime,
                 response->size
         ).getObject(runtime);
-        jsi::ArrayBuffer buf = o.getArrayBuffer(runtime);
+        jsi::ArrayBuffer buf = result.getArrayBuffer(runtime);
         memcpy(buf.data(runtime), response->message, response->size);
         free(response);
 
-        return o;
+        return result;
     }
 
     void install(jsi::Runtime &jsiRuntime) {
