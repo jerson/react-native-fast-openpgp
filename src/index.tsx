@@ -112,6 +112,8 @@ export default class OpenPGP {
    */
   static useJSI = false;
 
+  private static readonly delimiter = '|';
+
   private static async call(
     name: string,
     bytes: Uint8Array
@@ -188,7 +190,7 @@ export default class OpenPGP {
     const builder = new flatbuffers.Builder(0);
 
     const messageOffset = builder.createString(
-      [inputFile, outputFile].join('|')
+      [inputFile, outputFile].join(this.delimiter)
     );
     const passphraseOffset = builder.createString(passphrase);
     const privateKeyOffset = builder.createString(privateKey);
@@ -244,7 +246,7 @@ export default class OpenPGP {
     const builder = new flatbuffers.Builder(0);
 
     const messageOffset = builder.createString(
-      [inputFile, outputFile].join('|')
+      [inputFile, outputFile].join(this.delimiter)
     );
     const publicKeyOffset = builder.createString(publicKey);
 
@@ -393,7 +395,7 @@ export default class OpenPGP {
     const builder = new flatbuffers.Builder(0);
 
     const messageOffset = builder.createString(
-      [inputFile, outputFile].join('|')
+      [inputFile, outputFile].join(this.delimiter)
     );
     const passphraseOffset = builder.createString(passphrase);
 
@@ -452,7 +454,7 @@ export default class OpenPGP {
     const builder = new flatbuffers.Builder(0);
 
     const messageOffset = builder.createString(
-      [inputFile, outputFile].join('|')
+      [inputFile, outputFile].join(this.delimiter)
     );
     const passphraseOffset = builder.createString(passphrase);
 

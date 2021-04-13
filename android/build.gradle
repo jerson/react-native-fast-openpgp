@@ -140,5 +140,6 @@ def kotlin_version = getExtOrDefault('kotlinVersion')
 dependencies {
   // noinspection GradleDynamicVersion
   api 'com.facebook.react:react-native:+'
+  implementation group: 'com.google.flatbuffers', name: 'flatbuffers-java', version: '1.12.0'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
