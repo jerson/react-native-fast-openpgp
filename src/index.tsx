@@ -110,7 +110,7 @@ export default class OpenPGP {
   /**
    * for now we recommend use this in false because is sync
    */
-  static useJSI = false;
+  static useJSI = true;
 
   private static readonly delimiter = '|';
 
