@@ -4,8 +4,11 @@ import {SafeAreaView, ScrollView, StatusBar, StyleSheet, View,} from 'react-nati
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import EncryptDecrypt from "./modules/EncryptDecrypt";
 import SignVerify from "./modules/SignVerify";
-import EncryptSymmetricDecryptSymmetric from "./modules/EncryptSymmetricDecryptSymmetric";
+import EncryptDecryptSymmetric from "./modules/EncryptDecryptSymmetric";
 import Generate from "./modules/Generate";
+import EncryptDecryptFile from "./modules/EncryptDecryptFile";
+import EncryptDecryptSymmetricFile from "./modules/EncryptDecryptSymmetricFile";
+import SignVerifyFile from "./modules/SignVerifyFile";
 
 const passphrase = 'test';
 const privateKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----
@@ -115,9 +118,13 @@ const App = () => {
                 >
                     <View style={styles.body}>
                         <EncryptDecrypt publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
+                        <EncryptDecryptFile publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
                         <SignVerify publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
-                        <EncryptSymmetricDecryptSymmetric publicKey={publicKey} privateKey={privateKey}
-                                                          passphrase={passphrase}/>
+                        <SignVerifyFile publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
+                        <EncryptDecryptSymmetric publicKey={publicKey} privateKey={privateKey}
+                                                 passphrase={passphrase}/>
+                        <EncryptDecryptSymmetricFile publicKey={publicKey} privateKey={privateKey}
+                                                     passphrase={passphrase}/>
                         <Generate publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
                     </View>
                 </ScrollView>
