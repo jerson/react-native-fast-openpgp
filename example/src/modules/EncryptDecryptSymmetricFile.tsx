@@ -6,6 +6,7 @@ import SectionTitle from "../components/SectionTitle";
 import SectionResult from "../components/SectionResult";
 import Container from "../components/Container";
 import { createFile, deleteFile } from "./Shared";
+import RNFS from "react-native-fs";
 
 interface Props {
     publicKey: string,
@@ -22,13 +23,15 @@ export default function ({passphrase}: Props) {
     const [output,setOutput] = useState('');
     const [encrypted, setEncrypted] = useState('');
     const [decrypted, setDecrypted] = useState('');
+    const [encryptedFile, setEncryptedFile] = useState('');
+    const [decryptedFile, setDecryptedFile] = useState('');
 
     useEffect(() => {
         createFile(fileName,content).then((value)=>{
             setInput(value);
             setOutput(value+".asc");
             setLoading(false);
-        }) 
+        })
 
         return ()=>{
             deleteFile(fileName)
@@ -51,9 +54,13 @@ export default function ({passphrase}: Props) {
                         passphrase
                     );
                     setEncrypted(result);
+                    RNFS.readFile(result,'base64').then((data) => {
+                        setEncryptedFile(data)
+                    })
                 }}
             />
             <SectionResult>{encrypted}</SectionResult>
+            <SectionResult>{encryptedFile}</SectionResult>
         </SectionContainer>
         {!!encrypted && (
             <SectionContainer>
@@ -67,12 +74,16 @@ export default function ({passphrase}: Props) {
                             passphrase
                         );
                         setDecrypted(result);
+                        RNFS.readFile(result,'utf8').then((data) => {
+                            setDecryptedFile(data)
+                        })
                     }}
                 />
                 {!!decrypted && (
-                    <SectionResult>
-                        {decrypted}
-                    </SectionResult>
+                    <>
+                        <SectionResult>{decrypted}</SectionResult>
+                        <SectionResult>{decryptedFile}</SectionResult>
+                    </>
                 )}
             </SectionContainer>
         )}

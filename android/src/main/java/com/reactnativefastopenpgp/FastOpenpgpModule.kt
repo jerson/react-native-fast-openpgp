@@ -57,31 +57,130 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
             return true
         }
         if (name == "signFile") {
-            val request = SignRequest.getRootAsSignRequest(ByteBuffer.wrap(payload))
-            val input = request.message!!
+            signFile(payload, promise)
             return true
         }
         if (name == "verifyFile") {
-            val request = VerifyRequest.getRootAsVerifyRequest(ByteBuffer.wrap(payload))
-            val input = request.message!!
-
+            verifyFile(payload, promise)
             return true
         }
         if (name == "decryptSymmetricFile") {
-            val request =
-                DecryptSymmetricRequest.getRootAsDecryptSymmetricRequest(ByteBuffer.wrap(payload))
-            val (input, output) = getInputAndOutput(request.message)
-
+            decryptSymmetricFile(payload, promise)
             return true
         }
         if (name == "encryptSymmetricFile") {
+            encryptSymmetricFile(payload, promise)
+            return true
+        }
+        return false
+    }
+
+    private fun verifyFile(
+        payload: ByteArray,
+        promise: Promise
+    ) {
+        try {
+            val request = VerifyRequest.getRootAsVerifyRequest(ByteBuffer.wrap(payload))
+            val input = request.message!!
+
+            val builder = FlatBufferBuilder()
+            val message = builder.createByteVector(readFile(input))
+            val publicKey = builder.createString(request.publicKey)
+            val signature = builder.createString(request.signature)
+
+            VerifyBytesRequest.startVerifyBytesRequest(builder)
+            VerifyBytesRequest.addMessage(builder, message)
+            VerifyBytesRequest.addPublicKey(builder, publicKey)
+            VerifyBytesRequest.addSignature(builder, signature)
+            val offset = VerifyBytesRequest.endVerifyBytesRequest(builder)
+            builder.finish(offset)
+
+            val result = callNative("verifyBytes", builder.sizedByteArray())
+            val response = BoolResponse.getRootAsBoolResponse(ByteBuffer.wrap(result))
+
+            val resultList = createBoolResponseArray(response.error, response.output)
+            promise.resolve(resultList)
+        } catch (e: Exception) {
+            promise.reject(e)
+        }
+    }
+
+    private fun signFile(
+        payload: ByteArray,
+        promise: Promise
+    ) {
+        try {
+            val request = SignRequest.getRootAsSignRequest(ByteBuffer.wrap(payload))
+            val input = request.message!!
+
+            val builder = FlatBufferBuilder()
+            val options = createKeyOptions(request.options, builder)
+            val message = builder.createByteVector(readFile(input))
+            val publicKey = builder.createString(request.publicKey)
+            val privateKey = builder.createString(request.privateKey)
+            val passphrase = builder.createString(request.passphrase)
+
+            SignBytesRequest.startSignBytesRequest(builder)
+            if (options != null) {
+                SignBytesRequest.addOptions(builder, options)
+            }
+            SignBytesRequest.addMessage(builder, message)
+            SignBytesRequest.addPublicKey(builder, publicKey)
+            SignBytesRequest.addPrivateKey(builder, privateKey)
+            SignBytesRequest.addPassphrase(builder, passphrase)
+            val offset = SignBytesRequest.endSignBytesRequest(builder)
+            builder.finish(offset)
+
+            val result = callNative("signBytes", builder.sizedByteArray())
+            val response = BytesResponse.getRootAsBytesResponse(ByteBuffer.wrap(result))
+
+            val resultList = createStringResponseArray(
+                response.error,
+                String(response.outputAsByteBuffer.array(), Charsets.US_ASCII)
+            )
+            promise.resolve(resultList)
+        } catch (e: Exception) {
+            promise.reject(e)
+        }
+    }
+
+    private fun encryptSymmetricFile(
+        payload: ByteArray,
+        promise: Promise
+    ) {
+        try {
             val request =
                 EncryptSymmetricRequest.getRootAsEncryptSymmetricRequest(ByteBuffer.wrap(payload))
             val (input, output) = getInputAndOutput(request.message)
 
-            return true
+
+            val builder = FlatBufferBuilder()
+            val options = createKeyOptions(request.options, builder)
+            val fileHints = createFileHints(request.fileHints, builder)
+            val message = builder.createByteVector(readFile(input))
+            val passphrase = builder.createString(request.passphrase)
+
+            EncryptSymmetricBytesRequest.startEncryptSymmetricBytesRequest(builder)
+            if (options != null) {
+                EncryptSymmetricBytesRequest.addOptions(builder, options)
+            }
+            if (fileHints != null) {
+                EncryptSymmetricBytesRequest.addFileHints(builder, fileHints)
+            }
+            EncryptSymmetricBytesRequest.addMessage(builder, message)
+            EncryptSymmetricBytesRequest.addPassphrase(builder, passphrase)
+            val offset = EncryptBytesRequest.endEncryptBytesRequest(builder)
+            builder.finish(offset)
+
+            val result = callNative("encryptSymmetricBytes", builder.sizedByteArray())
+            val response = BytesResponse.getRootAsBytesResponse(ByteBuffer.wrap(result))
+            writeFile(response.outputAsByteBuffer, output);
+
+            val resultList = createStringResponseArray(response.error, output)
+            promise.resolve(resultList)
+        } catch (e: Exception) {
+            promise.reject(e)
         }
-        return false
     }
 
     private fun encryptFile(
@@ -109,9 +208,9 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
             if (signed != null) {
                 EncryptBytesRequest.addSigned(builder, signed)
             }
-            EncryptRequest.addMessage(builder, message)
-            EncryptRequest.addPublicKey(builder, publicKey)
-            val offset = EncryptRequest.endEncryptRequest(builder)
+            EncryptBytesRequest.addMessage(builder, message)
+            EncryptBytesRequest.addPublicKey(builder, publicKey)
+            val offset = EncryptBytesRequest.endEncryptBytesRequest(builder)
             builder.finish(offset)
 
             val result = callNative("encryptBytes", builder.sizedByteArray())
@@ -144,10 +243,10 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
             if (options != null) {
                 DecryptBytesRequest.addOptions(builder, options)
             }
-            DecryptRequest.addMessage(builder, message)
-            DecryptRequest.addPassphrase(builder, passphrase)
-            DecryptRequest.addPrivateKey(builder, privateKey)
-            val offset = DecryptRequest.endDecryptRequest(builder)
+            DecryptBytesRequest.addMessage(builder, message)
+            DecryptBytesRequest.addPassphrase(builder, passphrase)
+            DecryptBytesRequest.addPrivateKey(builder, privateKey)
+            val offset = DecryptBytesRequest.endDecryptBytesRequest(builder)
             builder.finish(offset)
 
             val result = callNative("decryptBytes", builder.sizedByteArray())
@@ -159,6 +258,58 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
         } catch (e: Exception) {
             promise.reject(e)
         }
+    }
+
+    private fun decryptSymmetricFile(
+        payload: ByteArray,
+        promise: Promise
+    ) {
+        try {
+            val request =
+                DecryptSymmetricRequest.getRootAsDecryptSymmetricRequest(ByteBuffer.wrap(payload))
+            val (input, output) = getInputAndOutput(request.message)
+
+            val builder = FlatBufferBuilder()
+
+            val options = createKeyOptions(request.options, builder)
+            val message = builder.createByteVector(readFile(input))
+            val passphrase = builder.createString(request.passphrase)
+
+            DecryptSymmetricBytesRequest.startDecryptSymmetricBytesRequest(builder)
+            if (options != null) {
+                DecryptSymmetricBytesRequest.addOptions(builder, options)
+            }
+            DecryptSymmetricBytesRequest.addMessage(builder, message)
+            DecryptSymmetricBytesRequest.addPassphrase(builder, passphrase)
+            val offset = DecryptSymmetricBytesRequest.endDecryptSymmetricBytesRequest(builder)
+            builder.finish(offset)
+
+            val result = callNative("decryptSymmetricBytes", builder.sizedByteArray())
+            val response = BytesResponse.getRootAsBytesResponse(ByteBuffer.wrap(result))
+            writeFile(response.outputAsByteBuffer, output);
+
+            val resultList = createStringResponseArray(response.error, output)
+            promise.resolve(resultList)
+        } catch (e: Exception) {
+            promise.reject(e)
+        }
+    }
+
+    private fun createBoolResponseArray(
+        error: String?,
+        output: Boolean
+    ): WritableArray? {
+        val builder = FlatBufferBuilder()
+        val errorOffset = builder.createString(error ?: "")
+        val responseOffset =
+            BoolResponse.createBoolResponse(builder, output, errorOffset)
+        builder.finish(responseOffset)
+        val outputArray = builder.sizedByteArray()
+        val resultList = Arguments.createArray()
+        for (i in outputArray.indices) {
+            resultList.pushInt(outputArray[i].toInt())
+        }
+        return resultList
     }
 
     private fun createStringResponseArray(
