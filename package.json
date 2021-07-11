@@ -24,7 +24,7 @@
   "scripts": {
     "test": "jest",
     "typescript": "tsc --noEmit",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "lint": "echo 'skipped'",
     "prepare": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
@@ -80,7 +80,6 @@
   },
   "husky": {
     "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
       "pre-commit": "yarn lint && yarn typescript"
     }
   },
@@ -152,5 +151,8 @@
         }
       ]
     ]
+  },
+  "dependencies": {
+    "flatbuffers": "^2.0.3"
   }
 }

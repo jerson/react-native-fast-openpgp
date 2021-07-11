@@ -50,7 +50,7 @@ class EncryptSymmetricRequest : Table() {
         }
     }
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsEncryptSymmetricRequest(_bb: ByteBuffer): EncryptSymmetricRequest = getRootAsEncryptSymmetricRequest(_bb, EncryptSymmetricRequest())
         fun getRootAsEncryptSymmetricRequest(_bb: ByteBuffer, obj: EncryptSymmetricRequest): EncryptSymmetricRequest {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

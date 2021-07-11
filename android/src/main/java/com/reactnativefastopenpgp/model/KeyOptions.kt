@@ -118,7 +118,7 @@ class KeyOptions : Table() {
         }
     }
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsKeyOptions(_bb: ByteBuffer): KeyOptions = getRootAsKeyOptions(_bb, KeyOptions())
         fun getRootAsKeyOptions(_bb: ByteBuffer, obj: KeyOptions): KeyOptions {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

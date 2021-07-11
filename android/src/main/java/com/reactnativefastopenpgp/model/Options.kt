@@ -55,7 +55,7 @@ class Options : Table() {
         }
     }
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsOptions(_bb: ByteBuffer): Options = getRootAsOptions(_bb, Options())
         fun getRootAsOptions(_bb: ByteBuffer, obj: Options): Options {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

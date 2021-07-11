@@ -1,5 +1,5 @@
 import {Button, Text} from "react-native";
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useEffect, useState} from "react";
 import OpenPGP from 'react-native-fast-openpgp';
 import SectionContainer from "../components/SectionContainer";
 import SectionTitle from "../components/SectionTitle";

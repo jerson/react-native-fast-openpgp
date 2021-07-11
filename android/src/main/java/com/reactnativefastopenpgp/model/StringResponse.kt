@@ -32,7 +32,7 @@ class StringResponse : Table() {
     val errorAsByteBuffer : ByteBuffer get() = __vector_as_bytebuffer(6, 1)
     fun errorInByteBuffer(_bb: ByteBuffer) : ByteBuffer = __vector_in_bytebuffer(_bb, 6, 1)
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsStringResponse(_bb: ByteBuffer): StringResponse = getRootAsStringResponse(_bb, StringResponse())
         fun getRootAsStringResponse(_bb: ByteBuffer, obj: StringResponse): StringResponse {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

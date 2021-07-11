@@ -71,7 +71,7 @@ class SignBytesRequest : Table() {
         }
     }
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsSignBytesRequest(_bb: ByteBuffer): SignBytesRequest = getRootAsSignBytesRequest(_bb, SignBytesRequest())
         fun getRootAsSignBytesRequest(_bb: ByteBuffer, obj: SignBytesRequest): SignBytesRequest {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

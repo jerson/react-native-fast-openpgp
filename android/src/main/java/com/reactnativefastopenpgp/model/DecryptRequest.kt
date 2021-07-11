@@ -48,7 +48,7 @@ class DecryptRequest : Table() {
         }
     }
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsDecryptRequest(_bb: ByteBuffer): DecryptRequest = getRootAsDecryptRequest(_bb, DecryptRequest())
         fun getRootAsDecryptRequest(_bb: ByteBuffer, obj: DecryptRequest): DecryptRequest {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

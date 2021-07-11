@@ -9,7 +9,7 @@
 
 REPO="jerson/openpgp-mobile"
 NAME="flatbuffers_libopenpgp_bridge_ts"
-OUTPUT_DIR="src/model"
+OUTPUT_DIR="src"
 
 #######################################################
 # you shouldn't edit below this line                  #

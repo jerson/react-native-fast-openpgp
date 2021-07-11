@@ -81,7 +81,7 @@ class PrivateKeyMetadata : Table() {
         }
     }
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsPrivateKeyMetadata(_bb: ByteBuffer): PrivateKeyMetadata = getRootAsPrivateKeyMetadata(_bb, PrivateKeyMetadata())
         fun getRootAsPrivateKeyMetadata(_bb: ByteBuffer, obj: PrivateKeyMetadata): PrivateKeyMetadata {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

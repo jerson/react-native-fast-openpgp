@@ -59,7 +59,7 @@ class EncryptRequest : Table() {
         }
     }
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsEncryptRequest(_bb: ByteBuffer): EncryptRequest = getRootAsEncryptRequest(_bb, EncryptRequest())
         fun getRootAsEncryptRequest(_bb: ByteBuffer, obj: EncryptRequest): EncryptRequest {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

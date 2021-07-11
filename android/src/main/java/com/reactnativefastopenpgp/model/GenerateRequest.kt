@@ -27,7 +27,7 @@ class GenerateRequest : Table() {
         }
     }
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsGenerateRequest(_bb: ByteBuffer): GenerateRequest = getRootAsGenerateRequest(_bb, GenerateRequest())
         fun getRootAsGenerateRequest(_bb: ByteBuffer, obj: GenerateRequest): GenerateRequest {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

@@ -1,6 +1,16 @@
 import { NativeModules } from 'react-native';
-import { model } from './model/bridge_generated';
-import * as flatbuffers from './flatbuffers/flatbuffers';
+import * as model from './bridge';
+import * as flatbuffers from 'flatbuffers';
+import { BoolResponse } from './model/bool-response';
+import { DecryptRequest } from './model/decrypt-request';
+import { DecryptSymmetricRequest } from './model/decrypt-symmetric-request';
+import { EncryptRequest } from './model/encrypt-request';
+import { EncryptSymmetricRequest } from './model/encrypt-symmetric-request';
+import { GenerateRequest } from './model/generate-request';
+import { KeyPairResponse } from './model/key-pair-response';
+import { SignRequest } from './model/sign-request';
+import { StringResponse } from './model/string-response';
+import { VerifyRequest } from './model/verify-request';
 
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
   .FastOpenPGP;
@@ -23,6 +33,7 @@ export enum Cipher {
   AES192 = 1,
   AES256 = 2,
 }
+
 export interface KeyOptions {
   /**
    * RSABits is the number of bits in new RSA keys made with NewEntity.
@@ -66,6 +77,7 @@ export interface KeyOptions {
    */
   compressionLevel?: number;
 }
+
 export interface Options {
   comment?: string;
   email?: string;
@@ -73,6 +85,7 @@ export interface Options {
   passphrase?: string;
   keyOptions?: KeyOptions;
 }
+
 export interface KeyPair {
   publicKey: string;
   privateKey: string;
@@ -88,6 +101,7 @@ export interface Entity {
   privateKey: string;
   passphrase?: string;
 }
+
 export interface FileHints {
   /**
    * IsBinary can be set to hint that the contents are binary data.
@@ -114,16 +128,362 @@ export default class OpenPGP {
 
   private static readonly delimiter = '|';
 
+  static async decrypt(
+    message: string,
+    privateKey: string,
+    passphrase: string,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(message);
+    const passphraseOffset = builder.createString(passphrase);
+    const privateKeyOffset = builder.createString(privateKey);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    DecryptRequest.startDecryptRequest(builder);
+    DecryptRequest.addOptions(builder, optionsOffset);
+    DecryptRequest.addMessage(builder, messageOffset);
+    DecryptRequest.addPassphrase(builder, passphraseOffset);
+    DecryptRequest.addPrivateKey(builder, privateKeyOffset);
+    const offset = DecryptRequest.endDecryptRequest(builder);
+    builder.finish(offset);
+
+    const result = await this.call('decrypt', builder.asUint8Array());
+    return this._stringResponse(result);
+  }
+
+  static async decryptFile(
+    inputFile: string,
+    outputFile: string,
+    privateKey: string,
+    passphrase: string,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(
+      [inputFile, outputFile].join(this.delimiter),
+    );
+    const passphraseOffset = builder.createString(passphrase);
+    const privateKeyOffset = builder.createString(privateKey);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    DecryptRequest.startDecryptRequest(builder);
+    DecryptRequest.addOptions(builder, optionsOffset);
+    DecryptRequest.addMessage(builder, messageOffset);
+    DecryptRequest.addPassphrase(builder, passphraseOffset);
+    DecryptRequest.addPrivateKey(builder, privateKeyOffset);
+    const offset = DecryptRequest.endDecryptRequest(builder);
+    builder.finish(offset);
+
+    const result = await this.call('decryptFile', builder.asUint8Array());
+    return this._stringResponse(result);
+  }
+
+  static async encrypt(
+    message: string,
+    publicKey: string,
+    signedEntity?: Entity,
+    fileHints?: FileHints,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(message);
+    const publicKeyOffset = builder.createString(publicKey);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    const fileHintsOffset = this._fileHints(builder, fileHints);
+    const signedEntityOffset = this._entity(builder, signedEntity);
+    EncryptRequest.startEncryptRequest(builder);
+    EncryptRequest.addOptions(builder, optionsOffset);
+    EncryptRequest.addFileHints(builder, fileHintsOffset);
+    EncryptRequest.addSigned(builder, signedEntityOffset);
+    EncryptRequest.addMessage(builder, messageOffset);
+    EncryptRequest.addPublicKey(builder, publicKeyOffset);
+
+    const offset = EncryptRequest.endEncryptRequest(builder);
+    builder.finish(offset);
+
+    const result = await this.call('encrypt', builder.asUint8Array());
+    return this._stringResponse(result);
+  }
+
+  static async encryptFile(
+    inputFile: string,
+    outputFile: string,
+    publicKey: string,
+    signedEntity?: Entity,
+    fileHints?: FileHints,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(
+      [inputFile, outputFile].join(this.delimiter),
+    );
+    const publicKeyOffset = builder.createString(publicKey);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    const fileHintsOffset = this._fileHints(builder, fileHints);
+    const signedEntityOffset = this._entity(builder, signedEntity);
+    EncryptRequest.startEncryptRequest(builder);
+    EncryptRequest.addOptions(builder, optionsOffset);
+    EncryptRequest.addFileHints(builder, fileHintsOffset);
+    EncryptRequest.addSigned(builder, signedEntityOffset);
+    EncryptRequest.addMessage(builder, messageOffset);
+    EncryptRequest.addPublicKey(builder, publicKeyOffset);
+
+    const offset = EncryptRequest.endEncryptRequest(builder);
+    builder.finish(offset);
+
+    const result = await this.call('encryptFile', builder.asUint8Array());
+    return this._stringResponse(result);
+  }
+
+  static async sign(
+    message: string,
+    publicKey: string,
+    privateKey: string,
+    passphrase: string,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(message);
+    const publicKeyOffset = builder.createString(publicKey);
+    const privateKeyOffset = builder.createString(privateKey);
+    const passphraseOffset = builder.createString(passphrase);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    SignRequest.startSignRequest(builder);
+    SignRequest.addOptions(builder, optionsOffset);
+    SignRequest.addMessage(builder, messageOffset);
+    SignRequest.addPublicKey(builder, publicKeyOffset);
+    SignRequest.addPrivateKey(builder, privateKeyOffset);
+    SignRequest.addPassphrase(builder, passphraseOffset);
+    const offset = SignRequest.endSignRequest(builder);
+    builder.finish(offset);
+
+    const result = await this.call('sign', builder.asUint8Array());
+    return this._stringResponse(result);
+  }
+
+  static async signFile(
+    inputFile: string,
+    publicKey: string,
+    privateKey: string,
+    passphrase: string,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const inputFileOffset = builder.createString(inputFile);
+    const publicKeyOffset = builder.createString(publicKey);
+    const privateKeyOffset = builder.createString(privateKey);
+    const passphraseOffset = builder.createString(passphrase);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    SignRequest.startSignRequest(builder);
+    SignRequest.addOptions(builder, optionsOffset);
+    SignRequest.addMessage(builder, inputFileOffset);
+    SignRequest.addPublicKey(builder, publicKeyOffset);
+    SignRequest.addPrivateKey(builder, privateKeyOffset);
+    SignRequest.addPassphrase(builder, passphraseOffset);
+    const offset = SignRequest.endSignRequest(builder);
+    builder.finish(offset);
+
+    const result = await this.call('signFile', builder.asUint8Array());
+    return this._stringResponse(result);
+  }
+
+  static async verify(
+    signature: string,
+    message: string,
+    publicKey: string,
+  ): Promise<boolean> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(message);
+    const publicKeyOffset = builder.createString(publicKey);
+    const signatureOffset = builder.createString(signature);
+
+    VerifyRequest.startVerifyRequest(builder);
+    VerifyRequest.addMessage(builder, messageOffset);
+    VerifyRequest.addPublicKey(builder, publicKeyOffset);
+    VerifyRequest.addSignature(builder, signatureOffset);
+    const offset = VerifyRequest.endVerifyRequest(builder);
+    builder.finish(offset);
+
+    const result = await this.call('verify', builder.asUint8Array());
+    return this._boolResponse(result);
+  }
+
+  static async verifyFile(
+    signature: string,
+    inputFile: string,
+    publicKey: string,
+  ): Promise<boolean> {
+    const builder = new flatbuffers.Builder(0);
+
+    const inputFileOffset = builder.createString(inputFile);
+    const publicKeyOffset = builder.createString(publicKey);
+    const signatureOffset = builder.createString(signature);
+
+    VerifyRequest.startVerifyRequest(builder);
+    VerifyRequest.addMessage(builder, inputFileOffset);
+    VerifyRequest.addPublicKey(builder, publicKeyOffset);
+    VerifyRequest.addSignature(builder, signatureOffset);
+    const offset = VerifyRequest.endVerifyRequest(builder);
+    builder.finish(offset);
+
+    const result = await this.call('verifyFile', builder.asUint8Array());
+    return this._boolResponse(result);
+  }
+
+  static async decryptSymmetric(
+    message: string,
+    passphrase: string,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(message);
+    const passphraseOffset = builder.createString(passphrase);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    DecryptSymmetricRequest.startDecryptSymmetricRequest(builder);
+    DecryptSymmetricRequest.addOptions(builder, optionsOffset);
+    DecryptSymmetricRequest.addMessage(builder, messageOffset);
+    DecryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
+
+    const offset = DecryptSymmetricRequest.endDecryptSymmetricRequest(
+      builder,
+    );
+    builder.finish(offset);
+
+    const result = await this.call('decryptSymmetric', builder.asUint8Array());
+    return this._stringResponse(result);
+  }
+
+  static async decryptSymmetricFile(
+    inputFile: string,
+    outputFile: string,
+    passphrase: string,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(
+      [inputFile, outputFile].join(this.delimiter),
+    );
+    const passphraseOffset = builder.createString(passphrase);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    DecryptSymmetricRequest.startDecryptSymmetricRequest(builder);
+    DecryptSymmetricRequest.addOptions(builder, optionsOffset);
+    DecryptSymmetricRequest.addMessage(builder, messageOffset);
+    DecryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
+
+    const offset = DecryptSymmetricRequest.endDecryptSymmetricRequest(
+      builder,
+    );
+    builder.finish(offset);
+
+    const result = await this.call(
+      'decryptSymmetricFile',
+      builder.asUint8Array(),
+    );
+    return this._stringResponse(result);
+  }
+
+  static async encryptSymmetric(
+    message: string,
+    passphrase: string,
+    fileHints?: FileHints,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(message);
+    const passphraseOffset = builder.createString(passphrase);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    const fileHintsOffset = this._fileHints(builder, fileHints);
+    EncryptSymmetricRequest.startEncryptSymmetricRequest(builder);
+    EncryptSymmetricRequest.addOptions(builder, optionsOffset);
+    EncryptSymmetricRequest.addFileHints(builder, fileHintsOffset);
+    EncryptSymmetricRequest.addMessage(builder, messageOffset);
+    EncryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
+
+    const offset = EncryptSymmetricRequest.endEncryptSymmetricRequest(
+      builder,
+    );
+    builder.finish(offset);
+
+    const result = await this.call('encryptSymmetric', builder.asUint8Array());
+    return this._stringResponse(result);
+  }
+
+  static async encryptSymmetricFile(
+    inputFile: string,
+    outputFile: string,
+    passphrase: string,
+    fileHints?: FileHints,
+    options?: KeyOptions,
+  ): Promise<string> {
+    const builder = new flatbuffers.Builder(0);
+
+    const messageOffset = builder.createString(
+      [inputFile, outputFile].join(this.delimiter),
+    );
+    const passphraseOffset = builder.createString(passphrase);
+
+    const optionsOffset = this._keyOptions(builder, options);
+    const fileHintsOffset = this._fileHints(builder, fileHints);
+    EncryptSymmetricRequest.startEncryptSymmetricRequest(builder);
+    EncryptSymmetricRequest.addOptions(builder, optionsOffset);
+    EncryptSymmetricRequest.addFileHints(builder, fileHintsOffset);
+    EncryptSymmetricRequest.addMessage(builder, messageOffset);
+    EncryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
+
+    const offset = EncryptSymmetricRequest.endEncryptSymmetricRequest(
+      builder,
+    );
+    builder.finish(offset);
+
+    const result = await this.call(
+      'encryptSymmetricFile',
+      builder.asUint8Array(),
+    );
+
+    return this._stringResponse(result);
+  }
+
+  static async generate(options: Options): Promise<KeyPair> {
+    const builder = new flatbuffers.Builder(0);
+    const optionsOffset = this._options(builder, options);
+    GenerateRequest.startGenerateRequest(builder);
+    GenerateRequest.addOptions(builder, optionsOffset);
+    const offset = GenerateRequest.endGenerateRequest(builder);
+    builder.finish(offset);
+
+    const result = await this.call('generate', builder.asUint8Array());
+
+    return this._keyPairResponse(result);
+  }
+
   private static async call(
     name: string,
-    bytes: Uint8Array
+    bytes: Uint8Array,
   ): Promise<flatbuffers.ByteBuffer> {
     try {
       let result: BridgeResponse;
       if (this.useJSI) {
         const buff = bytes.buffer.slice(
           bytes.byteOffset,
-          bytes.byteLength + bytes.byteOffset
+          bytes.byteLength + bytes.byteOffset,
         );
 
         result = await global.FastOpenPGPCallPromise(name, buff);
@@ -156,344 +516,9 @@ export default class OpenPGP {
     return new flatbuffers.ByteBuffer(rawResponse);
   }
 
-  static async decrypt(
-    message: string,
-    privateKey: string,
-    passphrase: string,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(message);
-    const passphraseOffset = builder.createString(passphrase);
-    const privateKeyOffset = builder.createString(privateKey);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    model.DecryptRequest.startDecryptRequest(builder);
-    model.DecryptRequest.addOptions(builder, optionsOffset);
-    model.DecryptRequest.addMessage(builder, messageOffset);
-    model.DecryptRequest.addPassphrase(builder, passphraseOffset);
-    model.DecryptRequest.addPrivateKey(builder, privateKeyOffset);
-    const offset = model.DecryptRequest.endDecryptRequest(builder);
-    builder.finish(offset);
-
-    const result = await this.call('decrypt', builder.asUint8Array());
-    return this._stringResponse(result);
-  }
-  static async decryptFile(
-    inputFile: string,
-    outputFile: string,
-    privateKey: string,
-    passphrase: string,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(
-      [inputFile, outputFile].join(this.delimiter)
-    );
-    const passphraseOffset = builder.createString(passphrase);
-    const privateKeyOffset = builder.createString(privateKey);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    model.DecryptRequest.startDecryptRequest(builder);
-    model.DecryptRequest.addOptions(builder, optionsOffset);
-    model.DecryptRequest.addMessage(builder, messageOffset);
-    model.DecryptRequest.addPassphrase(builder, passphraseOffset);
-    model.DecryptRequest.addPrivateKey(builder, privateKeyOffset);
-    const offset = model.DecryptRequest.endDecryptRequest(builder);
-    builder.finish(offset);
-
-    const result = await this.call('decryptFile', builder.asUint8Array());
-    return this._stringResponse(result);
-  }
-  static async encrypt(
-    message: string,
-    publicKey: string,
-    signedEntity?: Entity,
-    fileHints?: FileHints,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(message);
-    const publicKeyOffset = builder.createString(publicKey);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    const fileHintsOffset = this._fileHints(builder, fileHints);
-    const signedEntityOffset = this._entity(builder, signedEntity);
-    model.EncryptRequest.startEncryptRequest(builder);
-    model.EncryptRequest.addOptions(builder, optionsOffset);
-    model.EncryptRequest.addFileHints(builder, fileHintsOffset);
-    model.EncryptRequest.addSigned(builder, signedEntityOffset);
-    model.EncryptRequest.addMessage(builder, messageOffset);
-    model.EncryptRequest.addPublicKey(builder, publicKeyOffset);
-
-    const offset = model.EncryptRequest.endEncryptRequest(builder);
-    builder.finish(offset);
-
-    const result = await this.call('encrypt', builder.asUint8Array());
-    return this._stringResponse(result);
-  }
-  static async encryptFile(
-    inputFile: string,
-    outputFile: string,
-    publicKey: string,
-    signedEntity?: Entity,
-    fileHints?: FileHints,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(
-      [inputFile, outputFile].join(this.delimiter)
-    );
-    const publicKeyOffset = builder.createString(publicKey);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    const fileHintsOffset = this._fileHints(builder, fileHints);
-    const signedEntityOffset = this._entity(builder, signedEntity);
-    model.EncryptRequest.startEncryptRequest(builder);
-    model.EncryptRequest.addOptions(builder, optionsOffset);
-    model.EncryptRequest.addFileHints(builder, fileHintsOffset);
-    model.EncryptRequest.addSigned(builder, signedEntityOffset);
-    model.EncryptRequest.addMessage(builder, messageOffset);
-    model.EncryptRequest.addPublicKey(builder, publicKeyOffset);
-
-    const offset = model.EncryptRequest.endEncryptRequest(builder);
-    builder.finish(offset);
-
-    const result = await this.call('encryptFile', builder.asUint8Array());
-    return this._stringResponse(result);
-  }
-  static async sign(
-    message: string,
-    publicKey: string,
-    privateKey: string,
-    passphrase: string,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(message);
-    const publicKeyOffset = builder.createString(publicKey);
-    const privateKeyOffset = builder.createString(privateKey);
-    const passphraseOffset = builder.createString(passphrase);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    model.SignRequest.startSignRequest(builder);
-    model.SignRequest.addOptions(builder, optionsOffset);
-    model.SignRequest.addMessage(builder, messageOffset);
-    model.SignRequest.addPublicKey(builder, publicKeyOffset);
-    model.SignRequest.addPrivateKey(builder, privateKeyOffset);
-    model.SignRequest.addPassphrase(builder, passphraseOffset);
-    const offset = model.SignRequest.endSignRequest(builder);
-    builder.finish(offset);
-
-    const result = await this.call('sign', builder.asUint8Array());
-    return this._stringResponse(result);
-  }
-  static async signFile(
-    inputFile: string,
-    publicKey: string,
-    privateKey: string,
-    passphrase: string,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const inputFileOffset = builder.createString(inputFile);
-    const publicKeyOffset = builder.createString(publicKey);
-    const privateKeyOffset = builder.createString(privateKey);
-    const passphraseOffset = builder.createString(passphrase);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    model.SignRequest.startSignRequest(builder);
-    model.SignRequest.addOptions(builder, optionsOffset);
-    model.SignRequest.addMessage(builder, inputFileOffset);
-    model.SignRequest.addPublicKey(builder, publicKeyOffset);
-    model.SignRequest.addPrivateKey(builder, privateKeyOffset);
-    model.SignRequest.addPassphrase(builder, passphraseOffset);
-    const offset = model.SignRequest.endSignRequest(builder);
-    builder.finish(offset);
-
-    const result = await this.call('signFile', builder.asUint8Array());
-    return this._stringResponse(result);
-  }
-  static async verify(
-    signature: string,
-    message: string,
-    publicKey: string
-  ): Promise<boolean> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(message);
-    const publicKeyOffset = builder.createString(publicKey);
-    const signatureOffset = builder.createString(signature);
-
-    model.VerifyRequest.startVerifyRequest(builder);
-    model.VerifyRequest.addMessage(builder, messageOffset);
-    model.VerifyRequest.addPublicKey(builder, publicKeyOffset);
-    model.VerifyRequest.addSignature(builder, signatureOffset);
-    const offset = model.VerifyRequest.endVerifyRequest(builder);
-    builder.finish(offset);
-
-    const result = await this.call('verify', builder.asUint8Array());
-    return this._boolResponse(result);
-  }
-  static async verifyFile(
-    signature: string,
-    inputFile: string,
-    publicKey: string
-  ): Promise<boolean> {
-    const builder = new flatbuffers.Builder(0);
-
-    const inputFileOffset = builder.createString(inputFile);
-    const publicKeyOffset = builder.createString(publicKey);
-    const signatureOffset = builder.createString(signature);
-
-    model.VerifyRequest.startVerifyRequest(builder);
-    model.VerifyRequest.addMessage(builder, inputFileOffset);
-    model.VerifyRequest.addPublicKey(builder, publicKeyOffset);
-    model.VerifyRequest.addSignature(builder, signatureOffset);
-    const offset = model.VerifyRequest.endVerifyRequest(builder);
-    builder.finish(offset);
-
-    const result = await this.call('verifyFile', builder.asUint8Array());
-    return this._boolResponse(result);
-  }
-  static async decryptSymmetric(
-    message: string,
-    passphrase: string,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(message);
-    const passphraseOffset = builder.createString(passphrase);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    model.DecryptSymmetricRequest.startDecryptSymmetricRequest(builder);
-    model.DecryptSymmetricRequest.addOptions(builder, optionsOffset);
-    model.DecryptSymmetricRequest.addMessage(builder, messageOffset);
-    model.DecryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
-
-    const offset = model.DecryptSymmetricRequest.endDecryptSymmetricRequest(
-      builder
-    );
-    builder.finish(offset);
-
-    const result = await this.call('decryptSymmetric', builder.asUint8Array());
-    return this._stringResponse(result);
-  }
-  static async decryptSymmetricFile(
-    inputFile: string,
-    outputFile: string,
-    passphrase: string,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(
-      [inputFile, outputFile].join(this.delimiter)
-    );
-    const passphraseOffset = builder.createString(passphrase);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    model.DecryptSymmetricRequest.startDecryptSymmetricRequest(builder);
-    model.DecryptSymmetricRequest.addOptions(builder, optionsOffset);
-    model.DecryptSymmetricRequest.addMessage(builder, messageOffset);
-    model.DecryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
-
-    const offset = model.DecryptSymmetricRequest.endDecryptSymmetricRequest(
-      builder
-    );
-    builder.finish(offset);
-
-    const result = await this.call(
-      'decryptSymmetricFile',
-      builder.asUint8Array()
-    );
-    return this._stringResponse(result);
-  }
-  static async encryptSymmetric(
-    message: string,
-    passphrase: string,
-    fileHints?: FileHints,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(message);
-    const passphraseOffset = builder.createString(passphrase);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    const fileHintsOffset = this._fileHints(builder, fileHints);
-    model.EncryptSymmetricRequest.startEncryptSymmetricRequest(builder);
-    model.EncryptSymmetricRequest.addOptions(builder, optionsOffset);
-    model.EncryptSymmetricRequest.addFileHints(builder, fileHintsOffset);
-    model.EncryptSymmetricRequest.addMessage(builder, messageOffset);
-    model.EncryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
-
-    const offset = model.EncryptSymmetricRequest.endEncryptSymmetricRequest(
-      builder
-    );
-    builder.finish(offset);
-
-    const result = await this.call('encryptSymmetric', builder.asUint8Array());
-    return this._stringResponse(result);
-  }
-
-  static async encryptSymmetricFile(
-    inputFile: string,
-    outputFile: string,
-    passphrase: string,
-    fileHints?: FileHints,
-    options?: KeyOptions
-  ): Promise<string> {
-    const builder = new flatbuffers.Builder(0);
-
-    const messageOffset = builder.createString(
-      [inputFile, outputFile].join(this.delimiter)
-    );
-    const passphraseOffset = builder.createString(passphrase);
-
-    const optionsOffset = this._keyOptions(builder, options);
-    const fileHintsOffset = this._fileHints(builder, fileHints);
-    model.EncryptSymmetricRequest.startEncryptSymmetricRequest(builder);
-    model.EncryptSymmetricRequest.addOptions(builder, optionsOffset);
-    model.EncryptSymmetricRequest.addFileHints(builder, fileHintsOffset);
-    model.EncryptSymmetricRequest.addMessage(builder, messageOffset);
-    model.EncryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
-
-    const offset = model.EncryptSymmetricRequest.endEncryptSymmetricRequest(
-      builder
-    );
-    builder.finish(offset);
-
-    const result = await this.call(
-      'encryptSymmetricFile',
-      builder.asUint8Array()
-    );
-
-    return this._stringResponse(result);
-  }
-  static async generate(options: Options): Promise<KeyPair> {
-    const builder = new flatbuffers.Builder(0);
-    const optionsOffset = this._options(builder, options);
-    model.GenerateRequest.startGenerateRequest(builder);
-    model.GenerateRequest.addOptions(builder, optionsOffset);
-    const offset = model.GenerateRequest.endGenerateRequest(builder);
-    builder.finish(offset);
-
-    const result = await this.call('generate', builder.asUint8Array());
-
-    return this._keyPairResponse(result);
-  }
-
   private static _entity(
     builder: flatbuffers.Builder,
-    options?: Entity
+    options?: Entity,
   ): number {
     if (!options) {
       model.Entity.startEntity(builder);
@@ -520,7 +545,7 @@ export default class OpenPGP {
 
   private static _fileHints(
     builder: flatbuffers.Builder,
-    options?: FileHints
+    options?: FileHints,
   ): number {
     if (!options) {
       model.FileHints.startFileHints(builder);
@@ -551,7 +576,7 @@ export default class OpenPGP {
 
   private static _keyOptions(
     builder: flatbuffers.Builder,
-    options?: KeyOptions
+    options?: KeyOptions,
   ): number {
     if (!options) {
       model.KeyOptions.startKeyOptions(builder);
@@ -580,7 +605,7 @@ export default class OpenPGP {
 
   private static _options(
     builder: flatbuffers.Builder,
-    options?: Options
+    options?: Options,
   ): number {
     if (!options) {
       model.Options.startOptions(builder);
@@ -624,7 +649,7 @@ export default class OpenPGP {
   }
 
   private static _keyPairResponse(result: flatbuffers.ByteBuffer): KeyPair {
-    const response = model.KeyPairResponse.getRootAsKeyPairResponse(result);
+    const response = KeyPairResponse.getRootAsKeyPairResponse(result);
     const error = response.error();
     if (error) {
       throw new Error('keyPairResponse: ' + error);
@@ -641,7 +666,7 @@ export default class OpenPGP {
   }
 
   private static _stringResponse(result: flatbuffers.ByteBuffer): string {
-    const response = model.StringResponse.getRootAsStringResponse(result);
+    const response = StringResponse.getRootAsStringResponse(result);
     const error = response.error();
     if (error) {
       throw new Error('stringResponse: ' + error);
@@ -650,7 +675,7 @@ export default class OpenPGP {
   }
 
   private static _boolResponse(result: flatbuffers.ByteBuffer): boolean {
-    const response = model.BoolResponse.getRootAsBoolResponse(result);
+    const response = BoolResponse.getRootAsBoolResponse(result);
     const error = response.error();
     if (error) {
       throw new Error('boolResponse: ' + error);

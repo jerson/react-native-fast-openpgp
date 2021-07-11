@@ -39,7 +39,7 @@ class VerifyRequest : Table() {
     val publicKeyAsByteBuffer : ByteBuffer get() = __vector_as_bytebuffer(8, 1)
     fun publicKeyInByteBuffer(_bb: ByteBuffer) : ByteBuffer = __vector_in_bytebuffer(_bb, 8, 1)
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsVerifyRequest(_bb: ByteBuffer): VerifyRequest = getRootAsVerifyRequest(_bb, VerifyRequest())
         fun getRootAsVerifyRequest(_bb: ByteBuffer, obj: VerifyRequest): VerifyRequest {
             _bb.order(ByteOrder.LITTLE_ENDIAN)

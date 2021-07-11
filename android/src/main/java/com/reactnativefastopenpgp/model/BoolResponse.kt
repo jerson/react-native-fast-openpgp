@@ -39,7 +39,7 @@ class BoolResponse : Table() {
     val errorAsByteBuffer : ByteBuffer get() = __vector_as_bytebuffer(6, 1)
     fun errorInByteBuffer(_bb: ByteBuffer) : ByteBuffer = __vector_in_bytebuffer(_bb, 6, 1)
     companion object {
-        fun validateVersion() = Constants.FLATBUFFERS_1_12_0()
+        fun validateVersion() = Constants.FLATBUFFERS_2_0_0()
         fun getRootAsBoolResponse(_bb: ByteBuffer): BoolResponse = getRootAsBoolResponse(_bb, BoolResponse())
         fun getRootAsBoolResponse(_bb: ByteBuffer, obj: BoolResponse): BoolResponse {
             _bb.order(ByteOrder.LITTLE_ENDIAN)
