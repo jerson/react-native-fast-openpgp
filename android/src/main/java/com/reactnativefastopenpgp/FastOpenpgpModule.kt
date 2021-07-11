@@ -11,7 +11,8 @@ import java.nio.channels.WritableByteChannel
 
 
 @ExperimentalUnsignedTypes
-internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
+    ReactContextBaseJavaModule(reactContext) {
 
     private val delimiter = "|"
 
@@ -45,41 +46,14 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactC
         channel.write(data)
         out.close()
     }
+
     private fun handleLocalMethod(name: String, payload: ByteArray, promise: Promise): Boolean {
         if (name == "decryptFile") {
-
-            try {
-
-                val request = DecryptRequest.getRootAsDecryptRequest(ByteBuffer.wrap(payload))
-                val (input, output) = getInputAndOutput(request.message)
-                val builder = FlatBufferBuilder()
-
-                //FIXME
-                val options = builder.createByteVector(request.options!!.byteBuffer)
-
-                val message = builder.createByteVector(readFile(input))
-                val passphrase = builder.createString(request.passphrase)
-                val privateKey = builder.createString(request.privateKey)
-
-                DecryptBytesRequest.createDecryptBytesRequest(builder, message, passphrase, privateKey, options)
-
-                val result = callNative(name, builder.sizedByteArray())
-                val response = BytesResponse.getRootAsBytesResponse(ByteBuffer.wrap(result))
-                writeFile(response.outputAsByteBuffer, output);
-
-                val resultList = Arguments.createArray()
-                promise.resolve(resultList)
-            } catch (e: Exception) {
-                promise.reject(e)
-            }
-
-
+            decryptFile(payload, promise)
             return true
         }
         if (name == "encryptFile") {
-            val request = EncryptRequest.getRootAsEncryptRequest(ByteBuffer.wrap(payload))
-            val (input, output) = getInputAndOutput(request.message)
-
+            encryptFile(payload, promise)
             return true
         }
         if (name == "signFile") {
@@ -94,18 +68,170 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactC
             return true
         }
         if (name == "decryptSymmetricFile") {
-            val request = DecryptSymmetricRequest.getRootAsDecryptSymmetricRequest(ByteBuffer.wrap(payload))
+            val request =
+                DecryptSymmetricRequest.getRootAsDecryptSymmetricRequest(ByteBuffer.wrap(payload))
             val (input, output) = getInputAndOutput(request.message)
 
             return true
         }
         if (name == "encryptSymmetricFile") {
-            val request = EncryptSymmetricRequest.getRootAsEncryptSymmetricRequest(ByteBuffer.wrap(payload))
+            val request =
+                EncryptSymmetricRequest.getRootAsEncryptSymmetricRequest(ByteBuffer.wrap(payload))
             val (input, output) = getInputAndOutput(request.message)
 
             return true
         }
         return false
+    }
+
+    private fun encryptFile(
+        payload: ByteArray,
+        promise: Promise
+    ) {
+        try {
+            val request = EncryptRequest.getRootAsEncryptRequest(ByteBuffer.wrap(payload))
+            val (input, output) = getInputAndOutput(request.message)
+
+            val builder = FlatBufferBuilder()
+            val options = createKeyOptions(request.options, builder)
+            val fileHints = createFileHints(request.fileHints, builder)
+            val signed = createSigned(request.signed, builder)
+            val message = builder.createByteVector(readFile(input))
+            val publicKey = builder.createString(request.publicKey)
+
+            EncryptBytesRequest.startEncryptBytesRequest(builder)
+            if (options != null) {
+                EncryptBytesRequest.addOptions(builder, options)
+            }
+            if (fileHints != null) {
+                EncryptBytesRequest.addFileHints(builder, fileHints)
+            }
+            if (signed != null) {
+                EncryptBytesRequest.addSigned(builder, signed)
+            }
+            EncryptRequest.addMessage(builder, message)
+            EncryptRequest.addPublicKey(builder, publicKey)
+            val offset = EncryptRequest.endEncryptRequest(builder)
+            builder.finish(offset)
+
+            val result = callNative("encryptBytes", builder.sizedByteArray())
+            val response = BytesResponse.getRootAsBytesResponse(ByteBuffer.wrap(result))
+            writeFile(response.outputAsByteBuffer, output);
+
+            val resultList = createStringResponseArray(response.error, output)
+            promise.resolve(resultList)
+        } catch (e: Exception) {
+            promise.reject(e)
+        }
+    }
+
+    private fun decryptFile(
+        payload: ByteArray,
+        promise: Promise
+    ) {
+        try {
+            val request = DecryptRequest.getRootAsDecryptRequest(ByteBuffer.wrap(payload))
+            val (input, output) = getInputAndOutput(request.message)
+
+            val builder = FlatBufferBuilder()
+
+            val options = createKeyOptions(request.options, builder)
+            val message = builder.createByteVector(readFile(input))
+            val passphrase = builder.createString(request.passphrase)
+            val privateKey = builder.createString(request.privateKey)
+
+            DecryptBytesRequest.startDecryptBytesRequest(builder)
+            if (options != null) {
+                DecryptBytesRequest.addOptions(builder, options)
+            }
+            DecryptRequest.addMessage(builder, message)
+            DecryptRequest.addPassphrase(builder, passphrase)
+            DecryptRequest.addPrivateKey(builder, privateKey)
+            val offset = DecryptRequest.endDecryptRequest(builder)
+            builder.finish(offset)
+
+            val result = callNative("decryptBytes", builder.sizedByteArray())
+            val response = BytesResponse.getRootAsBytesResponse(ByteBuffer.wrap(result))
+            writeFile(response.outputAsByteBuffer, output);
+
+            val resultList = createStringResponseArray(response.error, output)
+            promise.resolve(resultList)
+        } catch (e: Exception) {
+            promise.reject(e)
+        }
+    }
+
+    private fun createStringResponseArray(
+        error: String?,
+        output: String
+    ): WritableArray? {
+        val builder = FlatBufferBuilder()
+        val errorOffset = builder.createString(error ?: "")
+        val outputOffset = builder.createString(output)
+        val responseOffset =
+            StringResponse.createStringResponse(builder, outputOffset, errorOffset)
+        builder.finish(responseOffset)
+        val outputArray = builder.sizedByteArray()
+        val resultList = Arguments.createArray()
+        for (i in outputArray.indices) {
+            resultList.pushInt(outputArray[i].toInt())
+        }
+        return resultList
+    }
+
+    private fun createSigned(
+        request: Entity?,
+        builder: FlatBufferBuilder
+    ): Int? {
+        var options: Int? = null;
+        if (request != null) {
+            val publicKeyOffset = builder.createString(request.publicKey)
+            val privateKeyOffset = builder.createString(request.privateKey)
+            val passphraseOffset = builder.createString(request.passphrase)
+            options = Entity.createEntity(
+                builder,
+                publicKeyOffset,
+                privateKeyOffset,
+                passphraseOffset
+            );
+        }
+        return options
+    }
+
+    private fun createFileHints(
+        request: FileHints?,
+        builder: FlatBufferBuilder
+    ): Int? {
+        var options: Int? = null;
+        if (request != null) {
+            val filenameOffset = builder.createString(request.fileName)
+            val modTimeOffset = builder.createString(request.modTime)
+            options = FileHints.createFileHints(
+                builder,
+                request.isBinary,
+                filenameOffset,
+                modTimeOffset
+            );
+        }
+        return options
+    }
+
+    private fun createKeyOptions(
+        request: KeyOptions?,
+        builder: FlatBufferBuilder
+    ): Int? {
+        var options: Int? = null;
+        if (request != null) {
+            options = KeyOptions.createKeyOptions(
+                builder,
+                request.hash,
+                request.cipher,
+                request.compression,
+                request.compressionLevel,
+                request.rsaBits
+            );
+        }
+        return options
     }
 
 
@@ -125,7 +251,8 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) : ReactC
                 if (isHandled) {
                     return@Thread
                 }
-                var result = callJSI(this.reactApplicationContext.javaScriptContextHolder.get(), name, bytes)
+                var result =
+                    callJSI(this.reactApplicationContext.javaScriptContextHolder.get(), name, bytes)
                 val resultList = Arguments.createArray()
                 for (i in result.indices) {
                     resultList.pushInt(result[i].toInt())
