@@ -1,5 +1,6 @@
 package com.reactnativefastopenpgp
 
+import android.util.Base64
 import androidx.annotation.NonNull
 import com.facebook.react.bridge.*
 import com.google.flatbuffers.FlatBufferBuilder
@@ -131,12 +132,12 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
             val offset = SignBytesRequest.endSignBytesRequest(builder)
             builder.finish(offset)
 
-            val result = callNative("signBytes", builder.sizedByteArray())
-            val response = BytesResponse.getRootAsBytesResponse(ByteBuffer.wrap(result))
+            val result = callNative("signBytesToString", builder.sizedByteArray())
+            val response = StringResponse.getRootAsStringResponse(ByteBuffer.wrap(result))
 
             val resultList = createStringResponseArray(
                 response.error,
-                String(response.outputAsByteBuffer.array(), Charsets.US_ASCII)
+                response.output?:""
             )
             promise.resolve(resultList)
         } catch (e: Exception) {
