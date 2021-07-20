@@ -1,7 +1,12 @@
 #import "FastOpenpgp.h"
+#import <React/RCTBridge+Private.h>
+#import <React/RCTUtils.h>
+#import "react-native-fast-openpgp.h"
 
 @implementation FastOpenpgp
 
+@synthesize bridge = _bridge;
+@synthesize methodQueue = _methodQueue;
 RCT_EXPORT_MODULE()
 
 // Example method for C++
@@ -10,9 +15,31 @@ RCT_EXPORT_METHOD(multiply:(nonnull NSNumber*)a withB:(nonnull NSNumber*)b
                   withResolver:(RCTPromiseResolveBlock)resolve
                   withReject:(RCTPromiseRejectBlock)reject)
 {
-    NSNumber *result = @(example::multiply([a floatValue], [b floatValue]));
+  //  NSNumber *result = @(example::multiply([a floatValue], [b floatValue]));
 
-    resolve(result);
+   // resolve(result);
+}
+
++ (BOOL)requiresMainQueueSetup {
+  return YES;
+}
+
+- (void)setBridge:(RCTBridge *)bridge
+{
+  _bridge = bridge;
+  _setBridgeOnMainQueue = RCTIsMainQueue();
+
+  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+  if (!cxxBridge.runtime) {
+    return;
+  }
+    
+    fastOpenPGP::install(*(facebook::jsi::Runtime *)cxxBridge.runtime);
+
+}
+
+- (void)invalidate {
+  // clean here
 }
 
 @end

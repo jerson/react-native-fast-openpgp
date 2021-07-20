@@ -2,10 +2,11 @@
 
 #ifdef __cplusplus
 
-#import "example.h"
+#import "react-native-fast-openpgp.h"
 
 #endif
 
 @interface FastOpenpgp : NSObject <RCTBridgeModule>
+@property (nonatomic, assign) BOOL setBridgeOnMainQueue;
 
 @end
