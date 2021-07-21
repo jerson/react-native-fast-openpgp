@@ -1,7 +1,7 @@
 #import "FastOpenpgp.h"
 #import <React/RCTBridge+Private.h>
 #import <React/RCTUtils.h>
-#import "react-native-fast-openpgp.h"
+#include "libopenpgp_bridge.h"
 
 @implementation FastOpenpgp
 
@@ -9,15 +9,58 @@
 @synthesize methodQueue = _methodQueue;
 RCT_EXPORT_MODULE()
 
-// Example method for C++
-// See the implementation of the example module in the `cpp` folder
-RCT_EXPORT_METHOD(multiply:(nonnull NSNumber*)a withB:(nonnull NSNumber*)b
+
+RCT_EXPORT_METHOD(call:(nonnull NSString*)name withPayload:(nonnull NSArray*)payload
                   withResolver:(RCTPromiseResolveBlock)resolve
                   withReject:(RCTPromiseRejectBlock)reject)
 {
-  //  NSNumber *result = @(example::multiply([a floatValue], [b floatValue]));
+    Byte* bytes = (Byte*)malloc(payload.count);
+    [payload enumerateObjectsUsingBlock:^(NSNumber* number, NSUInteger index, BOOL* stop){
+        bytes[index] = number.integerValue;
+    }];
+    
+    
+    BytesReturn * response = OpenPGPBridgeCall([name UTF8String], bytes, payload.count);
+    free(bytes);
+    
+    
+    if(response->error!=nil){
+        reject(@"e001",response->error,nil);
+        return
+    }
+    void * message = response->message;
+    int size = response->size;
 
-   // resolve(result);
+    NSArray * result=[NSArray arrayWithArray:buf.length(*runtime)];
+    resolve(result);
+    
+}
+
+RCT_EXPORT_METHOD(callJSI:(nonnull NSString*)name withPayload:(nonnull NSArray*)payload
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withReject:(RCTPromiseRejectBlock)reject)
+{
+    Byte* bytes = (Byte*)malloc(payload.count);
+    [payload enumerateObjectsUsingBlock:^(NSNumber* number, NSUInteger index, BOOL* stop){
+        bytes[index] = number.integerValue;
+    }];
+    
+    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+    if (!cxxBridge.runtime) {
+      return;
+    }
+    jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
+    
+    jsi::Value response = fastOpenPGP::call(*runtime, jsi::String(""), jsi::Object(nil));
+    
+    if(response.isString()){
+        reject(@"e001",response.asString(*runtime),nil);
+        return
+    }
+    jsi::ArrayBuffer buf = response.asObject(*runtime).getArrayBuffer(*runtime);
+
+    NSArray * result=[NSArray arrayWithArray:buf.length(*runtime)];
+    resolve(result);
 }
 
 + (BOOL)requiresMainQueueSetup {
@@ -33,13 +76,14 @@ RCT_EXPORT_METHOD(multiply:(nonnull NSNumber*)a withB:(nonnull NSNumber*)b
   if (!cxxBridge.runtime) {
     return;
   }
+    jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
     
-    fastOpenPGP::install(*(facebook::jsi::Runtime *)cxxBridge.runtime);
+    fastOpenPGP::install(*runtime);
 
 }
 
 - (void)invalidate {
-  // clean here
+    fastOpenPGP::cleanup();
 }
 
 @end

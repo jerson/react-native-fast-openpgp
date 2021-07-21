@@ -6,6 +6,7 @@
 
 #endif
 
+
 @interface FastOpenpgp : NSObject <RCTBridgeModule>
 @property (nonatomic, assign) BOOL setBridgeOnMainQueue;
 
