@@ -1,16 +1,16 @@
-#import "FastOpenpgp.h"
+#import "FastOpenPGP.h"
 #import <React/RCTBridge+Private.h>
 #import <React/RCTUtils.h>
 #include "libopenpgp_bridge.h"
 
-@implementation FastOpenpgp
+@implementation FastOpenPGP
 
 @synthesize bridge = _bridge;
 @synthesize methodQueue = _methodQueue;
 RCT_EXPORT_MODULE()
 
 
-RCT_EXPORT_METHOD(call:(nonnull NSString*)name withPayload:(nonnull NSArray*)payload
+RCT_REMAP_METHOD(call,call:(nonnull NSString*)name withPayload:(nonnull NSArray*)payload
                   withResolver:(RCTPromiseResolveBlock)resolve
                   withReject:(RCTPromiseRejectBlock)reject)
 {
@@ -19,20 +19,25 @@ RCT_EXPORT_METHOD(call:(nonnull NSString*)name withPayload:(nonnull NSArray*)pay
         bytes[index] = number.integerValue;
     }];
     
-    
-    BytesReturn * response = OpenPGPBridgeCall([name UTF8String], bytes, payload.count);
+    char *cname= strdup([name UTF8String]);
+
+    BytesReturn * response = OpenPGPBridgeCall(cname, &bytes, (int)payload.count);
     free(bytes);
     
-    
+ /*
     if(response->error!=nil){
         reject(@"e001",response->error,nil);
         return
-    }
+    }*/
     void * message = response->message;
     int size = response->size;
-
+    
+    NSLog(@"message: %@",message);
+    NSLog(@"size: %d",size);
+    
+/*
     NSArray * result=[NSArray arrayWithArray:buf.length(*runtime)];
-    resolve(result);
+    resolve(result);*/
     
 }
 
@@ -40,7 +45,7 @@ RCT_EXPORT_METHOD(callJSI:(nonnull NSString*)name withPayload:(nonnull NSArray*)
                   withResolver:(RCTPromiseResolveBlock)resolve
                   withReject:(RCTPromiseRejectBlock)reject)
 {
-    Byte* bytes = (Byte*)malloc(payload.count);
+ /*   Byte* bytes = (Byte*)malloc(payload.count);
     [payload enumerateObjectsUsingBlock:^(NSNumber* number, NSUInteger index, BOOL* stop){
         bytes[index] = number.integerValue;
     }];
@@ -60,7 +65,7 @@ RCT_EXPORT_METHOD(callJSI:(nonnull NSString*)name withPayload:(nonnull NSArray*)
     jsi::ArrayBuffer buf = response.asObject(*runtime).getArrayBuffer(*runtime);
 
     NSArray * result=[NSArray arrayWithArray:buf.length(*runtime)];
-    resolve(result);
+    resolve(result);*/
 }
 
 + (BOOL)requiresMainQueueSetup {
