@@ -39,7 +39,7 @@ RCT_REMAP_METHOD(call,call:(nonnull NSString*)name withPayload:(nonnull NSArray*
     
     NSMutableArray* result = [[NSMutableArray alloc] init];
     for (int i=0; i<response->size; i++) {
-        result[i]=[NSString stringWithFormat:@"%d",(int)bytesResult[i]];
+        result[i]=[NSNumber numberWithInt:(int)bytesResult[i]];
     }
     free(response);
     free(bytesResult);
@@ -91,7 +91,7 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
     
     NSMutableArray* result = [[NSMutableArray alloc] init];
     for (int i=0; i<sizeResult; i++) {
-        result[i]=[NSString stringWithFormat:@"%d",(int)dataResult[i]];
+        result[i]=[NSNumber numberWithInt:(int)dataResult[i]];
     }
     
     resolve(result);
