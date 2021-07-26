@@ -65,14 +65,6 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
             verifyFile(payload, promise)
             return true
         }
-        if (name == "decryptSymmetricFile") {
-            decryptSymmetricFile(payload, promise)
-            return true
-        }
-        if (name == "encryptSymmetricFile") {
-            encryptSymmetricFile(payload, promise)
-            return true
-        }
         return false
     }
 
