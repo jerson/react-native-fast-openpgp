@@ -53,8 +53,8 @@ export default function ({passphrase}: Props) {
                         output,
                         passphrase
                     );
-                    setEncrypted(result);
-                    RNFS.readFile(result,'base64').then((data) => {
+                    setEncrypted(result.toString());
+                    RNFS.readFile(output,'base64').then((data) => {
                         setEncryptedFile(data)
                     })
                 }}
@@ -73,8 +73,8 @@ export default function ({passphrase}: Props) {
                             input,
                             passphrase
                         );
-                        setDecrypted(result);
-                        RNFS.readFile(result,'utf8').then((data) => {
+                        setDecrypted(result.toString());
+                        RNFS.readFile(output,'utf8').then((data) => {
                             setDecryptedFile(data)
                         })
                     }}

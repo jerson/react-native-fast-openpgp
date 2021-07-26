@@ -11,6 +11,9 @@ import {KeyPairResponse} from './model/key-pair-response';
 import {SignRequest} from './model/sign-request';
 import {StringResponse} from './model/string-response';
 import {VerifyRequest} from './model/verify-request';
+import { DecryptSymmetricFileRequest } from './model/decrypt-symmetric-file-request';
+import { EncryptSymmetricFileRequest } from './model/encrypt-symmetric-file-request';
+import { IntResponse } from './model/int-response';
 
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
     .FastOpenPGP;
@@ -372,21 +375,21 @@ export default class OpenPGP {
         outputFile: string,
         passphrase: string,
         options?: KeyOptions,
-    ): Promise<string> {
+    ): Promise<number> {
         const builder = new flatbuffers.Builder(0);
 
-        const messageOffset = builder.createString(
-            [inputFile, outputFile].join(this.delimiter),
-        );
+        const inputOffset = builder.createString(inputFile );
+        const outputOffset = builder.createString(outputFile );
         const passphraseOffset = builder.createString(passphrase);
 
         const optionsOffset = this._keyOptions(builder, options);
-        DecryptSymmetricRequest.startDecryptSymmetricRequest(builder);
-        typeof optionsOffset !== 'undefined' && DecryptSymmetricRequest.addOptions(builder, optionsOffset);
-        DecryptSymmetricRequest.addMessage(builder, messageOffset);
-        DecryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
+        DecryptSymmetricFileRequest.startDecryptSymmetricFileRequest(builder);
+        typeof optionsOffset !== 'undefined' && DecryptSymmetricFileRequest.addOptions(builder, optionsOffset);
+        DecryptSymmetricFileRequest.addInput(builder, inputOffset);
+        DecryptSymmetricFileRequest.addOutput(builder, outputOffset);
+        DecryptSymmetricFileRequest.addPassphrase(builder, passphraseOffset);
 
-        const offset = DecryptSymmetricRequest.endDecryptSymmetricRequest(
+        const offset = DecryptSymmetricFileRequest.endDecryptSymmetricFileRequest(
             builder,
         );
         builder.finish(offset);
@@ -395,7 +398,7 @@ export default class OpenPGP {
             'decryptSymmetricFile',
             builder.asUint8Array(),
         );
-        return this._stringResponse(result);
+        return this._intResponse(result);
     }
 
     static async encryptSymmetric(
@@ -432,23 +435,23 @@ export default class OpenPGP {
         passphrase: string,
         fileHints?: FileHints,
         options?: KeyOptions,
-    ): Promise<string> {
+    ): Promise<number> {
         const builder = new flatbuffers.Builder(0);
 
-        const messageOffset = builder.createString(
-            [inputFile, outputFile].join(this.delimiter),
-        );
+        const inputOffset = builder.createString(inputFile );
+        const outputOffset = builder.createString(outputFile );
         const passphraseOffset = builder.createString(passphrase);
 
         const optionsOffset = this._keyOptions(builder, options);
         const fileHintsOffset = this._fileHints(builder, fileHints);
-        EncryptSymmetricRequest.startEncryptSymmetricRequest(builder);
-        typeof optionsOffset !== 'undefined' && EncryptSymmetricRequest.addOptions(builder, optionsOffset);
-        typeof fileHintsOffset !== 'undefined' && EncryptSymmetricRequest.addFileHints(builder, fileHintsOffset);
-        EncryptSymmetricRequest.addMessage(builder, messageOffset);
-        EncryptSymmetricRequest.addPassphrase(builder, passphraseOffset);
+        EncryptSymmetricFileRequest.startEncryptSymmetricFileRequest(builder);
+        typeof optionsOffset !== 'undefined' && EncryptSymmetricFileRequest.addOptions(builder, optionsOffset);
+        typeof fileHintsOffset !== 'undefined' && EncryptSymmetricFileRequest.addFileHints(builder, fileHintsOffset);
+        EncryptSymmetricFileRequest.addInput(builder, inputOffset);
+        EncryptSymmetricFileRequest.addOutput(builder, outputOffset);
+        EncryptSymmetricFileRequest.addPassphrase(builder, passphraseOffset);
 
-        const offset = EncryptSymmetricRequest.endEncryptSymmetricRequest(
+        const offset = EncryptSymmetricFileRequest.endEncryptSymmetricFileRequest(
             builder,
         );
         builder.finish(offset);
@@ -458,7 +461,7 @@ export default class OpenPGP {
             builder.asUint8Array(),
         );
 
-        return this._stringResponse(result);
+        return this._intResponse(result);
     }
 
     static async generate(options: Options): Promise<KeyPair> {
@@ -525,6 +528,15 @@ export default class OpenPGP {
         return response.output() || '';
     }
 
+    private static _intResponse(result: flatbuffers.ByteBuffer): number {
+        const response = IntResponse.getRootAsIntResponse(result);
+        const error = response.error();
+        if (error) {
+            throw new Error('intResponse: ' + error);
+        }
+        return response.output().toFloat64();
+    }
+    
     private static _boolResponse(result: flatbuffers.ByteBuffer): boolean {
         const response = BoolResponse.getRootAsBoolResponse(result);
         const error = response.error();
