@@ -74,7 +74,7 @@ export default function ({passphrase}: Props) {
                             passphrase
                         );
                         setDecrypted(result.toString());
-                        RNFS.readFile(output,'utf8').then((data) => {
+                        RNFS.readFile(input,'utf8').then((data) => {
                             setDecryptedFile(data)
                         })
                     }}

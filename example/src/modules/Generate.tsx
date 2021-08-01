@@ -28,7 +28,7 @@ export default function ({}: Props) {
                         email: 'test@test.com',
                         passphrase: 'test',
                         keyOptions: {
-                            rsaBits: 4096,
+                            rsaBits: 2048,
                         },
                     });
                     setKeyPair(output);

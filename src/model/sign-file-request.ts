@@ -30,65 +30,54 @@ input(optionalEncoding?:any):string|Uint8Array|null {
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
-output():string|null
-output(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-output(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
-
 publicKey():string|null
 publicKey(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 publicKey(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 8);
+  const offset = this.bb!.__offset(this.bb_pos, 6);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 privateKey():string|null
 privateKey(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 privateKey(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 10);
+  const offset = this.bb!.__offset(this.bb_pos, 8);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 passphrase():string|null
 passphrase(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 passphrase(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 12);
+  const offset = this.bb!.__offset(this.bb_pos, 10);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 options(obj?:KeyOptions):KeyOptions|null {
-  const offset = this.bb!.__offset(this.bb_pos, 14);
+  const offset = this.bb!.__offset(this.bb_pos, 12);
   return offset ? (obj || new KeyOptions()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 static startSignFileRequest(builder:flatbuffers.Builder) {
-  builder.startObject(6);
+  builder.startObject(5);
 }
 
 static addInput(builder:flatbuffers.Builder, inputOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, inputOffset, 0);
 }
 
-static addOutput(builder:flatbuffers.Builder, outputOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, outputOffset, 0);
-}
-
 static addPublicKey(builder:flatbuffers.Builder, publicKeyOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(2, publicKeyOffset, 0);
+  builder.addFieldOffset(1, publicKeyOffset, 0);
 }
 
 static addPrivateKey(builder:flatbuffers.Builder, privateKeyOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(3, privateKeyOffset, 0);
+  builder.addFieldOffset(2, privateKeyOffset, 0);
 }
 
 static addPassphrase(builder:flatbuffers.Builder, passphraseOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(4, passphraseOffset, 0);
+  builder.addFieldOffset(3, passphraseOffset, 0);
 }
 
 static addOptions(builder:flatbuffers.Builder, optionsOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(5, optionsOffset, 0);
+  builder.addFieldOffset(4, optionsOffset, 0);
 }
 
 static endSignFileRequest(builder:flatbuffers.Builder):flatbuffers.Offset {

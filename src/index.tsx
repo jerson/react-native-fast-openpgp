@@ -14,6 +14,10 @@ import {VerifyRequest} from './model/verify-request';
 import { DecryptSymmetricFileRequest } from './model/decrypt-symmetric-file-request';
 import { EncryptSymmetricFileRequest } from './model/encrypt-symmetric-file-request';
 import { IntResponse } from './model/int-response';
+import { DecryptFileRequest } from './model/decrypt-file-request';
+import { EncryptFileRequest } from './model/encrypt-file-request';
+import { SignFileRequest } from './model/sign-file-request';
+import { VerifyFileRequest } from './model/verify-file-request';
 
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
     .FastOpenPGP;
@@ -129,8 +133,6 @@ export default class OpenPGP {
      */
     static useJSI = false;
 
-    private static readonly delimiter = '|';
-
     static async decrypt(
         message: string,
         privateKey: string,
@@ -162,26 +164,26 @@ export default class OpenPGP {
         privateKey: string,
         passphrase: string,
         options?: KeyOptions,
-    ): Promise<string> {
+    ): Promise<number> {
         const builder = new flatbuffers.Builder(0);
 
-        const messageOffset = builder.createString(
-            [inputFile, outputFile].join(this.delimiter),
-        );
+        const inputOffset = builder.createString(inputFile);
+        const outputOffset = builder.createString(outputFile);
         const passphraseOffset = builder.createString(passphrase);
         const privateKeyOffset = builder.createString(privateKey);
 
         const optionsOffset = this._keyOptions(builder, options);
-        DecryptRequest.startDecryptRequest(builder);
-        typeof optionsOffset !== "undefined" && DecryptRequest.addOptions(builder, optionsOffset);
-        DecryptRequest.addMessage(builder, messageOffset);
-        DecryptRequest.addPassphrase(builder, passphraseOffset);
-        DecryptRequest.addPrivateKey(builder, privateKeyOffset);
-        const offset = DecryptRequest.endDecryptRequest(builder);
+        DecryptFileRequest.startDecryptFileRequest(builder);
+        typeof optionsOffset !== "undefined" && DecryptFileRequest.addOptions(builder, optionsOffset);
+        DecryptFileRequest.addInput(builder, inputOffset);
+        DecryptFileRequest.addOutput(builder, outputOffset);
+        DecryptFileRequest.addPassphrase(builder, passphraseOffset);
+        DecryptFileRequest.addPrivateKey(builder, privateKeyOffset);
+        const offset = DecryptFileRequest.endDecryptFileRequest(builder);
         builder.finish(offset);
 
         const result = await this.call('decryptFile', builder.asUint8Array());
-        return this._stringResponse(result);
+        return this._intResponse(result);
     }
 
     static async encrypt(
@@ -220,29 +222,29 @@ export default class OpenPGP {
         signedEntity?: Entity,
         fileHints?: FileHints,
         options?: KeyOptions,
-    ): Promise<string> {
+    ): Promise<number> {
         const builder = new flatbuffers.Builder(0);
 
-        const messageOffset = builder.createString(
-            [inputFile, outputFile].join(this.delimiter),
-        );
+        const inputOffset = builder.createString(inputFile);
+        const outputOffset = builder.createString(outputFile);
         const publicKeyOffset = builder.createString(publicKey);
 
         const optionsOffset = this._keyOptions(builder, options);
         const fileHintsOffset = this._fileHints(builder, fileHints);
         const signedEntityOffset = this._entity(builder, signedEntity);
-        EncryptRequest.startEncryptRequest(builder);
-        typeof optionsOffset !== 'undefined' && EncryptRequest.addOptions(builder, optionsOffset);
-        typeof fileHintsOffset !== 'undefined' && EncryptRequest.addFileHints(builder, fileHintsOffset);
-        typeof signedEntityOffset !== 'undefined' && EncryptRequest.addSigned(builder, signedEntityOffset);
-        EncryptRequest.addMessage(builder, messageOffset);
-        EncryptRequest.addPublicKey(builder, publicKeyOffset);
+        EncryptFileRequest.startEncryptFileRequest(builder);
+        typeof optionsOffset !== 'undefined' && EncryptFileRequest.addOptions(builder, optionsOffset);
+        typeof fileHintsOffset !== 'undefined' && EncryptFileRequest.addFileHints(builder, fileHintsOffset);
+        typeof signedEntityOffset !== 'undefined' && EncryptFileRequest.addSigned(builder, signedEntityOffset);
+        EncryptFileRequest.addInput(builder, inputOffset);
+        EncryptFileRequest.addOutput(builder, outputOffset);
+        EncryptFileRequest.addPublicKey(builder, publicKeyOffset);
 
-        const offset = EncryptRequest.endEncryptRequest(builder);
+        const offset = EncryptFileRequest.endEncryptFileRequest(builder);
         builder.finish(offset);
 
         const result = await this.call('encryptFile', builder.asUint8Array());
-        return this._stringResponse(result);
+        return this._intResponse(result);
     }
 
     static async sign(
@@ -288,13 +290,13 @@ export default class OpenPGP {
         const passphraseOffset = builder.createString(passphrase);
 
         const optionsOffset = this._keyOptions(builder, options);
-        SignRequest.startSignRequest(builder);
-        typeof optionsOffset !== 'undefined' && SignRequest.addOptions(builder, optionsOffset);
-        SignRequest.addMessage(builder, inputFileOffset);
-        SignRequest.addPublicKey(builder, publicKeyOffset);
-        SignRequest.addPrivateKey(builder, privateKeyOffset);
-        SignRequest.addPassphrase(builder, passphraseOffset);
-        const offset = SignRequest.endSignRequest(builder);
+        SignFileRequest.startSignFileRequest(builder);
+        typeof optionsOffset !== 'undefined' && SignFileRequest.addOptions(builder, optionsOffset);
+        SignFileRequest.addInput(builder, inputFileOffset);
+        SignFileRequest.addPublicKey(builder, publicKeyOffset);
+        SignFileRequest.addPrivateKey(builder, privateKeyOffset);
+        SignFileRequest.addPassphrase(builder, passphraseOffset);
+        const offset = SignFileRequest.endSignFileRequest(builder);
         builder.finish(offset);
 
         const result = await this.call('signFile', builder.asUint8Array());
@@ -334,11 +336,11 @@ export default class OpenPGP {
         const publicKeyOffset = builder.createString(publicKey);
         const signatureOffset = builder.createString(signature);
 
-        VerifyRequest.startVerifyRequest(builder);
-        VerifyRequest.addMessage(builder, inputFileOffset);
-        VerifyRequest.addPublicKey(builder, publicKeyOffset);
-        VerifyRequest.addSignature(builder, signatureOffset);
-        const offset = VerifyRequest.endVerifyRequest(builder);
+        VerifyFileRequest.startVerifyFileRequest(builder);
+        VerifyFileRequest.addInput(builder, inputFileOffset);
+        VerifyFileRequest.addPublicKey(builder, publicKeyOffset);
+        VerifyFileRequest.addSignature(builder, signatureOffset);
+        const offset = VerifyFileRequest.endVerifyFileRequest(builder);
         builder.finish(offset);
 
         const result = await this.call('verifyFile', builder.asUint8Array());
