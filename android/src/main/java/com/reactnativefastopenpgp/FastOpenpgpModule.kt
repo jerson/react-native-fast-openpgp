@@ -15,8 +15,6 @@ import java.nio.channels.WritableByteChannel
 internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
 
-    private val delimiter = "|"
-
     external fun initialize(jsiPtr: Long);
     external fun destruct();
     external fun callJSI(jsiPtr: Long, name: String, payload: ByteArray): ByteArray;
