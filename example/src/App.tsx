@@ -110,7 +110,7 @@ const App = () => {
     return (
         <>
             <StatusBar barStyle="dark-content"/>
-            <SafeAreaView>
+            <SafeAreaView testID={'welcome'}>
                 <ScrollView
                     contentInsetAdjustmentBehavior="automatic"
                     style={styles.scrollView}

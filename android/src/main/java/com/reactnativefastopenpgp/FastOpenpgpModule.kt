@@ -1,15 +1,7 @@
 package com.reactnativefastopenpgp
 
-import android.util.Base64
 import androidx.annotation.NonNull
 import com.facebook.react.bridge.*
-import com.google.flatbuffers.FlatBufferBuilder
-import com.reactnativefastopenpgp.model.*
-import java.io.*
-import java.nio.ByteBuffer
-import java.nio.channels.Channels
-import java.nio.channels.WritableByteChannel
-
 
 @ExperimentalUnsignedTypes
 internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
