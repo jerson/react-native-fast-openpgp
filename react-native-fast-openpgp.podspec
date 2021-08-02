@@ -16,6 +16,6 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
   s.vendored_libraries  = '*.a'
   s.xcconfig = { 'OTHER_LDFLAGS' => '-force_load "/Users/usuario/Proyectos/react-native-fast-openpgp/ios/libopenpgp_bridge.a"'}
-
+  s.pod_target_xcconfig = {  'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
   s.dependency "React-Core"
 end
