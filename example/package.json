@@ -9,7 +9,9 @@
     "start": "react-native start",
     "test": "jest",
     "test:android": "detox test --configuration android",
-    "build:android":"detox build --configuration android "
+    "build:android":"detox build --configuration android ",
+    "test:ios": "detox test --configuration ios",
+    "build:ios":"detox build --configuration ios "
   },
   "jest": {
     "preset": "react-native",
