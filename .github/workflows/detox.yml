@@ -19,6 +19,7 @@ jobs:
       - name: Download Android Emulator Image
         run: |
           echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-30;google_apis;x86"
+          echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "cmake;3.10.2.4988404"
           echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name PhoneAPI30 --device "Nexus 5X" -k 'system-images;android-30;google_apis;x86'
           $ANDROID_HOME/emulator/emulator -list-avds
       - name: Set up Node
