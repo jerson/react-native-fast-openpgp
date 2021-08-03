@@ -27,7 +27,8 @@ jobs:
           npm install -g react-native-cli
           npm install -g detox-cli
           npm install -g yarn
-      - run: yarn example install
+      - run: yarn
+      - run: yarn example
       - run: yarn example build:android
       - name: Android Emulator
         timeout-minutes: 10
@@ -37,5 +38,6 @@ jobs:
           $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
           $ANDROID_HOME/platform-tools/adb devices
           echo "Emulator started"
-      - run: yarn example start &
+      - name: React Native Server
+        run: yarn example start &
       - run: yarn example test:android
