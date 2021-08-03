@@ -9,23 +9,33 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v1
-      - uses: joschi/setup-jdk@v2
+      - uses: actions/cache@v2
         with:
-          java-version: '8'
-          architecture: 'x64'
-      - name: Download Android Emulator Image
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
+      - uses: actions/cache@v2
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: android-actions/setup-android@v2
+      - name: Android Deps
         run: |
-          echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --uninstall "cmake;3.18.1" || echo "skipped"
-          echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "cmake;3.10.2.4988404"
-          echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-30;google_apis;x86"
-          echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name PhoneAPI30 --device "Nexus 5X" -k 'system-images;android-30;google_apis;x86'
-          $ANDROID_HOME/emulator/emulator -list-avds
+          sdkmanager --uninstall "cmake;3.18.1" || echo "skipped"
+          sdkmanager --install "cmake;3.10.2.4988404"
+          sdkmanager --install "system-images;android-30;google_apis;x86"
       - name: Set up Node
         run: |
-          npm install -g react-native-cli
           npm install -g detox-cli
           npm install -g yarn
       - name: Deps
@@ -34,16 +44,27 @@ jobs:
           yarn example
           npm install -g yarn
       - run: yarn example build:android
-      - name: Android Emulator
+      - name: create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          avd-name: PhoneAPI30
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          avd-name: PhoneAPI30
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedCheck
+      - name: Run Tests
         timeout-minutes: 10
-        continue-on-error: true
         run: |
-          nohup $ANDROID_HOME/emulator/emulator -avd PhoneAPI30 -no-audio -no-snapshot -no-window &
-          $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
-          $ANDROID_HOME/platform-tools/adb devices
-          echo "Emulator started"
-      - name: React Native Server
-        timeout-minutes: 10
-        continue-on-error: true
-        run: yarn example start &
-      - run: yarn example test:android
+          yarn example start &
+          yarn example test:android
