@@ -110,8 +110,9 @@ const App = () => {
     return (
         <>
             <StatusBar barStyle="dark-content"/>
-            <SafeAreaView testID={'list'}>
+            <SafeAreaView>
                 <ScrollView
+                    testID={'list'}
                     contentInsetAdjustmentBehavior="automatic"
                     style={styles.scrollView}
                     keyboardShouldPersistTaps={'handled'}
@@ -119,12 +120,12 @@ const App = () => {
                     <View style={styles.body}>
                         <EncryptDecrypt publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
                         <EncryptDecryptFile publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
-                        <SignVerify publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
-                        <SignVerifyFile publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
                         <EncryptDecryptSymmetric publicKey={publicKey} privateKey={privateKey}
                                                  passphrase={passphrase}/>
                         <EncryptDecryptSymmetricFile publicKey={publicKey} privateKey={privateKey}
                                                      passphrase={passphrase}/>
+                        <SignVerify publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
+                        <SignVerifyFile publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
                         <Generate publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
                     </View>
                 </ScrollView>

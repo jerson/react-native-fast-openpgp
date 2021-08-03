@@ -21,12 +21,12 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
     const [input,setInput] = useState('');
     const [signed, setSigned] = useState('');
     const [verified, setVerified] = useState(false);
-    
+
     useEffect(() => {
         createFile(fileName,content).then((value)=>{
             setInput(value);
             setLoading(false);
-        }) 
+        })
 
         return ()=>{
             deleteFile(fileName)
@@ -59,6 +59,7 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
                 <SectionTitle>Verify File</SectionTitle>
                 <Button
                     title={"Verify File"}
+                    testID={'button'}
                     onPress={async () => {
                         const output = await OpenPGP.verifyFile(
                             signed,

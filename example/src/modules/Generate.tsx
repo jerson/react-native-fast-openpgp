@@ -35,8 +35,8 @@ export default function ({}: Props) {
                     setKeyPair(output);
                 }}
             />
-            {keyPair && keyPair.publicKey && <SectionResult testID={'publicKey'}>{keyPair.publicKey}</SectionResult>}
-            {keyPair && keyPair.privateKey && <SectionResult testID={'privateKey'}>{keyPair.privateKey}</SectionResult>}
+            {!!keyPair && !!keyPair.publicKey && <SectionResult testID={'publicKey'}>{keyPair.publicKey}</SectionResult>}
+            {!!keyPair && !!keyPair.privateKey && <SectionResult testID={'privateKey'}>{keyPair.privateKey}</SectionResult>}
         </SectionContainer>
 
     </Container>;
