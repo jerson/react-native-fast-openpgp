@@ -33,7 +33,6 @@ jobs:
         run: |
           sdkmanager --uninstall "cmake;3.18.1" || echo "skipped"
           sdkmanager --install "cmake;3.10.2.4988404"
-          sdkmanager --install "system-images;android-30;google_apis;x86"
       - name: Set up Node
         run: |
           npm install -g detox-cli
@@ -44,23 +43,11 @@ jobs:
           yarn example
           npm install -g yarn
       - run: yarn example build:android
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          avd-name: PhoneAPI30
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
           avd-name: PhoneAPI30
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew connectedCheck
       - name: Run Tests
