@@ -16,12 +16,13 @@ export default function ({}: Props) {
 
     const [keyPair, setKeyPair] = useState({publicKey: '', privateKey: ''});
 
-    return <Container>
-        <SectionContainer>
+    return <Container  testID={'generate'}>
+        <SectionContainer  testID={'generator'}>
             <SectionTitle>Generate</SectionTitle>
 
             <Button
                 title={"Generate"}
+                testID={'button'}
                 onPress={async () => {
                     const output = await OpenPGP.generate({
                         name: 'test',
@@ -34,8 +35,8 @@ export default function ({}: Props) {
                     setKeyPair(output);
                 }}
             />
-            <SectionResult>PublicKey:{keyPair.publicKey}</SectionResult>
-            <SectionResult>PrivateKey:{keyPair.privateKey}</SectionResult>
+            {keyPair && keyPair.publicKey && <SectionResult testID={'publicKey'}>{keyPair.publicKey}</SectionResult>}
+            {keyPair && keyPair.privateKey && <SectionResult testID={'privateKey'}>{keyPair.privateKey}</SectionResult>}
         </SectionContainer>
 
     </Container>;

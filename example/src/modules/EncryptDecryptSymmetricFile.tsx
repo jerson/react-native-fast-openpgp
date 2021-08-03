@@ -39,14 +39,15 @@ export default function ({passphrase}: Props) {
     }, [])
 
     if (loading){
-        return <Container><Text>...</Text></Container>
+        return <Container testID={'loading'}><Text>...</Text></Container>
     }
 
-    return <Container>
-        <SectionContainer>
+    return <Container testID={'encrypt-decrypt-symmetric-file'}>
+        <SectionContainer testID={'encrypt'}>
             <SectionTitle>Encrypt Symmetric File</SectionTitle>
             <Button
                 title={"Encrypt Symmetric File"}
+                testID={'button'}
                 onPress={async () => {
                     const result = await OpenPGP.encryptSymmetricFile(
                         input,
@@ -59,14 +60,16 @@ export default function ({passphrase}: Props) {
                     })
                 }}
             />
-            <SectionResult>{encrypted}</SectionResult>
-            <SectionResult>{encryptedFile}</SectionResult>
+            <SectionResult testID={'resultsize'}>{encrypted}</SectionResult>
+            {!!encryptedFile && <SectionResult testID={'result'}>{encryptedFile}</SectionResult>}
+
         </SectionContainer>
         {!!encrypted && (
-            <SectionContainer>
+            <SectionContainer testID={'decrypt'}>
                 <SectionTitle>Decrypt Symmetric File</SectionTitle>
                 <Button
                     title={"Decrypt Symmetric File"}
+                    testID={'button'}
                     onPress={async () => {
                         const result = await OpenPGP.decryptSymmetricFile(
                             output,
@@ -81,8 +84,8 @@ export default function ({passphrase}: Props) {
                 />
                 {!!decrypted && (
                     <>
-                        <SectionResult>{decrypted}</SectionResult>
-                        <SectionResult>{decryptedFile}</SectionResult>
+                        <SectionResult testID={'resultsize'}>{decrypted}</SectionResult>
+                        <SectionResult testID={'result'}>{decryptedFile}</SectionResult>
                     </>
                 )}
             </SectionContainer>

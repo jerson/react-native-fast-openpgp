@@ -19,11 +19,12 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
     const [signed, setSigned] = useState('');
     const [verified, setVerified] = useState(false);
 
-    return <Container>
-        <SectionContainer>
+    return <Container testID={'sign-verify'}>
+        <SectionContainer testID={'sign'}>
             <SectionTitle>Sign</SectionTitle>
             <TextInput
                 value={input}
+                testID={'message'}
                 onChangeText={(text) => {
                     setInput(text);
                 }}
@@ -32,6 +33,7 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
             />
             <Button
                 title={"Sign"}
+                testID={'button'}
                 onPress={async () => {
                     const output = await OpenPGP.sign(
                         input,
@@ -42,13 +44,14 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
                     setSigned(output);
                 }}
             />
-            <SectionResult>{signed}</SectionResult>
+            {!!signed && <SectionResult testID={'result'}>{signed}</SectionResult>}
         </SectionContainer>
         {!!signed && (
-            <SectionContainer>
+            <SectionContainer testID={'verify'}>
                 <SectionTitle>Verify</SectionTitle>
                 <Button
                     title={"Verify"}
+                    testID={'button'}
                     onPress={async () => {
                         const output = await OpenPGP.verify(
                             signed,
@@ -60,7 +63,7 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
                     }}
                 />
                 {typeof verified !== 'undefined' && (
-                    <SectionResult>
+                    <SectionResult testID={'result'}>
                         {verified ? 'valid' : 'invalid'}
                     </SectionResult>
                 )}

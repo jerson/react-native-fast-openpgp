@@ -5,10 +5,11 @@ import {StyleSheet, Text} from "react-native";
 
 interface Props {
     children: React.ReactNode
+    testID: string
 }
 
-export default function ({children}: Props) {
-    return <Text  selectable style={styles.sectionDescription}>{children}</Text>;
+export default function ({children, testID}: Props) {
+    return <Text testID={testID} selectable style={styles.sectionDescription}>{children}</Text>;
 }
 const styles = StyleSheet.create({
     sectionDescription: {

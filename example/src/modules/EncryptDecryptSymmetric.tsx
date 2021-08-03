@@ -19,11 +19,12 @@ export default function ({passphrase}: Props) {
     const [encrypted, setEncrypted] = useState('');
     const [decrypted, setDecrypted] = useState('');
 
-    return <Container>
-        <SectionContainer>
+    return <Container testID={'encrypt-decrypt-symmetric'}>
+        <SectionContainer testID={'encrypt'}>
             <SectionTitle>Encrypt Symmetric</SectionTitle>
             <TextInput
                 value={input}
+                testID={'message'}
                 onChangeText={(text) => {
                     setInput(text);
                 }}
@@ -32,6 +33,7 @@ export default function ({passphrase}: Props) {
             />
             <Button
                 title={"Encrypt Symmetric"}
+                testID={'button'}
                 onPress={async () => {
                     const output = await OpenPGP.encryptSymmetric(
                         input,
@@ -40,13 +42,14 @@ export default function ({passphrase}: Props) {
                     setEncrypted(output);
                 }}
             />
-            <SectionResult>{encrypted}</SectionResult>
+            {!!encrypted && <SectionResult testID={'result'}>{encrypted}</SectionResult>}
         </SectionContainer>
         {!!encrypted && (
-            <SectionContainer>
+            <SectionContainer testID={'decrypt'}>
                 <SectionTitle>Decrypt Symmetric</SectionTitle>
                 <Button
                     title={"Decrypt Symmetric"}
+                    testID={'button'}
                     onPress={async () => {
                         const output = await OpenPGP.decryptSymmetric(
                             encrypted,
@@ -56,7 +59,7 @@ export default function ({passphrase}: Props) {
                     }}
                 />
                 {!!decrypted && (
-                    <SectionResult>
+                    <SectionResult testID={'result'}>
                         {decrypted}
                     </SectionResult>
                 )}

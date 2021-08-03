@@ -39,32 +39,33 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
     }, [])
 
 
-
     if (loading) {
-        return <Container><Text>...</Text></Container>
+        return <Container testID={'loading'}><Text>...</Text></Container>
     }
 
-    return <Container>
-        <SectionContainer>
+    return <Container testID={'encrypt-decrypt-file'}>
+        <SectionContainer testID={'encrypt'}>
             <SectionTitle>Encrypt File</SectionTitle>
             <Button
                 title={"Encrypt File"}
+                testID={'button'}
                 onPress={async () => {
                     const result = await OpenPGP.encryptFile(input, output, publicKey);
                     setEncrypted(result.toString());
-                    RNFS.readFile(output,'base64').then((data) => {
+                    RNFS.readFile(output, 'base64').then((data) => {
                         setEncryptedFile(data)
                     })
                 }}
             />
-            <SectionResult>{encrypted}</SectionResult>
-            <SectionResult>{encryptedFile}</SectionResult>
+            <SectionResult  testID={'resultsize'}>{encrypted}</SectionResult>
+            {!!encryptedFile && <SectionResult testID={'result'}>{encryptedFile}</SectionResult>}
         </SectionContainer>
         {!!encrypted && (
-            <SectionContainer>
+            <SectionContainer testID={'decrypt'}>
                 <SectionTitle>Decrypt File</SectionTitle>
                 <Button
                     title={"Decrypt File"}
+                    testID={'button'}
                     onPress={async () => {
                         const result = await OpenPGP.decryptFile(
                             output,
@@ -73,15 +74,15 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
                             passphrase
                         );
                         setDecrypted(result.toString());
-                        RNFS.readFile(input,'utf8').then((data) => {
+                        RNFS.readFile(input, 'utf8').then((data) => {
                             setDecryptedFile(data)
                         })
                     }}
                 />
                 {!!decrypted && (
                     <>
-                        <SectionResult>{decrypted}</SectionResult>
-                        <SectionResult>{decryptedFile}</SectionResult>
+                        <SectionResult testID={'resultsize'}>{decrypted}</SectionResult>
+                        <SectionResult testID={'result'}>{decryptedFile}</SectionResult>
                     </>
                 )}
             </SectionContainer>

@@ -19,11 +19,12 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
     const [encrypted, setEncrypted] = useState('');
     const [decrypted, setDecrypted] = useState('');
 
-    return <Container>
-        <SectionContainer>
+    return <Container testID={'encrypt-decrypt'}>
+        <SectionContainer testID={'encrypt'}>
             <SectionTitle>Encrypt</SectionTitle>
             <TextInput
                 value={input}
+                testID={'message'}
                 onChangeText={(text) => {
                     setInput(text);
                 }}
@@ -32,18 +33,20 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
             />
             <Button
                 title={"Encrypt"}
+                testID={'button'}
                 onPress={async () => {
                     const output = await OpenPGP.encrypt(input, publicKey);
                     setEncrypted(output);
                 }}
             />
-            <SectionResult>{encrypted}</SectionResult>
+            {!!encrypted && <SectionResult testID={'result'}>{encrypted}</SectionResult>}
         </SectionContainer>
         {!!encrypted && (
-            <SectionContainer>
+            <SectionContainer testID={'decrypt'}>
                 <SectionTitle>Decrypt</SectionTitle>
                 <Button
                     title={"Decrypt"}
+                    testID={'button'}
                     onPress={async () => {
                         const output = await OpenPGP.decrypt(
                             encrypted,
@@ -54,7 +57,7 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
                     }}
                 />
                 {!!decrypted && (
-                    <SectionResult>
+                    <SectionResult testID={'result'}>
                         {decrypted}
                     </SectionResult>
                 )}

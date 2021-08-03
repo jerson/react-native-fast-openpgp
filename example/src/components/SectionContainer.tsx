@@ -3,10 +3,11 @@ import {StyleSheet, View} from "react-native";
 
 interface Props {
     children: React.ReactNode[]
+    testID: string
 }
 
-export default function ({children}: Props) {
-    return <View style={styles.sectionContainer}>{children}</View>;
+export default function ({testID,children}: Props) {
+    return <View testID={testID} style={styles.sectionContainer}>{children}</View>;
 }
 
 const styles = StyleSheet.create({

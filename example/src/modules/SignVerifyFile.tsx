@@ -34,13 +34,14 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
     }, [])
 
     if (loading){
-        return <Container><Text>...</Text></Container>
+        return <Container testID={'loading'}><Text>...</Text></Container>
     }
-    return <Container>
-        <SectionContainer>
+    return <Container testID={'sign-verify-file'}>
+        <SectionContainer testID={'sign'}>
             <SectionTitle>Sign File</SectionTitle>
             <Button
                 title={"Sign File"}
+                testID={'button'}
                 onPress={async () => {
                     const output = await OpenPGP.signFile(
                         input,
@@ -51,10 +52,10 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
                     setSigned(output);
                 }}
             />
-            <SectionResult>{signed}</SectionResult>
+            {!!signed && <SectionResult testID={'result'}>{signed}</SectionResult>}
         </SectionContainer>
         {!!signed && (
-            <SectionContainer>
+            <SectionContainer testID={'verify'}>
                 <SectionTitle>Verify File</SectionTitle>
                 <Button
                     title={"Verify File"}
@@ -69,7 +70,7 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
                     }}
                 />
                 {typeof verified !== 'undefined' && (
-                    <SectionResult>
+                    <SectionResult testID={'result'}>
                         {verified ? 'valid' : 'invalid'}
                     </SectionResult>
                 )}
