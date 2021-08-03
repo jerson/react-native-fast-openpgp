@@ -1,4 +1,4 @@
-name: Detox E2E
+name: Integration
 
 on:
   workflow_dispatch:
@@ -8,8 +8,7 @@ on:
       - 'v*'
 
 jobs:
-  detox:
-    name: Test
+  test:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v1
@@ -27,8 +26,11 @@ jobs:
           npm install -g react-native-cli
           npm install -g detox-cli
           npm install -g yarn
-      - run: yarn
-      - run: yarn example
+      - name: Deps
+        run: |
+          yarn
+          yarn example
+          npm install -g yarn
       - run: yarn example build:android
       - name: Android Emulator
         timeout-minutes: 10
@@ -39,5 +41,7 @@ jobs:
           $ANDROID_HOME/platform-tools/adb devices
           echo "Emulator started"
       - name: React Native Server
+        timeout-minutes: 10
+        continue-on-error: true
         run: yarn example start &
       - run: yarn example test:android
