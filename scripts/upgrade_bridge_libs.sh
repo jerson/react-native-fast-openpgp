@@ -52,4 +52,4 @@ do
 done
 #
 echo "All updated"
-
+rm ios/libopenpgp_bridge.h || echo "."
