@@ -1,0 +1,86 @@
+name: Integration
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  android:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
+      - uses: actions/cache@v2
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: android-actions/setup-android@v2
+      - name: Android Deps
+        run: |
+          sdkmanager --uninstall "cmake;3.18.1" || echo "skipped"
+          sdkmanager --install "cmake;3.10.2.4988404"
+      - name: Set up Node
+        run: |
+          npm install -g detox-cli
+          npm install -g yarn
+      - name: Deps
+        run: |
+          yarn
+          yarn example
+      - run: yarn example build:android
+      - run: yarn example start &
+        timeout-minutes: 10
+      - if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          avd-name: PhoneAPI30
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          avd-name: PhoneAPI30
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: yarn example test:android
+  ios:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Node
+        run: |
+          npm install -g detox-cli
+          npm install -g yarn
+      - name: Install Detox
+        run: |
+          brew tap wix/brew
+          brew install applesimutils
+      - name: Deps
+        run: |
+          yarn
+          yarn example
+      - run: cd ./example/ios && pod install && cd ../..
+      - run: yarn example build:ios
+      - run: yarn example start &
+        timeout-minutes: 10
+      - run: yarn example test:ios
