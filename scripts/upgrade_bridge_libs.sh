@@ -50,7 +50,7 @@ do
   curl -L -o $TMP_FILE "$FILE_URL" 
 
   echo "Extracting: $TMP_FILE to $OUTPUT_DIR"
-  mkdir -p "$OUTPUT_DIR" 
+  mkdir -p $OUTPUT_DIR
   tar -xz --strip-components=$OUTPUT_STRIP_DIR --directory=$OUTPUT_DIR --file=$TMP_FILE $OUTPUT_SUB_DIR
 
   INDEX=${INDEX}+1
