@@ -1,6 +1,6 @@
 describe('OpenPGP', () => {
     const timeout = 1000 * 60
-    const dyScroll = 300.0;
+    const dyScroll = 100.0;
     const input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras orci ex, pellentesque quis lobortis in";
     const list = by.id('list')
 
