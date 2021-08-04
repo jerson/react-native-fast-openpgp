@@ -1,0 +1,31 @@
+name: iOS
+
+on:
+  workflow_dispatch:
+#  pull_request:
+#  push:
+#    tags:
+#      - 'v*'
+
+jobs:
+  e2e:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Node
+        run: |
+          npm install -g detox-cli
+          npm install -g yarn
+      - name: Install Detox
+        run: |
+          brew tap wix/brew
+          brew install applesimutils
+      - name: Deps
+        run: |
+          yarn
+          yarn example
+      - run: cd ./example/ios && pod install && cd ../..
+      - run: yarn example build:ios
+      - run: yarn example start &
+        timeout-minutes: 10
+      - run: yarn example test:ios
