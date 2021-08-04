@@ -43,6 +43,9 @@ jobs:
           yarn example
           npm install -g yarn
       - run: yarn example build:android
+      - name: React Native Server
+        timeout-minutes: 10
+        run: yarn example start &
       - if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -61,9 +64,5 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --info
-      - name: Run Tests
-        timeout-minutes: 10
-        run: |
-          yarn example start &
-          yarn example test:android
+          script: yarn example test:android
+          
