@@ -173,7 +173,6 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
   },
   scrollView: {
     backgroundColor: Colors.lighter,
