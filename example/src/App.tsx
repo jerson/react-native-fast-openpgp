@@ -1,14 +1,22 @@
 import React from 'react';
-import {SafeAreaView, ScrollView, StatusBar, StyleSheet, View,} from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  View,
+} from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import EncryptDecrypt from "./modules/EncryptDecrypt";
-import SignVerify from "./modules/SignVerify";
-import EncryptDecryptSymmetric from "./modules/EncryptDecryptSymmetric";
-import Generate from "./modules/Generate";
-import EncryptDecryptFile from "./modules/EncryptDecryptFile";
-import EncryptDecryptSymmetricFile from "./modules/EncryptDecryptSymmetricFile";
-import SignVerifyFile from "./modules/SignVerifyFile";
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import EncryptDecrypt from './modules/EncryptDecrypt';
+import SignVerify from './modules/SignVerify';
+import EncryptDecryptSymmetric from './modules/EncryptDecryptSymmetric';
+import Generate from './modules/Generate';
+import EncryptDecryptFile from './modules/EncryptDecryptFile';
+import EncryptDecryptSymmetricFile from './modules/EncryptDecryptSymmetricFile';
+import SignVerifyFile from './modules/SignVerifyFile';
 
 const passphrase = 'test';
 const privateKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----
@@ -104,43 +112,75 @@ D4m65Neoc7DBEdvzgK9IUMpwG5N0t+0pfWLhs8AZdMxE7RbP
 =kbtq
 -----END PGP PUBLIC KEY BLOCK-----`;
 
-
 const App = () => {
-
-    return (
-        <>
-            <StatusBar barStyle="dark-content"/>
-            <SafeAreaView>
-                <ScrollView
-                    testID={'list'}
-                    contentInsetAdjustmentBehavior="automatic"
-                    style={styles.scrollView}
-                    keyboardShouldPersistTaps={'handled'}
-                >
-                    <View style={styles.body}>
-                        <EncryptDecrypt publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
-                        <EncryptDecryptFile publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
-                        <EncryptDecryptSymmetric publicKey={publicKey} privateKey={privateKey}
-                                                 passphrase={passphrase}/>
-                        <EncryptDecryptSymmetricFile publicKey={publicKey} privateKey={privateKey}
-                                                     passphrase={passphrase}/>
-                        <SignVerify publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
-                        <SignVerifyFile publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
-                        <Generate publicKey={publicKey} privateKey={privateKey} passphrase={passphrase}/>
-                    </View>
-                </ScrollView>
-            </SafeAreaView>
-        </>
-    );
+  return (
+    <>
+      <StatusBar barStyle="dark-content" />
+      <SafeAreaView>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.container}
+        >
+          <ScrollView
+            testID={'list'}
+            contentInsetAdjustmentBehavior="automatic"
+            style={styles.scrollView}
+            keyboardShouldPersistTaps={'handled'}
+          >
+            <View style={styles.body}>
+              <EncryptDecrypt
+                publicKey={publicKey}
+                privateKey={privateKey}
+                passphrase={passphrase}
+              />
+              <EncryptDecryptFile
+                publicKey={publicKey}
+                privateKey={privateKey}
+                passphrase={passphrase}
+              />
+              <EncryptDecryptSymmetric
+                publicKey={publicKey}
+                privateKey={privateKey}
+                passphrase={passphrase}
+              />
+              <EncryptDecryptSymmetricFile
+                publicKey={publicKey}
+                privateKey={privateKey}
+                passphrase={passphrase}
+              />
+              <SignVerify
+                publicKey={publicKey}
+                privateKey={privateKey}
+                passphrase={passphrase}
+              />
+              <SignVerifyFile
+                publicKey={publicKey}
+                privateKey={privateKey}
+                passphrase={passphrase}
+              />
+              <Generate
+                publicKey={publicKey}
+                privateKey={privateKey}
+                passphrase={passphrase}
+              />
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </>
+  );
 };
 
 const styles = StyleSheet.create({
-    scrollView: {
-        backgroundColor: Colors.lighter,
-    },
-    body: {
-        backgroundColor: Colors.white,
-    },
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    backgroundColor: Colors.lighter,
+  },
+  body: {
+    backgroundColor: Colors.white,
+  },
 });
 
 export default App;
