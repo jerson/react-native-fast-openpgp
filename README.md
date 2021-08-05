@@ -12,7 +12,7 @@ If you want to use with `JSI` instead of `NativeModules` you need to set
 ```typescript
 import OpenPGP from "react-native-fast-openpgp";
 
-OpenPGP.useJSI=true
+OpenPGP.useJSI = true;
 ```
 if you need to use generate methods it is a good idea to disable it, because for now JSI will lock your UI but it is faster compared to NativeModules
 
