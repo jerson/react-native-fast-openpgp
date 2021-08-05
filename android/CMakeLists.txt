@@ -1,17 +1,10 @@
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.9.0)
 
-include_directories(
-        ../cpp
-        ../node_modules/react-native/ReactCommon/jsi
-)
+set (CMAKE_VERBOSE_MAKEFILE ON)
+set (CMAKE_CXX_STANDARD 14)
+set (BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
 
-add_definitions(
-        -DFOLLY_USE_LIBCPP=1
-        -DFOLLY_NO_CONFIG=1
-        -DFOLLY_HAVE_MEMRCHR=1
-)
-
-add_library(openpgp_bridge SHARED IMPORTED )
+add_library(openpgp_bridge SHARED IMPORTED)
 
 set_target_properties(openpgp_bridge
         PROPERTIES
@@ -20,17 +13,20 @@ set_target_properties(openpgp_bridge
 
 add_library(fast-openpgp
         SHARED
-        ../node_modules/react-native/ReactCommon/jsi/jsi/jsi.cpp
+        "${NODE_MODULES_DIR}/react-native/ReactCommon/jsi/jsi/jsi.cpp"
         ../cpp/react-native-fast-openpgp.cpp
         ../cpp/react-native-fast-openpgp.h
         fast-openpgp-adapter.cpp
 )
 
-find_library(
-        log-lib
-        log )
+include_directories(
+        fast-openpgp
+        PRIVATE
+        "${NODE_MODULES_DIR}/react-native/ReactCommon/jsi"
+        ../cpp
+)
 
 target_link_libraries(fast-openpgp
         openpgp_bridge
         android
-        ${log-lib})
+        log)
