@@ -14,7 +14,7 @@ import OpenPGP from "react-native-fast-openpgp";
 
 OpenPGP.useJSI = true;
 ```
-if you need to use generate methods it is a good idea to disable it, because for now JSI will lock your UI but it is faster compared to NativeModules
+if you need to use generate methods it is a good idea to disable it, because for now JSI will block your UI but it is faster compared to NativeModules
 
 
 ## Usage
@@ -200,7 +200,7 @@ export interface FileHints {
 
 ## Native Code
 
-the native library is made in Golang and build with gomobile for faster performance
+the native library is made in Golang for faster performance
 
 <https://github.com/jerson/openpgp-mobile>
 
