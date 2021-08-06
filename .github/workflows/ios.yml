@@ -20,11 +20,7 @@ jobs:
         run: |
           brew tap wix/brew
           brew install applesimutils
-      - name: Deps
-        run: |
-          yarn
-          yarn example
-      - run: cd ./example/ios && pod install && cd ../..
+      - run: yarn
       - run: yarn example build:ios
       - run: yarn example start &
         timeout-minutes: 10

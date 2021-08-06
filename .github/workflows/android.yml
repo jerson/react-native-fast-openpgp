@@ -37,10 +37,7 @@ jobs:
         run: |
           npm install -g detox-cli
           npm install -g yarn
-      - name: Deps
-        run: |
-          yarn
-          yarn example
+      - run: yarn
       - run: yarn example build:android
       - run: yarn example start &
         timeout-minutes: 10
