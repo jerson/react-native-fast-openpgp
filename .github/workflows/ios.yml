@@ -17,6 +17,7 @@ jobs:
         with:
           path: |
             example/ios/build/*
+            example/ios/Pods/*
           key: ios
       - name: Set up Node
         run: |
