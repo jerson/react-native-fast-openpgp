@@ -1,7 +1,7 @@
 require "json"
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
-shared_lib = File.join(__dir__, "ios/libopenpgp_bridge.a")
+shared_lib = File.join(__dir__, "ios/libopenpgp_bridge.a").gsub(/ /, '\ ')
 
 Pod::Spec.new do |s|
   s.name         = package["name"]
