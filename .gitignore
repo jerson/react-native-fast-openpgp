@@ -40,6 +40,7 @@ local.properties
 *.iml
 android/.project
 android/.settings
+.cxx/
 
 # BUCK
 buck-out/

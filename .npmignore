@@ -4,6 +4,7 @@ xcuserdata
 .project
 .settings
 !android/src
+.cxx/
 docs/
 src/
 build/

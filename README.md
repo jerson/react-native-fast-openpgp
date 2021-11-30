@@ -4,109 +4,57 @@
 
 `$ npm install react-native-fast-openpgp --save`
 
-## Mostly automatic installation
+## JSI
 
-`$ react-native link react-native-fast-openpgp`
 
-## Manual installation
+If you want to use with `JSI` instead of `NativeModules` you need to set
 
-### iOS
+```typescript
+import OpenPGP from "react-native-fast-openpgp";
 
-1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
-2. Go to `node_modules` ➜ `react-native-fast-openpgp` and add `RNFastOpenpgp.xcodeproj`
-3. In XCode, in the project navigator, select your project. Add `libRNFastOpenpgp.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. Run your project (`Cmd+R`)<
+OpenPGP.useJSI = true;
+```
+if you need to use generate methods it is a good idea to disable it, because for now JSI will block your UI but it is faster compared to NativeModules
 
-### Android
-
-1. Open up `android/app/src/main/java/[...]/MainActivity.java`
-
-- Add `import dev.jerson.RNFastOpenPGPPackage;` to the imports at the top of the file
-- Add `new RNFastOpenPGPPackage()` to the list returned by the `getPackages()` method
-
-2. Append the following lines to `android/settings.gradle`:
-   ```groovy
-   include ':react-native-fast-openpgp'
-   project(':react-native-fast-openpgp').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-fast-openpgp/android')
-   ```
-3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-   ```groovy
-     implementation project(':react-native-fast-openpgp')
-   ```
 
 ## Usage
 
-### Types
-```javascript
-import OpenPGP from "react-native-fast-openpgp";
-
-interface KeyOptions {
-  cipher?: "aes128" | "aes192" | "aes256";
-  compression?: "none" | "zlib" | "zip";
-  hash?: "sha256" | "sha224" | "sha384" | "sha512";
-  RSABits?: 2048 | 4096 | 1024;
-  compressionLevel?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-}
-interface Options {
-  comment?: string;
-  email?: string;
-  name?: string;
-  passphrase?: string;
-  keyOptions?: KeyOptions;
-}
-interface KeyPair {
-  publicKey: string;
-  privateKey: string;
-}
-```
-
 ### Encrypt methods
-```javascript
+```typescript
 import OpenPGP from "react-native-fast-openpgp";
 
-const encrypted = await OpenPGP.encrypt(message: string, publicKey: string): Promise<string>;
-const outputFile = await OpenPGP.encryptFile(inputFile: string, outputFile: string, publicKey: string): Promise<string>;
+const encrypted = await OpenPGP.encrypt(message: string, publicKey: string, signedEntity?: Entity, fileHints?: FileHints, options?: KeyOptions ): Promise<string>;
+const outputFile = await OpenPGP.encryptFile(inputFile: string, outputFile: string, publicKey: string, signedEntity?: Entity, fileHints?: FileHints, options?: KeyOptions): Promise<number>;
 
-const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
-const outputFile = await OpenPGP.encryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, options?: KeyOptions): Promise<string>;
+const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passphrase: string, fileHints?: FileHints, options?: KeyOptions ): Promise<string>;
+const outputFile = await OpenPGP.encryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, fileHints?: FileHints, options?: KeyOptions ): Promise<number> ;
 ```
 
 ### Decrypt methods
-```javascript
+```typescript
 import OpenPGP from "react-native-fast-openpgp";
 
-const decrypted = await OpenPGP.decrypt(message: string, privateKey: string, passphrase: string): Promise<string>;
-const outputFile = await OpenPGP.decryptFile(inputFile: string, outputFile: string, privateKey: string, passphrase: string): Promise<string>;
+const decrypted = await OpenPGP.decrypt(message: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
+const outputFile = await OpenPGP.decryptFile(inputFile: string, outputFile: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<number>;
 
-const decryptedSymmetric = await OpenPGP.decryptSymmetric(message: string, passphrase: string, options?: KeyOptions): Promise<string>;
-const outputFile = await OpenPGP.decryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, options?: KeyOptions): Promise<string>;
+const decryptedSymmetric = await OpenPGP.decryptSymmetric(message: string, passphrase: string, options?: KeyOptions ): Promise<string>;
+const outputFile = await OpenPGP.decryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, options?: KeyOptions ): Promise<number> ;
 ```
 
 ### Sign and Verify methods
-```javascript
+```typescript
 import OpenPGP from "react-native-fast-openpgp";
 
-const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
-const signed = await OpenPGP.signFile(inputFile: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
+const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
+const signed = await OpenPGP.signFile(inputFile: string, publicKey: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
 
-const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string): Promise<boolean>;
-const verified = await OpenPGP.verifyFile(signature: string, inputFile: string, publicKey: string): Promise<boolean>;
-```
-
-### Sign and Verify methods
-```javascript
-import OpenPGP from "react-native-fast-openpgp";
-
-const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
-const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string): Promise<boolean>;
-
-const signed = await OpenPGP.signFile(inputFile: string, publicKey: string, privateKey: string, passphrase: string): Promise<string>;
-const verified = await OpenPGP.verifyFile(signature: string, inputFile: string, publicKey: string): Promise<boolean>;
+const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string ): Promise<boolean>;
+const verified = await OpenPGP.verifyFile(signature: string, inputFile: string,publicKey: string): Promise<boolean>;
 ```
 
 
 ### Generate
-```javascript
+```typescript
 import OpenPGP from "react-native-fast-openpgp";
 
 const generated = await OpenPGP.generate(options: Options): Promise<KeyPair>;
@@ -114,7 +62,7 @@ const generated = await OpenPGP.generate(options: Options): Promise<KeyPair>;
 
 ### Encrypt with multiple keys
 
-```javascript
+```typescript
 import OpenPGP from "react-native-fast-openpgp";
 
 const publicKeys = `-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -138,27 +86,128 @@ D4m65Neoc7DBEdvzgK9IUMpwG5N0t+0pfWLhs8AZdMxE7RbP
 const encrypted = await OpenPGP.encrypt("sample text" publicKeys);
 ```
 
-## Android
-### ProGuard
+### Types
+```typescript
+import OpenPGP from "react-native-fast-openpgp";
 
-Add this lines to `android/app/proguard-rules.pro` for proguard support
 
-```proguard
--keep class go.** { *; }
--keep class openpgp.** { *; }
-```
+export enum Hash {
+    SHA256 = 0,
+    SHA224 = 1,
+    SHA384 = 2,
+    SHA512 = 3,
+}
 
-## Sample
+export enum Compression {
+    NONE = 0,
+    ZLIB = 1,
+    ZIP = 2,
+}
 
-inside `example` dir you can run
+export enum Cipher {
+    AES128 = 0,
+    AES192 = 1,
+    AES256 = 2,
+}
 
-```bash
-npm start
-npm run android
+export interface KeyOptions {
+    /**
+     * RSABits is the number of bits in new RSA keys made with NewEntity.
+     * If zero, then 2048 bit keys are created.
+     * @default 2048
+     */
+    rsaBits?: number;
+
+    /**
+     * Cipher is the cipher to be used.
+     * If zero, AES-128 is used.
+     * @default aes128
+     */
+    cipher?: Cipher;
+
+    /**
+     * Compression is the compression algorithm to be
+     * applied to the plaintext before encryption. If zero, no
+     * compression is done.
+     * @default none
+     */
+    compression?: Compression;
+
+    /**
+     * Hash is the default hash function to be used.
+     * If zero, SHA-256 is used.
+     * @default sha256
+     */
+    hash?: Hash;
+
+    /**
+     * CompressionLevel is the compression level to use. It must be set to
+     * between -1 and 9, with -1 causing the compressor to use the
+     * default compression level, 0 causing the compressor to use
+     * no compression and 1 to 9 representing increasing (better,
+     * slower) compression levels. If Level is less than -1 or
+     * more then 9, a non-nil error will be returned during
+     * encryption. See the constants above for convenient common
+     * settings for Level.
+     * @default 0
+     */
+    compressionLevel?: number;
+}
+
+export interface Options {
+    comment?: string;
+    email?: string;
+    name?: string;
+    passphrase?: string;
+    keyOptions?: KeyOptions;
+}
+
+export interface KeyPair {
+    publicKey: string;
+    privateKey: string;
+}
+
+/**
+ * An Entity represents the components of an OpenPGP key: a primary public key
+ * (which must be a signing key), one or more identities claimed by that key,
+ * and zero or more subkeys, which may be encryption keys.
+ */
+export interface Entity {
+    publicKey: string;
+    privateKey: string;
+    passphrase?: string;
+}
+
+export interface FileHints {
+    /**
+     * IsBinary can be set to hint that the contents are binary data.
+     */
+    isBinary?: boolean;
+    /**
+     * FileName hints at the name of the file that should be written. It's
+     * truncated to 255 bytes if longer. It may be empty to suggest that the
+     * file should not be written to disk. It may be equal to "_CONSOLE" to
+     * suggest the data should not be written to disk.
+     */
+    fileName?: string;
+    /**
+     * ModTime format allowed: RFC3339, contains the modification time of the file, or the zero time if not applicable.
+     */
+    modTime?: string;
+}
+
 ```
 
 ## Native Code
 
-the native library is made in Golang and build with gomobile for faster performance
+the native library is made in Golang for faster performance
 
 <https://github.com/jerson/openpgp-mobile>
+
+## Contributing
+
+See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+
+## License
+
+MIT
