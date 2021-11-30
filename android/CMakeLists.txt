@@ -6,6 +6,10 @@ set (BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
 
 add_library(openpgp_bridge SHARED IMPORTED)
 
+
+file(TO_CMAKE_PATH ${NODE_MODULES_DIR} NODE_MODULES_DIR)
+
+
 set_target_properties(openpgp_bridge
         PROPERTIES
         IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libopenpgp_bridge.so
