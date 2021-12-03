@@ -36,7 +36,7 @@ jobs:
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
-          ndk-version: r21d
+          ndk-version: r21c
       - name: Set up Node
         run: |
           npm install -g detox-cli
