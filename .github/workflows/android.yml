@@ -33,10 +33,12 @@ jobs:
         run: |
           sdkmanager --uninstall "cmake;3.18.1" || echo "skipped"
           sdkmanager --install "cmake;3.10.2.4988404"
+          rm -rf ~/Library/Android/sdk/ndk || echo "skipped"
+          rm -rf ~/Library/Android/sdk/ndk-bundle || echo "skipped"
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
-          ndk-version: r20b
+          ndk-version: r21d
       - name: Set up Node
         run: |
           npm install -g detox-cli
