@@ -34,19 +34,11 @@ jobs:
           sdkmanager --uninstall "cmake;3.18.1" || echo "skipped"
           sdkmanager --install "cmake;3.10.2.4988404"
           sdkmanager --install "ndk;21.3.6528147"
-      - uses: nttld/setup-ndk@v1
-        id: setup-ndk
-        with:
-          ndk-version: r21c
       - name: Set up Node
         run: |
           npm install -g detox-cli
           npm install -g yarn
       - run: yarn
-      - run: yarn example build:android
-        env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-          ANDROID_NDK_TOOLCHAIN: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin
       - run: yarn example start &
         timeout-minutes: 10
       - if: steps.avd-cache.outputs.cache-hit != 'true'
