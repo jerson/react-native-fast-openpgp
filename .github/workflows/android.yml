@@ -33,7 +33,6 @@ jobs:
         run: |
           sdkmanager --uninstall "cmake;3.18.1" || echo "skipped"
           sdkmanager --install "cmake;3.10.2.4988404"
-          sdkmanager --uninstall "ndk;21.4.7075529"  || echo "skipped"
           sdkmanager --install "ndk;21.3.6528147"
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
