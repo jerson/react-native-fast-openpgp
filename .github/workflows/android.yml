@@ -39,6 +39,7 @@ jobs:
           npm install -g detox-cli
           npm install -g yarn
       - run: yarn
+      - run: yarn example build:android
       - run: yarn example start &
         timeout-minutes: 10
       - if: steps.avd-cache.outputs.cache-hit != 'true'
