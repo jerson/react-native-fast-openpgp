@@ -1,5 +1,8 @@
 # react-native-fast-openpgp
 
+[![Android](https://github.com/jerson/react-native-fast-openpgp/actions/workflows/android.yml/badge.svg)](https://github.com/jerson/react-native-fast-openpgp/actions/workflows/android.yml)
+[![iOS](https://github.com/jerson/react-native-fast-openpgp/actions/workflows/ios.yml/badge.svg)](https://github.com/jerson/react-native-fast-openpgp/actions/workflows/ios.yml)
+
 ## Getting started
 
 `$ npm install react-native-fast-openpgp --save`
