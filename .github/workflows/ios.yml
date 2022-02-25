@@ -27,7 +27,7 @@ jobs:
         run: |
           brew tap wix/brew
           brew install applesimutils
-      - run: yarn install
+      - run: yarn
       - run: yarn example build:ios
       - run: yarn example start &
         timeout-minutes: 10
