@@ -43,7 +43,7 @@ jobs:
         run: |
           npm install -g detox-cli
           npm install -g yarn
-      - run: yarn install --pure-lockfile
+      - run: yarn install
       - run: yarn example build:android
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
