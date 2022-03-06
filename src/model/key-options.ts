@@ -104,7 +104,7 @@ compressionLevel():number {
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
-mutate_compressionLevel(value:number):boolean {
+mutate_compression_level(value:number):boolean {
   const offset = this.bb!.__offset(this.bb_pos, 10);
 
   if (offset === 0) {
@@ -124,7 +124,7 @@ rsaBits():number {
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
-mutate_rsaBits(value:number):boolean {
+mutate_rsa_bits(value:number):boolean {
   const offset = this.bb!.__offset(this.bb_pos, 12);
 
   if (offset === 0) {

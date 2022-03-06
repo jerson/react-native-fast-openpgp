@@ -536,7 +536,7 @@ export default class OpenPGP {
         if (error) {
             throw new Error('intResponse: ' + error);
         }
-        return response.output().toFloat64();
+        return Number(response.output());
     }
     
     private static _boolResponse(result: flatbuffers.ByteBuffer): boolean {

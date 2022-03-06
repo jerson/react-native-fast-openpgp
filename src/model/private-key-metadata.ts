@@ -20,16 +20,16 @@ static getSizePrefixedRootAsPrivateKeyMetadata(bb:flatbuffers.ByteBuffer, obj?:P
   return (obj || new PrivateKeyMetadata()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-keyID():string|null
-keyID(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-keyID(optionalEncoding?:any):string|Uint8Array|null {
+keyId():string|null
+keyId(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+keyId(optionalEncoding?:any):string|Uint8Array|null {
   const offset = this.bb!.__offset(this.bb_pos, 4);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
-keyIDShort():string|null
-keyIDShort(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-keyIDShort(optionalEncoding?:any):string|Uint8Array|null {
+keyIdShort():string|null
+keyIdShort(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+keyIdShort(optionalEncoding?:any):string|Uint8Array|null {
   const offset = this.bb!.__offset(this.bb_pos, 6);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
@@ -48,9 +48,9 @@ fingerprint(optionalEncoding?:any):string|Uint8Array|null {
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
-keyIDNumeric():string|null
-keyIDNumeric(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-keyIDNumeric(optionalEncoding?:any):string|Uint8Array|null {
+keyIdNumeric():string|null
+keyIdNumeric(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+keyIdNumeric(optionalEncoding?:any):string|Uint8Array|null {
   const offset = this.bb!.__offset(this.bb_pos, 12);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
@@ -60,7 +60,7 @@ isSubKey():boolean {
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
-mutate_isSubKey(value:boolean):boolean {
+mutate_is_sub_key(value:boolean):boolean {
   const offset = this.bb!.__offset(this.bb_pos, 14);
 
   if (offset === 0) {
@@ -91,12 +91,12 @@ static startPrivateKeyMetadata(builder:flatbuffers.Builder) {
   builder.startObject(7);
 }
 
-static addKeyID(builder:flatbuffers.Builder, keyIDOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(0, keyIDOffset, 0);
+static addKeyId(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(0, keyIdOffset, 0);
 }
 
-static addKeyIDShort(builder:flatbuffers.Builder, keyIDShortOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, keyIDShortOffset, 0);
+static addKeyIdShort(builder:flatbuffers.Builder, keyIdShortOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(1, keyIdShortOffset, 0);
 }
 
 static addCreationTime(builder:flatbuffers.Builder, creationTimeOffset:flatbuffers.Offset) {
@@ -107,8 +107,8 @@ static addFingerprint(builder:flatbuffers.Builder, fingerprintOffset:flatbuffers
   builder.addFieldOffset(3, fingerprintOffset, 0);
 }
 
-static addKeyIDNumeric(builder:flatbuffers.Builder, keyIDNumericOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(4, keyIDNumericOffset, 0);
+static addKeyIdNumeric(builder:flatbuffers.Builder, keyIdNumericOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(4, keyIdNumericOffset, 0);
 }
 
 static addIsSubKey(builder:flatbuffers.Builder, isSubKey:boolean) {
@@ -124,13 +124,13 @@ static endPrivateKeyMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 }
 
-static createPrivateKeyMetadata(builder:flatbuffers.Builder, keyIDOffset:flatbuffers.Offset, keyIDShortOffset:flatbuffers.Offset, creationTimeOffset:flatbuffers.Offset, fingerprintOffset:flatbuffers.Offset, keyIDNumericOffset:flatbuffers.Offset, isSubKey:boolean, encrypted:boolean):flatbuffers.Offset {
+static createPrivateKeyMetadata(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset, keyIdShortOffset:flatbuffers.Offset, creationTimeOffset:flatbuffers.Offset, fingerprintOffset:flatbuffers.Offset, keyIdNumericOffset:flatbuffers.Offset, isSubKey:boolean, encrypted:boolean):flatbuffers.Offset {
   PrivateKeyMetadata.startPrivateKeyMetadata(builder);
-  PrivateKeyMetadata.addKeyID(builder, keyIDOffset);
-  PrivateKeyMetadata.addKeyIDShort(builder, keyIDShortOffset);
+  PrivateKeyMetadata.addKeyId(builder, keyIdOffset);
+  PrivateKeyMetadata.addKeyIdShort(builder, keyIdShortOffset);
   PrivateKeyMetadata.addCreationTime(builder, creationTimeOffset);
   PrivateKeyMetadata.addFingerprint(builder, fingerprintOffset);
-  PrivateKeyMetadata.addKeyIDNumeric(builder, keyIDNumericOffset);
+  PrivateKeyMetadata.addKeyIdNumeric(builder, keyIdNumericOffset);
   PrivateKeyMetadata.addIsSubKey(builder, isSubKey);
   PrivateKeyMetadata.addEncrypted(builder, encrypted);
   return PrivateKeyMetadata.endPrivateKeyMetadata(builder);

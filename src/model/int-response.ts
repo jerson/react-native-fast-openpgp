@@ -20,12 +20,12 @@ static getSizePrefixedRootAsIntResponse(bb:flatbuffers.ByteBuffer, obj?:IntRespo
   return (obj || new IntResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-output():flatbuffers.Long {
+output():bigint {
   const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.readInt64(this.bb_pos + offset) : this.bb!.createLong(0, 0);
+  return offset ? this.bb!.readInt64(this.bb_pos + offset) : BigInt('0');
 }
 
-mutate_output(value:flatbuffers.Long):boolean {
+mutate_output(value:bigint):boolean {
   const offset = this.bb!.__offset(this.bb_pos, 4);
 
   if (offset === 0) {
@@ -47,8 +47,8 @@ static startIntResponse(builder:flatbuffers.Builder) {
   builder.startObject(2);
 }
 
-static addOutput(builder:flatbuffers.Builder, output:flatbuffers.Long) {
-  builder.addFieldInt64(0, output, builder.createLong(0, 0));
+static addOutput(builder:flatbuffers.Builder, output:bigint) {
+  builder.addFieldInt64(0, output, BigInt('0'));
 }
 
 static addError(builder:flatbuffers.Builder, errorOffset:flatbuffers.Offset) {
@@ -60,7 +60,7 @@ static endIntResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 }
 
-static createIntResponse(builder:flatbuffers.Builder, output:flatbuffers.Long, errorOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createIntResponse(builder:flatbuffers.Builder, output:bigint, errorOffset:flatbuffers.Offset):flatbuffers.Offset {
   IntResponse.startIntResponse(builder);
   IntResponse.addOutput(builder, output);
   IntResponse.addError(builder, errorOffset);

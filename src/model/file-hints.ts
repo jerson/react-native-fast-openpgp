@@ -28,7 +28,7 @@ isBinary():boolean {
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
-mutate_isBinary(value:boolean):boolean {
+mutate_is_binary(value:boolean):boolean {
   const offset = this.bb!.__offset(this.bb_pos, 4);
 
   if (offset === 0) {
