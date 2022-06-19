@@ -62,7 +62,9 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
 
     override fun initialize() {
         super.initialize()
-        initialize(this.reactApplicationContext.javaScriptContextHolder.get())
+        reactApplicationContext.runOnJSQueueThread {
+           initialize(this.reactApplicationContext.javaScriptContextHolder.get())
+        }
     }
 
     override fun onCatalystInstanceDestroy() {
