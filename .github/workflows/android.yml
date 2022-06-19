@@ -28,12 +28,10 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '8'
+          java-version: '11'
       - uses: android-actions/setup-android@v2
       - name: Android Deps
         run: |
-          sdkmanager --uninstall "cmake;3.18.1" || echo "skipped"
-          sdkmanager --install "cmake;3.10.2.4988404"
           rm -rf ~/Library/Android/sdk/ndk || echo "skipped"
           rm -rf ~/Library/Android/sdk/ndk-bundle || echo "skipped"
       - uses: nttld/setup-ndk@v1
