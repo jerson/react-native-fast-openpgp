@@ -50,6 +50,7 @@ interface NativeModulesDef {
 }
 
 interface Global {
+  BigInt: any;
   // for now we are not going to use this way because of hermes on release mode only
   // FastOpenPGP:FastOpenPGPJSI
   /**

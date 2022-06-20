@@ -18,6 +18,7 @@ import { DecryptFileRequest } from './model/decrypt-file-request';
 import { EncryptFileRequest } from './model/encrypt-file-request';
 import { SignFileRequest } from './model/sign-file-request';
 import { VerifyFileRequest } from './model/verify-file-request';
+import './shim'
 
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
     .FastOpenPGP;
