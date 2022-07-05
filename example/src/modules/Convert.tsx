@@ -1,5 +1,4 @@
-import {Colors} from "react-native/Libraries/NewAppScreen";
-import {Button, TextInput} from "react-native";
+import {Button} from "react-native";
 import React, {useState} from "react";
 import OpenPGP from 'react-native-fast-openpgp';
 import SectionContainer from "../components/SectionContainer";
@@ -19,7 +18,7 @@ export default function ({privateKey}: Props) {
         <SectionContainer testID={'convert'}>
             <SectionTitle>Convert</SectionTitle>
             <Button
-                title={"convertPrivateKeyToPublicKey"}
+                title={"convert PrivateKey To PublicKey"}
                 testID={'button'}
                 onPress={async () => {
                     const output = await OpenPGP.convertPrivateKeyToPublicKey(privateKey);
