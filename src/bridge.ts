@@ -6,3 +6,5 @@ export { Hash } from './model/hash';
 export { KeyOptions } from './model/key-options';
 export { KeyPair } from './model/key-pair';
 export { Options } from './model/options';
+export { PrivateKeyMetadata } from './model/private-key-metadata';
+export { PublicKeyMetadata } from './model/public-key-metadata';

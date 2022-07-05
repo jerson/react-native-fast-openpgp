@@ -18,6 +18,8 @@ import Generate from './modules/Generate';
 import EncryptDecryptFile from './modules/EncryptDecryptFile';
 import EncryptDecryptSymmetricFile from './modules/EncryptDecryptSymmetricFile';
 import SignVerifyFile from './modules/SignVerifyFile';
+import Metadata from './modules/Metadata';
+import Convert from './modules/Convert';
 
 const passphrase = 'test';
 const privateKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----
@@ -163,6 +165,13 @@ const App = () => {
                 publicKey={publicKey}
                 privateKey={privateKey}
                 passphrase={passphrase}
+              />
+              <Metadata
+                publicKey={publicKey}
+                privateKey={privateKey}
+              />
+              <Convert
+                privateKey={privateKey}
               />
             </View>
           </ScrollView>
