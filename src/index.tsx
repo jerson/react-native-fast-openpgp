@@ -1,16 +1,16 @@
-import {NativeModules} from 'react-native';
+import { NativeModules } from 'react-native';
 import * as model from './bridge';
 import * as flatbuffers from 'flatbuffers';
-import {BoolResponse} from './model/bool-response';
-import {DecryptRequest} from './model/decrypt-request';
-import {DecryptSymmetricRequest} from './model/decrypt-symmetric-request';
-import {EncryptRequest} from './model/encrypt-request';
-import {EncryptSymmetricRequest} from './model/encrypt-symmetric-request';
-import {GenerateRequest} from './model/generate-request';
-import {KeyPairResponse} from './model/key-pair-response';
-import {SignRequest} from './model/sign-request';
-import {StringResponse} from './model/string-response';
-import {VerifyRequest} from './model/verify-request';
+import { BoolResponse } from './model/bool-response';
+import { DecryptRequest } from './model/decrypt-request';
+import { DecryptSymmetricRequest } from './model/decrypt-symmetric-request';
+import { EncryptRequest } from './model/encrypt-request';
+import { EncryptSymmetricRequest } from './model/encrypt-symmetric-request';
+import { GenerateRequest } from './model/generate-request';
+import { KeyPairResponse } from './model/key-pair-response';
+import { SignRequest } from './model/sign-request';
+import { StringResponse } from './model/string-response';
+import { VerifyRequest } from './model/verify-request';
 import { DecryptSymmetricFileRequest } from './model/decrypt-symmetric-file-request';
 import { EncryptSymmetricFileRequest } from './model/encrypt-symmetric-file-request';
 import { IntResponse } from './model/int-response';
@@ -18,6 +18,11 @@ import { DecryptFileRequest } from './model/decrypt-file-request';
 import { EncryptFileRequest } from './model/encrypt-file-request';
 import { SignFileRequest } from './model/sign-file-request';
 import { VerifyFileRequest } from './model/verify-file-request';
+import { PublicKeyMetadataResponse } from './model/public-key-metadata-response';
+import { PrivateKeyMetadataResponse } from './model/private-key-metadata-response';
+import { GetPublicKeyMetadataRequest } from './model/get-public-key-metadata-request';
+import { GetPrivateKeyMetadataRequest } from './model/get-private-key-metadata-request';
+import { ConvertPrivateKeyToPublicKeyRequest } from './model/convert-private-key-to-public-key-request';
 import './shim'
 
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
@@ -97,6 +102,24 @@ export interface Options {
 export interface KeyPair {
     publicKey: string;
     privateKey: string;
+}
+
+export interface PublicKeyMetadata {
+    keyID: string;
+    keyIDShort: string;
+    creationTime: string;
+    fingerprint: string;
+    keyIDNumeric: string;
+    isSubKey: boolean;
+}
+export interface PrivateKeyMetadata {
+    keyID: string;
+    keyIDShort: string;
+    creationTime: string;
+    fingerprint: string;
+    keyIDNumeric: string;
+    isSubKey: boolean;
+    encrypted: boolean;
 }
 
 /**
@@ -381,8 +404,8 @@ export default class OpenPGP {
     ): Promise<number> {
         const builder = new flatbuffers.Builder(0);
 
-        const inputOffset = builder.createString(inputFile );
-        const outputOffset = builder.createString(outputFile );
+        const inputOffset = builder.createString(inputFile);
+        const outputOffset = builder.createString(outputFile);
         const passphraseOffset = builder.createString(passphrase);
 
         const optionsOffset = this._keyOptions(builder, options);
@@ -441,8 +464,8 @@ export default class OpenPGP {
     ): Promise<number> {
         const builder = new flatbuffers.Builder(0);
 
-        const inputOffset = builder.createString(inputFile );
-        const outputOffset = builder.createString(outputFile );
+        const inputOffset = builder.createString(inputFile);
+        const outputOffset = builder.createString(outputFile);
         const passphraseOffset = builder.createString(passphrase);
 
         const optionsOffset = this._keyOptions(builder, options);
@@ -478,6 +501,51 @@ export default class OpenPGP {
         const result = await this.call('generate', builder.asUint8Array());
 
         return this._keyPairResponse(result);
+    }
+
+    static async getPrivateKeyMetadata(
+        privateKey: string,
+    ): Promise<PrivateKeyMetadata> {
+        const builder = new flatbuffers.Builder(0);
+        const privateKeyOffset = builder.createString(privateKey);
+
+        GetPrivateKeyMetadataRequest.startGetPrivateKeyMetadataRequest(builder);
+        GetPrivateKeyMetadataRequest.addPrivateKey(builder, privateKeyOffset);
+        const offset = GetPrivateKeyMetadataRequest.endGetPrivateKeyMetadataRequest(builder);
+        builder.finish(offset);
+
+        const result = await this.call('getPrivateKeyMetadata', builder.asUint8Array());
+        return this._privateKeyMetadataResponse(result);
+    }
+
+    static async getPublicKeyMetadata(
+        publicKey: string,
+    ): Promise<PublicKeyMetadata> {
+        const builder = new flatbuffers.Builder(0);
+        const publicKeyOffset = builder.createString(publicKey);
+
+        GetPublicKeyMetadataRequest.startGetPublicKeyMetadataRequest(builder);
+        GetPublicKeyMetadataRequest.addPublicKey(builder, publicKeyOffset);
+        const offset = GetPublicKeyMetadataRequest.endGetPublicKeyMetadataRequest(builder);
+        builder.finish(offset);
+
+        const result = await this.call('getPublicKeyMetadata', builder.asUint8Array());
+        return this._publiKeyMetadataResponse(result);
+    }
+
+    static async convertPrivateKeyToPublicKey(
+        privateKey: string,
+    ): Promise<string> {
+        const builder = new flatbuffers.Builder(0);
+        const privateKeyOffset = builder.createString(privateKey);
+
+        ConvertPrivateKeyToPublicKeyRequest.startConvertPrivateKeyToPublicKeyRequest(builder);
+        ConvertPrivateKeyToPublicKeyRequest.addPrivateKey(builder, privateKeyOffset);
+        const offset = ConvertPrivateKeyToPublicKeyRequest.endConvertPrivateKeyToPublicKeyRequest(builder);
+        builder.finish(offset);
+
+        const result = await this.call('convertPrivateKeyToPublicKey', builder.asUint8Array());
+        return this._stringResponse(result);
     }
 
     private static async call(
@@ -539,7 +607,7 @@ export default class OpenPGP {
         }
         return Number(response.output());
     }
-    
+
     private static _boolResponse(result: flatbuffers.ByteBuffer): boolean {
         const response = BoolResponse.getRootAsBoolResponse(result);
         const error = response.error();
@@ -646,5 +714,48 @@ export default class OpenPGP {
             privateKey: output.privateKey() || '',
             publicKey: output.publicKey() || '',
         } as KeyPair;
+    }
+
+    private static _publiKeyMetadataResponse(result: flatbuffers.ByteBuffer): PublicKeyMetadata {
+        const response = PublicKeyMetadataResponse.getRootAsPublicKeyMetadataResponse(result);
+        const error = response.error();
+        if (error) {
+            throw new Error('publicKeyMetadataResponse: ' + error);
+        }
+        const output = response.output();
+        if (!output) {
+            throw new Error('empty output');
+        }
+
+        return {
+            keyID: output.keyId() || '',
+            keyIDShort: output.keyIdShort() || '',
+            creationTime: output.creationTime() || '',
+            fingerprint: output.fingerprint() || '',
+            keyIDNumeric: output.keyIdNumeric() || '',
+            isSubKey: output.isSubKey(),
+        } as PublicKeyMetadata;
+    }
+
+    private static _privateKeyMetadataResponse(result: flatbuffers.ByteBuffer): PrivateKeyMetadata {
+        const response = PrivateKeyMetadataResponse.getRootAsPrivateKeyMetadataResponse(result);
+        const error = response.error();
+        if (error) {
+            throw new Error('privateKeyMetadataResponse: ' + error);
+        }
+        const output = response.output();
+        if (!output) {
+            throw new Error('empty output');
+        }
+
+        return {
+            keyID: output.keyId() || '',
+            keyIDShort: output.keyIdShort() || '',
+            creationTime: output.creationTime() || '',
+            fingerprint: output.fingerprint() || '',
+            keyIDNumeric: output.keyIdNumeric() || '',
+            isSubKey: output.isSubKey(),
+            encrypted: output.encrypted(),
+        } as PrivateKeyMetadata;
     }
 }

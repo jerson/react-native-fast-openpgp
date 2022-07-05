@@ -63,6 +63,21 @@ import OpenPGP from "react-native-fast-openpgp";
 const generated = await OpenPGP.generate(options: Options): Promise<KeyPair>;
 ```
 
+### Convert methods
+```typescript
+import OpenPGP from "react-native-fast-openpgp";
+
+const publicKey = await OpenPGP.convertPrivateKeyToPublicKey(privateKey: string): Promise<string>;
+```
+
+### Metadata methods
+```typescript
+import OpenPGP from "react-native-fast-openpgp";
+
+const metadata1 = await OpenPGP.getPublicKeyMetadata(publicKey: string): Promise<PublicKeyMetadata>;
+const metadata2 = await OpenPGP.getPrivateKeyMetadata(privateKey: string): Promise<PrivateKeyMetadata>;
+```
+
 ### Encrypt with multiple keys
 
 ```typescript
@@ -168,6 +183,24 @@ export interface Options {
 export interface KeyPair {
     publicKey: string;
     privateKey: string;
+}
+
+export interface PublicKeyMetadata {
+    keyID: string;
+    keyIDShort: string;
+    creationTime: string;
+    fingerprint: string;
+    keyIDNumeric: string;
+    isSubKey: boolean;
+}
+export interface PrivateKeyMetadata {
+    keyID: string;
+    keyIDShort: string;
+    creationTime: string;
+    fingerprint: string;
+    keyIDNumeric: string;
+    isSubKey: boolean;
+    encrypted: boolean;
 }
 
 /**
