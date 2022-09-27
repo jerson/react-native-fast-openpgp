@@ -2,6 +2,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
+import { Identity } from '../model/identity';
+
+
 export class PrivateKeyMetadata {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
@@ -87,8 +90,18 @@ mutate_encrypted(value:boolean):boolean {
   return true;
 }
 
+identities(index: number, obj?:Identity):Identity|null {
+  const offset = this.bb!.__offset(this.bb_pos, 18);
+  return offset ? (obj || new Identity()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
+}
+
+identitiesLength():number {
+  const offset = this.bb!.__offset(this.bb_pos, 18);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+}
+
 static startPrivateKeyMetadata(builder:flatbuffers.Builder) {
-  builder.startObject(7);
+  builder.startObject(8);
 }
 
 static addKeyId(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset) {
@@ -119,12 +132,28 @@ static addEncrypted(builder:flatbuffers.Builder, encrypted:boolean) {
   builder.addFieldInt8(6, +encrypted, +false);
 }
 
+static addIdentities(builder:flatbuffers.Builder, identitiesOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(7, identitiesOffset, 0);
+}
+
+static createIdentitiesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
+  builder.startVector(4, data.length, 4);
+  for (let i = data.length - 1; i >= 0; i--) {
+    builder.addOffset(data[i]!);
+  }
+  return builder.endVector();
+}
+
+static startIdentitiesVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(4, numElems, 4);
+}
+
 static endPrivateKeyMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
 }
 
-static createPrivateKeyMetadata(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset, keyIdShortOffset:flatbuffers.Offset, creationTimeOffset:flatbuffers.Offset, fingerprintOffset:flatbuffers.Offset, keyIdNumericOffset:flatbuffers.Offset, isSubKey:boolean, encrypted:boolean):flatbuffers.Offset {
+static createPrivateKeyMetadata(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset, keyIdShortOffset:flatbuffers.Offset, creationTimeOffset:flatbuffers.Offset, fingerprintOffset:flatbuffers.Offset, keyIdNumericOffset:flatbuffers.Offset, isSubKey:boolean, encrypted:boolean, identitiesOffset:flatbuffers.Offset):flatbuffers.Offset {
   PrivateKeyMetadata.startPrivateKeyMetadata(builder);
   PrivateKeyMetadata.addKeyId(builder, keyIdOffset);
   PrivateKeyMetadata.addKeyIdShort(builder, keyIdShortOffset);
@@ -133,6 +162,7 @@ static createPrivateKeyMetadata(builder:flatbuffers.Builder, keyIdOffset:flatbuf
   PrivateKeyMetadata.addKeyIdNumeric(builder, keyIdNumericOffset);
   PrivateKeyMetadata.addIsSubKey(builder, isSubKey);
   PrivateKeyMetadata.addEncrypted(builder, encrypted);
+  PrivateKeyMetadata.addIdentities(builder, identitiesOffset);
   return PrivateKeyMetadata.endPrivateKeyMetadata(builder);
 }
 }
