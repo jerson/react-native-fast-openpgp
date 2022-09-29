@@ -153,6 +153,6 @@
   },
   "dependencies": {
     "big-integer": "^1.6.51",
-    "flatbuffers": "^2.0.6"
+    "flatbuffers": "2.0.6"
   }
 }
