@@ -51,6 +51,12 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withReject:(RCTPromiseRejectBlock)reject)
 {
+    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+    if (!cxxBridge.runtime) {
+        [self call:name withPayload:payload withResolver:resolve withReject:reject];
+        return;
+    }
+
     auto bytesCopy = (Byte*)malloc(payload.count);
     [payload enumerateObjectsUsingBlock:^(NSNumber* number, NSUInteger index, BOOL* stop){
         bytesCopy[index] = number.integerValue;
@@ -59,11 +65,6 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
     int size = (int) payload.count;
     
     
-    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
-    if (!cxxBridge.runtime) {
-        reject(@"E001",@"bridge not found",nil);
-        return;
-    }
     jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
     
     auto nameValue = jsi::String::createFromAscii(*runtime, cname);
@@ -97,6 +98,22 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
     resolve(result);
 }
 
+RCT_REMAP_METHOD(install,installWithResolver:(RCTPromiseResolveBlock)resolve
+                 withReject:(RCTPromiseRejectBlock)reject)
+{
+    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+    if (!cxxBridge.runtime) {
+        NSNumber * val = [NSNumber numberWithBool:NO];
+        resolve(val);
+        return;
+    }
+    jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
+
+    fastOpenPGP::install(*runtime);
+    NSNumber * val = [NSNumber numberWithBool:TRUE];
+    resolve(val);
+}
+
 + (BOOL)requiresMainQueueSetup {
     return YES;
 }
@@ -105,15 +122,6 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
 {
     _bridge = bridge;
     _setBridgeOnMainQueue = RCTIsMainQueue();
-    
-    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
-    if (!cxxBridge.runtime) {
-        return;
-    }
-    jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
-    
-    fastOpenPGP::install(*runtime);
-    
 }
 
 - (void)invalidate {
