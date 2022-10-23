@@ -97,6 +97,20 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
     resolve(result);
 }
 
+RCT_REMAP_METHOD(install,installWithResolver:(RCTPromiseResolveBlock)resolve
+                 withReject:(RCTPromiseRejectBlock)reject)
+{
+    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+    if (!cxxBridge.runtime) {
+        resolve(NO);
+        return;
+    }
+    jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
+
+    fastRSA::install(*runtime);
+    resolve(YES);
+}
+
 + (BOOL)requiresMainQueueSetup {
     return YES;
 }
@@ -105,15 +119,6 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
 {
     _bridge = bridge;
     _setBridgeOnMainQueue = RCTIsMainQueue();
-    
-    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
-    if (!cxxBridge.runtime) {
-        return;
-    }
-    jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
-    
-    fastOpenPGP::install(*runtime);
-    
 }
 
 - (void)invalidate {

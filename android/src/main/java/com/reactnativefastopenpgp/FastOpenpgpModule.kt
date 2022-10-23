@@ -1,11 +1,14 @@
 package com.reactnativefastopenpgp
 
+import android.util.Log
 import androidx.annotation.NonNull
 import com.facebook.react.bridge.*
 
 @ExperimentalUnsignedTypes
 internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
+
+  val TAG = "[FastRsaModule]"
 
     external fun initialize(jsiPtr: Long);
     external fun destruct();
@@ -18,56 +21,75 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    @ReactMethod
-    fun callJSI(name: String, payload: ReadableArray, promise: Promise) {
-        Thread {
-            try {
-                val bytes = ByteArray(payload.size()) { pos -> payload.getInt(pos).toByte() }
-                var result =
-                    callJSI(this.reactApplicationContext.javaScriptContextHolder.get(), name, bytes)
-                val resultList = Arguments.createArray()
-                for (i in result.indices) {
-                    resultList.pushInt(result[i].toInt())
-                }
-                result = ByteArray(0);
-                promise.resolve(resultList)
-            } catch (e: Exception) {
-                promise.reject(e)
-            }
-        }.start()
-    }
-
-    @ReactMethod
-    fun call(name: String, payload: ReadableArray, promise: Promise) {
-        Thread {
-            try {
-                val bytes = ByteArray(payload.size()) { pos -> payload.getInt(pos).toByte() }
-                var result = callNative(name, bytes)
-                val resultList = Arguments.createArray()
-                for (i in result.indices) {
-                    resultList.pushInt(result[i].toInt())
-                }
-                result = ByteArray(0);
-                promise.resolve(resultList)
-            } catch (e: Exception) {
-                promise.reject(e)
-            }
-        }.start()
-    }
-
-    @NonNull
-    override fun getName(): String {
-        return "FastOpenPGP"
-    }
-
-    override fun initialize() {
-        super.initialize()
-        reactApplicationContext.runOnJSQueueThread {
-           initialize(this.reactApplicationContext.javaScriptContextHolder.get())
+  @ReactMethod
+  fun callJSI(name: String, payload: ReadableArray, promise: Promise) {
+    Thread {
+      reactApplicationContext.runOnJSQueueThread {
+        try {
+          val contextHolder = this.reactApplicationContext.javaScriptContextHolder.get()
+          if (contextHolder.toInt() == 0) {
+            call(name, payload, promise)
+            return@runOnJSQueueThread
+          }
+          val bytes = ByteArray(payload.size()) { pos -> payload.getInt(pos).toByte() }
+          val result = callJSI(contextHolder, name, bytes)
+          val resultList = Arguments.createArray()
+          for (i in result.indices) {
+            resultList.pushInt(result[i].toInt())
+          }
+          promise.resolve(resultList)
+        } catch (e: Exception) {
+          promise.reject(e)
         }
-    }
+      }
+    }.start()
+  }
 
-    override fun onCatalystInstanceDestroy() {
-        destruct();
-    }
+  @ReactMethod
+  fun call(name: String, payload: ReadableArray, promise: Promise) {
+    Thread {
+      try {
+        val bytes = ByteArray(payload.size()) { pos -> payload.getInt(pos).toByte() }
+        val result = callNative(name, bytes)
+        val resultList = Arguments.createArray()
+        for (i in result.indices) {
+          resultList.pushInt(result[i].toInt())
+        }
+        promise.resolve(resultList)
+      } catch (e: Exception) {
+        promise.reject(e)
+      }
+    }.start()
+  }
+
+  @ReactMethod()
+  fun install(promise: Promise) {
+    Thread {
+      reactApplicationContext.runOnJSQueueThread {
+        Log.d(TAG, "installing")
+        try {
+          val contextHolder = this.reactApplicationContext.javaScriptContextHolder.get()
+          if (contextHolder.toInt() == 0) {
+            promise.resolve(false)
+            return@runOnJSQueueThread
+          }
+          initialize(contextHolder)
+          Log.i(TAG, "successfully installed")
+          promise.resolve(true)
+        } catch (exception: java.lang.Exception) {
+          Log.e(TAG, "failed to install JSI", exception)
+          promise.reject(exception)
+        }
+      }
+    }.start()
+  }
+
+  override fun getName(): String {
+    return "FastOpenPGP"
+  }
+
+  override fun onCatalystInstanceDestroy() {
+    destruct();
+  }
 }
+

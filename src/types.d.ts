@@ -43,6 +43,10 @@ interface FastOpenPGPNativeModules {
     name: string,
     payload: Array<number>
   ): Promise<BridgeResponseNativeModules>;
+  /**
+   * this method will install JSI definitions
+   */
+  install(): Promise<boolean>;
 }
 
 interface NativeModulesDef {
