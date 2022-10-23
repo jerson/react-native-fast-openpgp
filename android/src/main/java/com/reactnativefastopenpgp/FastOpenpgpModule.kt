@@ -7,7 +7,7 @@ import com.facebook.react.bridge.*
 internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
 
-  val TAG = "[FastRsaModule]"
+  val TAG = "[FastOpenPGPModule]"
 
     external fun initialize(jsiPtr: Long);
     external fun destruct();
