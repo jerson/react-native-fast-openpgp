@@ -51,6 +51,12 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withReject:(RCTPromiseRejectBlock)reject)
 {
+    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+    if (!cxxBridge.runtime) {
+        [self call:name withPayload:payload withResolver:resolve withReject:reject];
+        return;
+    }
+
     auto bytesCopy = (Byte*)malloc(payload.count);
     [payload enumerateObjectsUsingBlock:^(NSNumber* number, NSUInteger index, BOOL* stop){
         bytesCopy[index] = number.integerValue;
@@ -59,11 +65,6 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
     int size = (int) payload.count;
     
     
-    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
-    if (!cxxBridge.runtime) {
-        reject(@"E001",@"bridge not found",nil);
-        return;
-    }
     jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
     
     auto nameValue = jsi::String::createFromAscii(*runtime, cname);
@@ -102,13 +103,15 @@ RCT_REMAP_METHOD(install,installWithResolver:(RCTPromiseResolveBlock)resolve
 {
     RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
     if (!cxxBridge.runtime) {
-        resolve(NO);
+        NSNumber * val = [NSNumber numberWithBool:NO];
+        resolve(val);
         return;
     }
     jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
 
-    fastRSA::install(*runtime);
-    resolve(YES);
+    fastOpenPGP::install(*runtime);
+    NSNumber * val = [NSNumber numberWithBool:TRUE];
+    resolve(val);
 }
 
 + (BOOL)requiresMainQueueSetup {
