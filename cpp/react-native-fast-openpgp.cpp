@@ -131,22 +131,14 @@ namespace fastOpenPGP {
                                 auto rejectFunction = arguments[1].getObject(runtime).asFunction(
                                         runtime);
 
-                                auto resolveFunctionFuture = std::make_shared<jsi::Function>(
-                                        std::move(resolveFunction));
-                                auto rejectFunctionFuture = std::make_shared<jsi::Function>(
-                                        std::move(rejectFunction));
+                                auto response = call(runtime, *nameFuture, *payloadFuture);
 
-                                std::async(std::launch::async,
-                                           [rejectFunctionFuture, resolveFunctionFuture, &runtime, nameFuture, payloadFuture]() {
-                                               auto response = call(runtime, *nameFuture,
-                                                                    *payloadFuture);
+                                if (response.isString()) {
+                                    rejectFunction.call(runtime, response);
+                                } else {
+                                    resolveFunction.call(runtime, response);
+                                }
 
-                                               if (response.isString()) {
-                                                   rejectFunctionFuture->call(runtime, response);
-                                                   return;
-                                               }
-                                               resolveFunctionFuture->call(runtime, response);
-                                           }).get();
                                 return jsi::Value(0);
                             }
                     );
