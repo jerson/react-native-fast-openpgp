@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.annotation.NonNull
 import com.facebook.react.bridge.*
 
-@ExperimentalUnsignedTypes
 internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
 
@@ -62,7 +61,7 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
     }.start()
   }
 
-  @ReactMethod()
+  @ReactMethod
   fun install(promise: Promise) {
     Thread {
       reactApplicationContext.runOnJSQueueThread {
