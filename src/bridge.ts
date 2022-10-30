@@ -1,5 +1,7 @@
+export { Algorithm } from './model/algorithm';
 export { Cipher } from './model/cipher';
 export { Compression } from './model/compression';
+export { Curve } from './model/curve';
 export { Entity } from './model/entity';
 export { FileHints } from './model/file-hints';
 export { Hash } from './model/hash';

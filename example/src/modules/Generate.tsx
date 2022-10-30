@@ -1,6 +1,6 @@
 import {Button} from "react-native";
 import React, {useState} from "react";
-import OpenPGP from 'react-native-fast-openpgp';
+import OpenPGP, { Algorithm, Curve } from 'react-native-fast-openpgp';
 import SectionContainer from "../components/SectionContainer";
 import SectionTitle from "../components/SectionTitle";
 import SectionResult from "../components/SectionResult";
@@ -29,7 +29,8 @@ export default function ({}: Props) {
                         email: 'test@test.com',
                         passphrase: 'test',
                         keyOptions: {
-                            rsaBits: 2048,
+                            algorithm:Algorithm.ECDSA,
+                            curve:Curve.P256
                         },
                     });
                     setKeyPair(output);

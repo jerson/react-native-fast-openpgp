@@ -3,6 +3,8 @@
 export enum Cipher{
   AES128 = 0,
   AES192 = 1,
-  AES256 = 2
+  AES256 = 2,
+  DES = 3,
+  CAST5 = 4
 }
 

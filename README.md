@@ -108,27 +108,63 @@ const encrypted = await OpenPGP.encrypt("sample text" publicKeys);
 ```typescript
 import OpenPGP from "react-native-fast-openpgp";
 
+export enum Algorithm {
+  RSA = 0,
+  ECDSA = 1,
+  EDDSA = 2,
+  ECHD = 3,
+  DSA = 4,
+  ELGAMAL = 5,
+}
+
+export enum Curve {
+  CURVE25519 = 0,
+  CURVE448 = 1,
+  P256 = 2,
+  P384 = 3,
+  P521 = 4,
+  SECP256K1 = 5,
+  BRAINPOOLP256 = 6,
+  BRAINPOOLP384 = 7,
+  BRAINPOOLP512 = 8,
+}
 
 export enum Hash {
-    SHA256 = 0,
-    SHA224 = 1,
-    SHA384 = 2,
-    SHA512 = 3,
+  SHA256 = 0,
+  SHA224 = 1,
+  SHA384 = 2,
+  SHA512 = 3,
 }
 
 export enum Compression {
-    NONE = 0,
-    ZLIB = 1,
-    ZIP = 2,
+  NONE = 0,
+  ZLIB = 1,
+  ZIP = 2,
 }
 
 export enum Cipher {
-    AES128 = 0,
-    AES192 = 1,
-    AES256 = 2,
+  AES128 = 0,
+  AES192 = 1,
+  AES256 = 2,
+  DES = 3,
+  CAST5 = 4,
 }
 
 export interface KeyOptions {
+    /**
+     * The public key algorithm to use - will always create a signing primary
+     * key and encryption subkey.
+     * @default RSA
+     */
+    algorithm?: Algorithm;
+
+    /**
+     * Curve configures the desired packet.Curve if the Algorithm is PubKeyAlgoECDSA,
+     * PubKeyAlgoEdDSA, or PubKeyAlgoECDH. If empty Curve25519 is used.
+     * @default CURVE25519
+     */
+    curve?: Curve;
+
     /**
      * RSABits is the number of bits in new RSA keys made with NewEntity.
      * If zero, then 2048 bit keys are created.
@@ -139,7 +175,7 @@ export interface KeyOptions {
     /**
      * Cipher is the cipher to be used.
      * If zero, AES-128 is used.
-     * @default aes128
+     * @default AES128
      */
     cipher?: Cipher;
 
@@ -154,7 +190,7 @@ export interface KeyOptions {
     /**
      * Hash is the default hash function to be used.
      * If zero, SHA-256 is used.
-     * @default sha256
+     * @default SHA256
      */
     hash?: Hash;
 
