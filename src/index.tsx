@@ -28,6 +28,27 @@ import './shim';
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
   .FastOpenPGP;
 
+export enum Algorithm {
+  RSA = 0,
+  ECDSA = 1,
+  EDDSA = 2,
+  ECHD = 3,
+  DSA = 4,
+  ELGAMAL = 5,
+}
+
+export enum Curve {
+  CURVE25519 = 0,
+  CURVE448 = 1,
+  P256 = 2,
+  P384 = 3,
+  P521 = 4,
+  SECP256K1 = 5,
+  BRAINPOOLP256 = 6,
+  BRAINPOOLP384 = 7,
+  BRAINPOOLP512 = 8,
+}
+
 export enum Hash {
   SHA256 = 0,
   SHA224 = 1,
@@ -45,9 +66,22 @@ export enum Cipher {
   AES128 = 0,
   AES192 = 1,
   AES256 = 2,
+  DES = 3,
+  CAST5 = 4,
 }
 
 export interface KeyOptions {
+  /**
+   * The public key algorithm to use - will always create a signing primary
+   * key and encryption subkey.
+   */
+  algorithm?: Algorithm;
+
+  /**
+   * Curve configures the desired packet.Curve if the Algorithm is PubKeyAlgoECDSA,
+   * PubKeyAlgoEdDSA, or PubKeyAlgoECDH. If empty Curve25519 is used.
+   */
+  curve?: Curve;
   /**
    * RSABits is the number of bits in new RSA keys made with NewEntity.
    * If zero, then 2048 bit keys are created.
@@ -105,12 +139,15 @@ export interface KeyPair {
 }
 
 export interface PublicKeyMetadata {
+  algorithm: string;
   keyID: string;
   keyIDShort: string;
   creationTime: string;
   fingerprint: string;
   keyIDNumeric: string;
   isSubKey: boolean;
+  canSign: boolean;
+  canEncrypt: boolean;
 }
 export interface PrivateKeyMetadata {
   keyID: string;
@@ -120,6 +157,7 @@ export interface PrivateKeyMetadata {
   keyIDNumeric: string;
   isSubKey: boolean;
   encrypted: boolean;
+  canSign: boolean;
 }
 
 /**
@@ -730,6 +768,10 @@ export default class OpenPGP {
       model.KeyOptions.addCompressionLevel(builder, options.compressionLevel);
     typeof options.hash !== 'undefined' &&
       model.KeyOptions.addHash(builder, options.hash);
+    typeof options.algorithm !== 'undefined' &&
+      model.KeyOptions.addAlgorithm(builder, options.algorithm);
+    typeof options.curve !== 'undefined' &&
+      model.KeyOptions.addCurve(builder, options.curve);
     typeof options.rsaBits !== 'undefined' &&
       model.KeyOptions.addRsaBits(builder, options.rsaBits);
 
@@ -795,12 +837,15 @@ export default class OpenPGP {
     }
 
     return {
+      algorithm: output.algorithm() || '',
       keyID: output.keyId() || '',
       keyIDShort: output.keyIdShort() || '',
       creationTime: output.creationTime() || '',
       fingerprint: output.fingerprint() || '',
       keyIDNumeric: output.keyIdNumeric() || '',
       isSubKey: output.isSubKey(),
+      canSign: output.canSign(),
+      canEncrypt: output.canEncrypt(),
     } as PublicKeyMetadata;
   }
 
@@ -827,6 +872,7 @@ export default class OpenPGP {
       keyIDNumeric: output.keyIdNumeric() || '',
       isSubKey: output.isSubKey(),
       encrypted: output.encrypted(),
+      canSign: output.canSign(),
     } as PrivateKeyMetadata;
   }
 }

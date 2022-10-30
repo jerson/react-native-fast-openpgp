@@ -23,48 +23,87 @@ static getSizePrefixedRootAsPublicKeyMetadata(bb:flatbuffers.ByteBuffer, obj?:Pu
   return (obj || new PublicKeyMetadata()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
+algorithm():string|null
+algorithm(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+algorithm(optionalEncoding?:any):string|Uint8Array|null {
+  const offset = this.bb!.__offset(this.bb_pos, 4);
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+}
+
 keyId():string|null
 keyId(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 keyId(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 4);
+  const offset = this.bb!.__offset(this.bb_pos, 6);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 keyIdShort():string|null
 keyIdShort(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 keyIdShort(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 6);
+  const offset = this.bb!.__offset(this.bb_pos, 8);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 creationTime():string|null
 creationTime(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 creationTime(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 8);
+  const offset = this.bb!.__offset(this.bb_pos, 10);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 fingerprint():string|null
 fingerprint(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 fingerprint(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 10);
+  const offset = this.bb!.__offset(this.bb_pos, 12);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 keyIdNumeric():string|null
 keyIdNumeric(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 keyIdNumeric(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 12);
+  const offset = this.bb!.__offset(this.bb_pos, 14);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 isSubKey():boolean {
-  const offset = this.bb!.__offset(this.bb_pos, 14);
+  const offset = this.bb!.__offset(this.bb_pos, 16);
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
 mutate_is_sub_key(value:boolean):boolean {
-  const offset = this.bb!.__offset(this.bb_pos, 14);
+  const offset = this.bb!.__offset(this.bb_pos, 16);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeInt8(this.bb_pos + offset, +value);
+  return true;
+}
+
+canSign():boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 18);
+  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+}
+
+mutate_can_sign(value:boolean):boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 18);
+
+  if (offset === 0) {
+    return false;
+  }
+
+  this.bb!.writeInt8(this.bb_pos + offset, +value);
+  return true;
+}
+
+canEncrypt():boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 20);
+  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+}
+
+mutate_can_encrypt(value:boolean):boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 20);
 
   if (offset === 0) {
     return false;
@@ -75,45 +114,57 @@ mutate_is_sub_key(value:boolean):boolean {
 }
 
 identities(index: number, obj?:Identity):Identity|null {
-  const offset = this.bb!.__offset(this.bb_pos, 16);
+  const offset = this.bb!.__offset(this.bb_pos, 22);
   return offset ? (obj || new Identity()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
 }
 
 identitiesLength():number {
-  const offset = this.bb!.__offset(this.bb_pos, 16);
+  const offset = this.bb!.__offset(this.bb_pos, 22);
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
 static startPublicKeyMetadata(builder:flatbuffers.Builder) {
-  builder.startObject(7);
+  builder.startObject(10);
+}
+
+static addAlgorithm(builder:flatbuffers.Builder, algorithmOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(0, algorithmOffset, 0);
 }
 
 static addKeyId(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(0, keyIdOffset, 0);
+  builder.addFieldOffset(1, keyIdOffset, 0);
 }
 
 static addKeyIdShort(builder:flatbuffers.Builder, keyIdShortOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, keyIdShortOffset, 0);
+  builder.addFieldOffset(2, keyIdShortOffset, 0);
 }
 
 static addCreationTime(builder:flatbuffers.Builder, creationTimeOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(2, creationTimeOffset, 0);
+  builder.addFieldOffset(3, creationTimeOffset, 0);
 }
 
 static addFingerprint(builder:flatbuffers.Builder, fingerprintOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(3, fingerprintOffset, 0);
+  builder.addFieldOffset(4, fingerprintOffset, 0);
 }
 
 static addKeyIdNumeric(builder:flatbuffers.Builder, keyIdNumericOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(4, keyIdNumericOffset, 0);
+  builder.addFieldOffset(5, keyIdNumericOffset, 0);
 }
 
 static addIsSubKey(builder:flatbuffers.Builder, isSubKey:boolean) {
-  builder.addFieldInt8(5, +isSubKey, +false);
+  builder.addFieldInt8(6, +isSubKey, +false);
+}
+
+static addCanSign(builder:flatbuffers.Builder, canSign:boolean) {
+  builder.addFieldInt8(7, +canSign, +false);
+}
+
+static addCanEncrypt(builder:flatbuffers.Builder, canEncrypt:boolean) {
+  builder.addFieldInt8(8, +canEncrypt, +false);
 }
 
 static addIdentities(builder:flatbuffers.Builder, identitiesOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(6, identitiesOffset, 0);
+  builder.addFieldOffset(9, identitiesOffset, 0);
 }
 
 static createIdentitiesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
@@ -133,14 +184,17 @@ static endPublicKeyMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 }
 
-static createPublicKeyMetadata(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset, keyIdShortOffset:flatbuffers.Offset, creationTimeOffset:flatbuffers.Offset, fingerprintOffset:flatbuffers.Offset, keyIdNumericOffset:flatbuffers.Offset, isSubKey:boolean, identitiesOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createPublicKeyMetadata(builder:flatbuffers.Builder, algorithmOffset:flatbuffers.Offset, keyIdOffset:flatbuffers.Offset, keyIdShortOffset:flatbuffers.Offset, creationTimeOffset:flatbuffers.Offset, fingerprintOffset:flatbuffers.Offset, keyIdNumericOffset:flatbuffers.Offset, isSubKey:boolean, canSign:boolean, canEncrypt:boolean, identitiesOffset:flatbuffers.Offset):flatbuffers.Offset {
   PublicKeyMetadata.startPublicKeyMetadata(builder);
+  PublicKeyMetadata.addAlgorithm(builder, algorithmOffset);
   PublicKeyMetadata.addKeyId(builder, keyIdOffset);
   PublicKeyMetadata.addKeyIdShort(builder, keyIdShortOffset);
   PublicKeyMetadata.addCreationTime(builder, creationTimeOffset);
   PublicKeyMetadata.addFingerprint(builder, fingerprintOffset);
   PublicKeyMetadata.addKeyIdNumeric(builder, keyIdNumericOffset);
   PublicKeyMetadata.addIsSubKey(builder, isSubKey);
+  PublicKeyMetadata.addCanSign(builder, canSign);
+  PublicKeyMetadata.addCanEncrypt(builder, canEncrypt);
   PublicKeyMetadata.addIdentities(builder, identitiesOffset);
   return PublicKeyMetadata.endPublicKeyMetadata(builder);
 }
