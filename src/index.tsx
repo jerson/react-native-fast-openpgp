@@ -82,6 +82,7 @@ export interface KeyOptions {
    * PubKeyAlgoEdDSA, or PubKeyAlgoECDH. If empty Curve25519 is used.
    */
   curve?: Curve;
+  
   /**
    * RSABits is the number of bits in new RSA keys made with NewEntity.
    * If zero, then 2048 bit keys are created.
