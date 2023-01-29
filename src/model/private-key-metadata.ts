@@ -116,8 +116,18 @@ identitiesLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
+subKeys(index: number, obj?:PrivateKeyMetadata):PrivateKeyMetadata|null {
+  const offset = this.bb!.__offset(this.bb_pos, 22);
+  return offset ? (obj || new PrivateKeyMetadata()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
+}
+
+subKeysLength():number {
+  const offset = this.bb!.__offset(this.bb_pos, 22);
+  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+}
+
 static startPrivateKeyMetadata(builder:flatbuffers.Builder) {
-  builder.startObject(9);
+  builder.startObject(10);
 }
 
 static addKeyId(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset) {
@@ -168,12 +178,28 @@ static startIdentitiesVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 }
 
+static addSubKeys(builder:flatbuffers.Builder, subKeysOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(9, subKeysOffset, 0);
+}
+
+static createSubKeysVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
+  builder.startVector(4, data.length, 4);
+  for (let i = data.length - 1; i >= 0; i--) {
+    builder.addOffset(data[i]!);
+  }
+  return builder.endVector();
+}
+
+static startSubKeysVector(builder:flatbuffers.Builder, numElems:number) {
+  builder.startVector(4, numElems, 4);
+}
+
 static endPrivateKeyMetadata(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
 }
 
-static createPrivateKeyMetadata(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset, keyIdShortOffset:flatbuffers.Offset, creationTimeOffset:flatbuffers.Offset, fingerprintOffset:flatbuffers.Offset, keyIdNumericOffset:flatbuffers.Offset, isSubKey:boolean, encrypted:boolean, canSign:boolean, identitiesOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createPrivateKeyMetadata(builder:flatbuffers.Builder, keyIdOffset:flatbuffers.Offset, keyIdShortOffset:flatbuffers.Offset, creationTimeOffset:flatbuffers.Offset, fingerprintOffset:flatbuffers.Offset, keyIdNumericOffset:flatbuffers.Offset, isSubKey:boolean, encrypted:boolean, canSign:boolean, identitiesOffset:flatbuffers.Offset, subKeysOffset:flatbuffers.Offset):flatbuffers.Offset {
   PrivateKeyMetadata.startPrivateKeyMetadata(builder);
   PrivateKeyMetadata.addKeyId(builder, keyIdOffset);
   PrivateKeyMetadata.addKeyIdShort(builder, keyIdShortOffset);
@@ -184,6 +210,7 @@ static createPrivateKeyMetadata(builder:flatbuffers.Builder, keyIdOffset:flatbuf
   PrivateKeyMetadata.addEncrypted(builder, encrypted);
   PrivateKeyMetadata.addCanSign(builder, canSign);
   PrivateKeyMetadata.addIdentities(builder, identitiesOffset);
+  PrivateKeyMetadata.addSubKeys(builder, subKeysOffset);
   return PrivateKeyMetadata.endPrivateKeyMetadata(builder);
 }
 }

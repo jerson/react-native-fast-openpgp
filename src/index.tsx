@@ -82,7 +82,7 @@ export interface KeyOptions {
    * PubKeyAlgoEdDSA, or PubKeyAlgoECDH. If empty Curve25519 is used.
    */
   curve?: Curve;
-  
+
   /**
    * RSABits is the number of bits in new RSA keys made with NewEntity.
    * If zero, then 2048 bit keys are created.
@@ -149,6 +149,8 @@ export interface PublicKeyMetadata {
   isSubKey: boolean;
   canSign: boolean;
   canEncrypt: boolean;
+  identities?: Identity[];
+  subKeys?: PublicKeyMetadata[];
 }
 export interface PrivateKeyMetadata {
   keyID: string;
@@ -159,6 +161,15 @@ export interface PrivateKeyMetadata {
   isSubKey: boolean;
   encrypted: boolean;
   canSign: boolean;
+  identities?: Identity[];
+  subKeys?: PrivateKeyMetadata[];
+}
+
+export interface Identity {
+  id: string;
+  name: string;
+  comment: string;
+  email: string;
 }
 
 /**
@@ -837,6 +848,39 @@ export default class OpenPGP {
       throw new Error('empty output');
     }
 
+    let identities: Identity[] = [];
+    for (let i = 0; i < output.identitiesLength(); i++) {
+      const item = output.identities(i);
+      if (!item) {
+        continue;
+      }
+      identities.push({
+        comment: item.comment() || '',
+        email: item.email() || '',
+        name: item.name() || '',
+        id: item.id() || '',
+      });
+    }
+
+    let subKeys: PublicKeyMetadata[] = [];
+    for (let i = 0; i < output.subKeysLength(); i++) {
+      const item = output.subKeys(i);
+      if (!item) {
+        continue;
+      }
+      subKeys.push({
+        algorithm: item.algorithm() || '',
+        keyID: item.keyId() || '',
+        keyIDShort: item.keyIdShort() || '',
+        creationTime: item.creationTime() || '',
+        fingerprint: item.fingerprint() || '',
+        keyIDNumeric: item.keyIdNumeric() || '',
+        isSubKey: item.isSubKey(),
+        canSign: item.canSign(),
+        canEncrypt: item.canEncrypt(),
+      });
+    }
+
     return {
       algorithm: output.algorithm() || '',
       keyID: output.keyId() || '',
@@ -847,6 +891,8 @@ export default class OpenPGP {
       isSubKey: output.isSubKey(),
       canSign: output.canSign(),
       canEncrypt: output.canEncrypt(),
+      identities: identities,
+      subKeys: subKeys,
     } as PublicKeyMetadata;
   }
 
@@ -865,6 +911,38 @@ export default class OpenPGP {
       throw new Error('empty output');
     }
 
+    let identities: Identity[] = [];
+    for (let i = 0; i < output.identitiesLength(); i++) {
+      const item = output.identities(i);
+      if (!item) {
+        continue;
+      }
+      identities.push({
+        comment: item.comment() || '',
+        email: item.email() || '',
+        name: item.name() || '',
+        id: item.id() || '',
+      });
+    }
+
+    let subKeys: PrivateKeyMetadata[] = [];
+    for (let i = 0; i < output.subKeysLength(); i++) {
+      const item = output.subKeys(i);
+      if (!item) {
+        continue;
+      }
+      subKeys.push({
+        keyID: item.keyId() || '',
+        keyIDShort: item.keyIdShort() || '',
+        creationTime: item.creationTime() || '',
+        fingerprint: item.fingerprint() || '',
+        keyIDNumeric: item.keyIdNumeric() || '',
+        isSubKey: item.isSubKey(),
+        encrypted: item.encrypted(),
+        canSign: item.canSign(),
+      });
+    }
+
     return {
       keyID: output.keyId() || '',
       keyIDShort: output.keyIdShort() || '',
@@ -874,6 +952,8 @@ export default class OpenPGP {
       isSubKey: output.isSubKey(),
       encrypted: output.encrypted(),
       canSign: output.canSign(),
+      identities: identities,
+      subKeys: subKeys,
     } as PrivateKeyMetadata;
   }
 }
