@@ -9,8 +9,8 @@
     "test": "jest",
     "test:android": "detox test --configuration android.att.debug",
     "build:android": "detox build --configuration android.att.debug",
-    "test:ios": "detox test --configuration ios.emu.debug",
-    "build:ios": "detox build --configuration ios.emu.debug",
+    "test:ios": "detox test --configuration ios.sim.debug",
+    "build:ios": "detox build --configuration ios.sim.debug",
     "build:android:debug": "cd android && ./gradlew assembleDebug --no-daemon --console=plain -PreactNativeArchitectures=arm64-v8a",
     "build:ios:debug": "cd ios && xcodebuild -workspace FastOpenpgpExample.xcworkspace -scheme FastOpenpgpExample -configuration Debug -sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO"
   },
