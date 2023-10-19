@@ -1,4 +1,4 @@
-package com.example.reactnativefastopenpgp;
+package com.fastopenpgpexample;
 
 import com.wix.detox.Detox;
 import com.wix.detox.config.DetoxConfig;
@@ -24,7 +24,7 @@ public class DetoxTest {
         DetoxConfig detoxConfig = new DetoxConfig();
         detoxConfig.idlePolicyConfig.masterTimeoutSec = 90;
         detoxConfig.idlePolicyConfig.idleResourceTimeoutSec = 60;
-        detoxConfig.rnContextLoadTimeoutSec = (com.reactnativefastopenpgp.BuildConfig.DEBUG ? 360 : 180);
+        detoxConfig.rnContextLoadTimeoutSec = (com.fastopenpgpexample.BuildConfig.DEBUG ? 360 : 180);
 
         Detox.runTests(mActivityRule, detoxConfig);
     }

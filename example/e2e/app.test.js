@@ -9,13 +9,15 @@ describe('OpenPGP', () => {
     return waitFor(element(container))
       .toBeVisible()
       .whileElement(list)
-      .scroll(dyScroll, 'down');
+      .scroll(dyScroll, 'down')
+    
+
   };
 
   beforeAll(async () => {
-    await device.launchApp({ delete: true, newInstance: false });
-    await waitFor(element(list)).toExist().withTimeout(timeout);
+    await device.launchApp();
     await device.reloadReactNative();
+    await waitFor(element(list)).toExist().withTimeout(timeout);
   });
 
   describe('Encrypt and Decrypt', () => {
