@@ -139,6 +139,7 @@
     "lib/",
     "src/flatbuffers/",
     "src/model/",
+    "src/shim.tsx",
     "example/"
   ],
   "prettier": {
