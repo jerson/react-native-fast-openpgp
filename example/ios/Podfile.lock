@@ -376,6 +376,7 @@ PODS:
   - React-logger (0.72.6):
     - glog
   - react-native-fast-openpgp (2.6.0):
+    - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-NativeModulesApple (0.72.6):
     - hermes-engine
@@ -697,7 +698,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 3bf18ff7cb03cd8dfdce08fbbc0d15058c1d71ae
   React-jsinspector: 194e32c6aab382d88713ad3dd0025c5f5c4ee072
   React-logger: cebf22b6cf43434e471dc561e5911b40ac01d289
-  react-native-fast-openpgp: f2748962fc4c7a3acfee20df96f601c39750a0e8
+  react-native-fast-openpgp: eb8ca17f55e866965515a9e2b0b4a1dfc26a72d6
   React-NativeModulesApple: 02e35e9a51e10c6422f04f5e4076a7c02243fff2
   React-perflogger: e3596db7e753f51766bceadc061936ef1472edc3
   React-RCTActionSheet: 17ab132c748b4471012abbcdcf5befe860660485
