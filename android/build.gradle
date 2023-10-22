@@ -8,7 +8,7 @@ buildscript {
     }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.2.2'
+    classpath "com.android.tools.build:gradle:7.2.1"
     // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
@@ -30,7 +30,7 @@ android {
     buildToolsVersion getExtOrDefault('buildToolsVersion')
     ndkVersion getExtOrDefault('ndkVersion')
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion getExtOrDefault('minSdkVersion')
         targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
         versionCode 1
         versionName "1.0"
@@ -46,7 +46,6 @@ android {
 
     externalNativeBuild {
         cmake {
-            version '3.10.2'
             path "CMakeLists.txt"
         }
     }

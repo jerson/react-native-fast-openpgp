@@ -26,7 +26,7 @@ import { ConvertPrivateKeyToPublicKeyRequest } from './model/convert-private-key
 import './shim';
 
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
-  .FastOpenPGP;
+  .FastOpenpgp;
 
 export enum Algorithm {
   RSA = 0,

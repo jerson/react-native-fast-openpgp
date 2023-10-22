@@ -1,4 +1,4 @@
-package com.reactnativefastopenpgp
+package com.fastopenpgp
 
 import android.util.Log
 import androidx.annotation.NonNull

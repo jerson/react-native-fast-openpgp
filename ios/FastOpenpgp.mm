@@ -1,9 +1,9 @@
-#import "FastOpenPGP.h"
+#import "FastOpenpgp.h"
 #import <React/RCTBridge+Private.h>
 #import <React/RCTUtils.h>
 #include "libopenpgp_bridge.h"
 
-@implementation FastOpenPGP
+@implementation FastOpenpgp
 
 @synthesize bridge = _bridge;
 @synthesize methodQueue = _methodQueue;
@@ -18,12 +18,12 @@ RCT_REMAP_METHOD(call,call:(nonnull NSString*)name withPayload:(nonnull NSArray*
     [payload enumerateObjectsUsingBlock:^(NSNumber* number, NSUInteger index, BOOL* stop){
         bytesCopy[index] = number.integerValue;
     }];
-    
+
     char *cname= strdup([name UTF8String]);
     auto response = OpenPGPBridgeCall(cname, bytesCopy, (int)payload.count);
     free(bytesCopy);
     free(cname);
-    
+
     if(response->error!=nil){
         NSString * error = @(response->error);
         if(![error isEqual:@""]){
@@ -32,18 +32,18 @@ RCT_REMAP_METHOD(call,call:(nonnull NSString*)name withPayload:(nonnull NSArray*
             return;
         }
     }
-    
+
     auto bytesResult= (Byte*)malloc( response->size);
     memcpy(bytesResult, response->message, response->size);
-    
-    
+
+
     NSMutableArray* result = [[NSMutableArray alloc] init];
     for (int i=0; i<response->size; i++) {
         result[i]=[NSNumber numberWithInt:(int)bytesResult[i]];
     }
     free(response);
     free(bytesResult);
-    
+
     resolve(result);
 }
 
@@ -63,21 +63,21 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
     }];
     char *cname= strdup([name UTF8String]);
     int size = (int) payload.count;
-    
-    
+
+
     jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
-    
+
     auto nameValue = jsi::String::createFromAscii(*runtime, cname);
     auto arrayBuffer = runtime->global().getPropertyAsFunction(*runtime, "ArrayBuffer");
     jsi::Object o = arrayBuffer.callAsConstructor(*runtime, size).getObject(*runtime);
     jsi::ArrayBuffer payloadValue = o.getArrayBuffer(*runtime);
     memcpy(payloadValue.data(*runtime), bytesCopy, size);
-    
+
     auto response = fastOpenPGP::call(*runtime, nameValue, payloadValue);
     free(bytesCopy);
     free(cname);
-    
-    
+
+
     if(response.isString()){
         NSString * error =  [NSString stringWithUTF8String:response.asString(*runtime).utf8(*runtime).c_str()];
         if(![error isEqual:@""]){
@@ -85,16 +85,16 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
             return;
         }
     }
-    
+
     auto byteResult = response.asObject(*runtime).getArrayBuffer(*runtime);
     auto sizeResult = byteResult.size(*runtime);
     auto dataResult = byteResult.data(*runtime);
-    
+
     NSMutableArray* result = [[NSMutableArray alloc] init];
     for (int i=0; i<sizeResult; i++) {
         result[i]=[NSNumber numberWithInt:(int)dataResult[i]];
     }
-    
+
     resolve(result);
 }
 

@@ -50,7 +50,7 @@ interface FastOpenPGPNativeModules {
 }
 
 interface NativeModulesDef {
-  FastOpenPGP: FastOpenPGPNativeModules;
+  FastOpenpgp: FastOpenPGPNativeModules;
 }
 
 interface Global {
