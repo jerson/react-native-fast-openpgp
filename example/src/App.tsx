@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Dimensions,
   KeyboardAvoidingView,
@@ -20,10 +20,11 @@ import EncryptDecryptSymmetricFile from './modules/EncryptDecryptSymmetricFile';
 import SignVerifyFile from './modules/SignVerifyFile';
 import Metadata from './modules/Metadata';
 import Convert from './modules/Convert';
+import OpenPGP from 'react-native-fast-openpgp';
 
 const passphrase = 'test';
 const privateKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----
- 
+
 lQPGBF0Tpe0BCADm+ja4vMKuodkQEhLm/092M/6gt4TaKwzv8QcA53/FrM3g8wab
 oksgIN1T+CscKXOY9GeJ530sBZgu9kTsMeQW3Uf76smo2CV1W7kSTMU+XE5ExGET
 +LhkKeHpXoLfZNegKuzH1Qo7DGDOByVrnijbZIukonGwvC/MTduxb69ub+YRhWJc
@@ -84,7 +85,7 @@ dJmM+fNpXSDjKMpeWxlgNLw9zIVJ+GjUVfsgew/ALE9lwSpxFRrqpDonlf0H83T0
 -----END PGP PRIVATE KEY BLOCK-----`;
 
 const publicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
- 
+
 mQENBF0Tpe0BCADm+ja4vMKuodkQEhLm/092M/6gt4TaKwzv8QcA53/FrM3g8wab
 oksgIN1T+CscKXOY9GeJ530sBZgu9kTsMeQW3Uf76smo2CV1W7kSTMU+XE5ExGET
 +LhkKeHpXoLfZNegKuzH1Qo7DGDOByVrnijbZIukonGwvC/MTduxb69ub+YRhWJc
@@ -116,6 +117,11 @@ D4m65Neoc7DBEdvzgK9IUMpwG5N0t+0pfWLhs8AZdMxE7RbP
 -----END PGP PUBLIC KEY BLOCK-----`;
 
 const App = () => {
+
+  useEffect(()=>{
+    OpenPGP.useJSI = true
+  },[])
+
   return (
     <>
       <StatusBar barStyle="dark-content" />

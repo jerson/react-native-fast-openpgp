@@ -84,7 +84,7 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
   }
 
   override fun getName(): String {
-    return "FastOpenPGP"
+    return "FastOpenpgp"
   }
 
   override fun onCatalystInstanceDestroy() {

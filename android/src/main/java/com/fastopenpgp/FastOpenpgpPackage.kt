@@ -1,4 +1,4 @@
-package com.reactnativefastopenpgp
+package com.fastopenpgp
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
