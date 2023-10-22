@@ -1,147 +1,117 @@
 buildscript {
-    // Buildscript is evaluated before everything else so we can't use getExtOrDefault
-    def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['FastOpenpgp_kotlinVersion']
+  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['FastOpenpgp_kotlinVersion']
 
-    repositories {
-        google()
-        mavenCentral()
-    }
+  repositories {
+    google()
+    mavenCentral()
+  }
 
   dependencies {
     classpath "com.android.tools.build:gradle:7.2.1"
-    // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
 }
 
-apply plugin: 'com.android.library'
+def isNewArchitectureEnabled() {
+  return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
+}
+
+apply plugin: "com.android.library"
 apply plugin: 'kotlin-android'
 
+
+def appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
+
+if (isNewArchitectureEnabled()) {
+  apply plugin: "com.facebook.react"
+}
+
 def getExtOrDefault(name) {
-    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['FastOpenpgp_' + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["FastOpenpgp_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-    return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['FastOpenpgp_' + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["FastOpenpgp_" + name]).toInteger()
+}
+
+def supportsNamespace() {
+  def parsed = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+  def major = parsed[0].toInteger()
+  def minor = parsed[1].toInteger()
+
+  // Namespace support was added in 7.3.0
+  if (major == 7 && minor >= 3) {
+    return true
+  }
+
+  return major >= 8
 }
 
 android {
-    compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
-    buildToolsVersion getExtOrDefault('buildToolsVersion')
-    ndkVersion getExtOrDefault('ndkVersion')
-    defaultConfig {
-        minSdkVersion getExtOrDefault('minSdkVersion')
-        targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
-        versionCode 1
-        versionName "1.0"
+  if (supportsNamespace()) {
+    namespace "com.fastopenpgp"
 
-        externalNativeBuild {
-            cmake {
-                cppFlags "-O2 -frtti -fexceptions -Wall -Wno-unused-variable -fstack-protector-all"
-                abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
-                arguments "-DNODE_MODULES_DIR=${rootDir}/../node_modules"
-            }
-        }
+    sourceSets {
+      main {
+        manifest.srcFile "src/main/AndroidManifestNew.xml"
+      }
     }
+  }
+
+  ndkVersion getExtOrDefault("ndkVersion")
+  compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+
+  defaultConfig {
+    minSdkVersion getExtOrIntegerDefault("minSdkVersion")
+    targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
 
     externalNativeBuild {
-        cmake {
-            path "CMakeLists.txt"
-        }
+      cmake {
+        cppFlags "-O2 -frtti -fexceptions -Wall -Wno-unused-variable -fstack-protector-all"
+        abiFilters "x86", "x86_64", "armeabi-v7a", "arm64-v8a"
+        arguments "-DNODE_MODULES_DIR=${rootDir}/../node_modules"
+      }
     }
+  }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
+  externalNativeBuild {
+    cmake {
+      path "CMakeLists.txt"
     }
-    lintOptions {
-        disable 'GradleCompatible'
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    packagingOptions {
-        pickFirst "**/libopenpgp_bridge.so"
-    }
+  }
 
+  buildTypes {
+    release {
+      minifyEnabled false
+    }
+  }
+
+  lintOptions {
+    disable "GradleCompatible"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  packagingOptions {
+      pickFirst "**/libopenpgp_bridge.so"
+  }
 }
 
 repositories {
-    mavenCentral()
-    google()
-
-    def found = false
-    def defaultDir = null
-    def androidSourcesName = 'React Native sources'
-
-    if (rootProject.ext.has('reactNativeAndroidRoot')) {
-        defaultDir = rootProject.ext.get('reactNativeAndroidRoot')
-    } else {
-        defaultDir = new File(
-                projectDir,
-                '/../../../node_modules/react-native/android'
-        )
-    }
-
-    if (defaultDir.exists()) {
-        maven {
-            url defaultDir.toString()
-            name androidSourcesName
-        }
-
-        logger.info(":${project.name}:reactNativeAndroidRoot ${defaultDir.canonicalPath}")
-        found = true
-    } else {
-        def parentDir = rootProject.projectDir
-
-        1.upto(5, {
-            if (found) return true
-            parentDir = parentDir.parentFile
-
-            def androidSourcesDir = new File(
-                    parentDir,
-                    'node_modules/react-native'
-            )
-
-            def androidPrebuiltBinaryDir = new File(
-                    parentDir,
-                    'node_modules/react-native/android'
-            )
-
-            if (androidPrebuiltBinaryDir.exists()) {
-                maven {
-                    url androidPrebuiltBinaryDir.toString()
-                    name androidSourcesName
-                }
-
-                logger.info(":${project.name}:reactNativeAndroidRoot ${androidPrebuiltBinaryDir.canonicalPath}")
-                found = true
-            } else if (androidSourcesDir.exists()) {
-                maven {
-                    url androidSourcesDir.toString()
-                    name androidSourcesName
-                }
-
-                logger.info(":${project.name}:reactNativeAndroidRoot ${androidSourcesDir.canonicalPath}")
-                found = true
-            }
-        })
-    }
-
-    if (!found) {
-        throw new GradleException(
-                "${project.name}: unable to locate React Native android sources. " +
-                        "Ensure you have you installed React Native as a dependency in your project and try again."
-        )
-    }
+  mavenCentral()
+  google()
 }
 
 def kotlin_version = getExtOrDefault('kotlinVersion')
 
 dependencies {
-    // noinspection GradleDynamicVersion
-    api 'com.facebook.react:react-native:+'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  // For < 0.71, this will be from the local maven repo
+  // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
+  //noinspection GradleDynamicVersion
+  implementation "com.facebook.react:react-native:+"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
+
