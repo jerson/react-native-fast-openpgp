@@ -48,8 +48,8 @@ const outputFile = await OpenPGP.decryptSymmetricFile(inputFile: string, outputF
 ```typescript
 import OpenPGP from "react-native-fast-openpgp";
 
-const signed = await OpenPGP.sign(message: string, publicKey: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
-const signed = await OpenPGP.signFile(inputFile: string, publicKey: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
+const signed = await OpenPGP.sign(message: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
+const signed = await OpenPGP.signFile(inputFile: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
 
 const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string ): Promise<boolean>;
 const verified = await OpenPGP.verifyFile(signature: string, inputFile: string,publicKey: string): Promise<boolean>;
