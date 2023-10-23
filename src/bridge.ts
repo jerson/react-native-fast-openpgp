@@ -1,4 +1,5 @@
 export { Algorithm } from './model/algorithm';
+export { ArmorMetadata } from './model/armor-metadata';
 export { Cipher } from './model/cipher';
 export { Compression } from './model/compression';
 export { Curve } from './model/curve';

@@ -30,13 +30,6 @@ message(optionalEncoding?:any):string|Uint8Array|null {
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
-publicKey():string|null
-publicKey(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-publicKey(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
-
 privateKey():string|null
 privateKey(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 privateKey(optionalEncoding?:any):string|Uint8Array|null {
@@ -62,10 +55,6 @@ static startSignRequest(builder:flatbuffers.Builder) {
 
 static addMessage(builder:flatbuffers.Builder, messageOffset:flatbuffers.Offset) {
   builder.addFieldOffset(0, messageOffset, 0);
-}
-
-static addPublicKey(builder:flatbuffers.Builder, publicKeyOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, publicKeyOffset, 0);
 }
 
 static addPrivateKey(builder:flatbuffers.Builder, privateKeyOffset:flatbuffers.Offset) {

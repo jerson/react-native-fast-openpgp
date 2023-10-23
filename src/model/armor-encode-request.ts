@@ -35,8 +35,15 @@ packetArray():Uint8Array|null {
   return offset ? new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
 }
 
+type():string|null
+type(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+type(optionalEncoding?:any):string|Uint8Array|null {
+  const offset = this.bb!.__offset(this.bb_pos, 6);
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+}
+
 static startArmorEncodeRequest(builder:flatbuffers.Builder) {
-  builder.startObject(1);
+  builder.startObject(2);
 }
 
 static addPacket(builder:flatbuffers.Builder, packetOffset:flatbuffers.Offset) {
@@ -55,14 +62,19 @@ static startPacketVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(1, numElems, 1);
 }
 
+static addType(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(1, typeOffset, 0);
+}
+
 static endArmorEncodeRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
 }
 
-static createArmorEncodeRequest(builder:flatbuffers.Builder, packetOffset:flatbuffers.Offset):flatbuffers.Offset {
+static createArmorEncodeRequest(builder:flatbuffers.Builder, packetOffset:flatbuffers.Offset, typeOffset:flatbuffers.Offset):flatbuffers.Offset {
   ArmorEncodeRequest.startArmorEncodeRequest(builder);
   ArmorEncodeRequest.addPacket(builder, packetOffset);
+  ArmorEncodeRequest.addType(builder, typeOffset);
   return ArmorEncodeRequest.endArmorEncodeRequest(builder);
 }
 }
