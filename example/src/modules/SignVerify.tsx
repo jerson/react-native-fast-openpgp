@@ -37,7 +37,6 @@ export default function ({publicKey, privateKey, passphrase}: Props) {
                 onPress={async () => {
                     const output = await OpenPGP.sign(
                         input,
-                        publicKey,
                         privateKey,
                         passphrase
                     );

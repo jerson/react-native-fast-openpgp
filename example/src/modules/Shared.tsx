@@ -7,7 +7,7 @@ async function deleteFile(name:string){
        if(exists){
            await   RNFS.unlink(path)
        }
-    } catch (e) {
+    } catch (e:any) {
         console.warn('DeleteFile',e.message)
     }
     return path
@@ -18,7 +18,7 @@ async function createFile(name:string,content:string){
     await deleteFile(name)
     try {
         await RNFS.writeFile(path, content, 'utf8')
-    } catch (e) {
+    } catch (e:any) {
         console.warn('CreateFile',e.message)
     }
     return path

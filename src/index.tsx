@@ -26,7 +26,7 @@ import { ConvertPrivateKeyToPublicKeyRequest } from './model/convert-private-key
 import './shim';
 
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
-  .FastOpenPGP;
+  .FastOpenpgp;
 
 export enum Algorithm {
   RSA = 0,
@@ -334,7 +334,6 @@ export default class OpenPGP {
 
   static async sign(
     message: string,
-    publicKey: string,
     privateKey: string,
     passphrase: string,
     options?: KeyOptions
@@ -342,7 +341,6 @@ export default class OpenPGP {
     const builder = new flatbuffers.Builder(0);
 
     const messageOffset = builder.createString(message);
-    const publicKeyOffset = builder.createString(publicKey);
     const privateKeyOffset = builder.createString(privateKey);
     const passphraseOffset = builder.createString(passphrase);
 
@@ -351,7 +349,6 @@ export default class OpenPGP {
     typeof optionsOffset !== 'undefined' &&
       SignRequest.addOptions(builder, optionsOffset);
     SignRequest.addMessage(builder, messageOffset);
-    SignRequest.addPublicKey(builder, publicKeyOffset);
     SignRequest.addPrivateKey(builder, privateKeyOffset);
     SignRequest.addPassphrase(builder, passphraseOffset);
     const offset = SignRequest.endSignRequest(builder);
@@ -363,7 +360,6 @@ export default class OpenPGP {
 
   static async signFile(
     inputFile: string,
-    publicKey: string,
     privateKey: string,
     passphrase: string,
     options?: KeyOptions
@@ -371,7 +367,6 @@ export default class OpenPGP {
     const builder = new flatbuffers.Builder(0);
 
     const inputFileOffset = builder.createString(inputFile);
-    const publicKeyOffset = builder.createString(publicKey);
     const privateKeyOffset = builder.createString(privateKey);
     const passphraseOffset = builder.createString(passphrase);
 
@@ -380,7 +375,6 @@ export default class OpenPGP {
     typeof optionsOffset !== 'undefined' &&
       SignFileRequest.addOptions(builder, optionsOffset);
     SignFileRequest.addInput(builder, inputFileOffset);
-    SignFileRequest.addPublicKey(builder, publicKeyOffset);
     SignFileRequest.addPrivateKey(builder, privateKeyOffset);
     SignFileRequest.addPassphrase(builder, passphraseOffset);
     const offset = SignFileRequest.endSignFileRequest(builder);

@@ -1,3 +1,6 @@
+#ifndef FASTOPENPGP_H
+#define FASTOPENPGP_H
+
 #include <jsi/jsilib.h>
 #include <jsi/jsi.h>
 
@@ -11,3 +14,5 @@ namespace fastOpenPGP {
     jsi::Value call(jsi::Runtime &runtime, const jsi::String &nameValue,
                              const jsi::Object &payloadObject);
 }
+
+#endif /* FASTOPENPGP_H */

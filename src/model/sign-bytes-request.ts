@@ -38,13 +38,6 @@ messageArray():Uint8Array|null {
   return offset ? new Uint8Array(this.bb!.bytes().buffer, this.bb!.bytes().byteOffset + this.bb!.__vector(this.bb_pos + offset), this.bb!.__vector_len(this.bb_pos + offset)) : null;
 }
 
-publicKey():string|null
-publicKey(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-publicKey(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
-
 privateKey():string|null
 privateKey(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 privateKey(optionalEncoding?:any):string|Uint8Array|null {
@@ -82,10 +75,6 @@ static createMessageVector(builder:flatbuffers.Builder, data:number[]|Uint8Array
 
 static startMessageVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(1, numElems, 1);
-}
-
-static addPublicKey(builder:flatbuffers.Builder, publicKeyOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, publicKeyOffset, 0);
 }
 
 static addPrivateKey(builder:flatbuffers.Builder, privateKeyOffset:flatbuffers.Offset) {
