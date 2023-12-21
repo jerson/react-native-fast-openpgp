@@ -25,7 +25,7 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
     Thread {
       reactApplicationContext.runOnJSQueueThread {
         try {
-          val contextHolder = this.reactApplicationContext.javaScriptContextHolder.get()
+          val contextHolder = this.reactApplicationContext.javaScriptContextHolder!!.get()
           if (contextHolder.toInt() == 0) {
             call(name, payload, promise)
             return@runOnJSQueueThread
@@ -67,7 +67,7 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
       reactApplicationContext.runOnJSQueueThread {
         Log.d(TAG, "installing")
         try {
-          val contextHolder = this.reactApplicationContext.javaScriptContextHolder.get()
+          val contextHolder = this.reactApplicationContext.javaScriptContextHolder!!.get()
           if (contextHolder.toInt() == 0) {
             promise.resolve(false)
             return@runOnJSQueueThread
