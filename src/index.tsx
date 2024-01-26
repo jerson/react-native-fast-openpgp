@@ -636,7 +636,7 @@ export default class OpenPGP {
       let result: BridgeResponse;
       if (this.useJSI) {
         if (!this.loaded) {
-          this.loaded = await FastOpenPGPNativeModules.install();
+          this.loaded = FastOpenPGPNativeModules.install();
           console.log(
             this.TAG,
             `(${name})`,
