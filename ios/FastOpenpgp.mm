@@ -98,20 +98,21 @@ RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NS
     resolve(result);
 }
 
-RCT_REMAP_METHOD(install,installWithResolver:(RCTPromiseResolveBlock)resolve
-                 withReject:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
     RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
     if (!cxxBridge.runtime) {
-        NSNumber * val = [NSNumber numberWithBool:NO];
-        resolve(val);
-        return;
+        return @false;
     }
-    jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
+    using namespace facebook;
+    auto jsiRuntime = (jsi::Runtime *)cxxBridge.runtime;
+    if (jsiRuntime == nil) {
+        return @false;
+    }
+    auto &runtime = *jsiRuntime;
 
-    fastOpenPGP::install(*runtime);
-    NSNumber * val = [NSNumber numberWithBool:TRUE];
-    resolve(val);
+    fastOpenPGP::install(runtime);
+    return @true;
 }
 
 + (BOOL)requiresMainQueueSetup {

@@ -116,12 +116,8 @@ D4m65Neoc7DBEdvzgK9IUMpwG5N0t+0pfWLhs8AZdMxE7RbP
 =kbtq
 -----END PGP PUBLIC KEY BLOCK-----`;
 
+OpenPGP.useJSI = true;
 const App = () => {
-
-  useEffect(()=>{
-    OpenPGP.useJSI = true
-  },[])
-
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -172,13 +168,8 @@ const App = () => {
                 privateKey={privateKey}
                 passphrase={passphrase}
               />
-              <Metadata
-                publicKey={publicKey}
-                privateKey={privateKey}
-              />
-              <Convert
-                privateKey={privateKey}
-              />
+              <Metadata publicKey={publicKey} privateKey={privateKey} />
+              <Convert privateKey={privateKey} />
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -188,14 +179,13 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-  },
+  container: {},
   scrollView: {
     backgroundColor: Colors.lighter,
   },
   body: {
     backgroundColor: Colors.white,
-    minHeight: Dimensions.get("screen").height
+    minHeight: Dimensions.get('screen').height,
   },
 });
 

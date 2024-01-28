@@ -5,20 +5,20 @@ import androidx.annotation.NonNull
 import com.facebook.react.bridge.*
 
 internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
-    ReactContextBaseJavaModule(reactContext) {
+  ReactContextBaseJavaModule(reactContext) {
 
   val TAG = "[FastOpenPGPModule]"
 
-    external fun initialize(jsiPtr: Long);
-    external fun destruct();
-    external fun callJSI(jsiPtr: Long, name: String, payload: ByteArray): ByteArray;
-    external fun callNative(name: String, payload: ByteArray): ByteArray;
+  external fun initialize(jsiPtr: Long);
+  external fun destruct();
+  external fun callJSI(jsiPtr: Long, name: String, payload: ByteArray): ByteArray;
+  external fun callNative(name: String, payload: ByteArray): ByteArray;
 
-    companion object {
-        init {
-            System.loadLibrary("fast-openpgp")
-        }
+  companion object {
+    init {
+      System.loadLibrary("fast-openpgp")
     }
+  }
 
   @ReactMethod
   fun callJSI(name: String, payload: ReadableArray, promise: Promise) {
@@ -61,26 +61,22 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
     }.start()
   }
 
-  @ReactMethod
-  fun install(promise: Promise) {
-    Thread {
-      reactApplicationContext.runOnJSQueueThread {
-        Log.d(TAG, "installing")
-        try {
-          val contextHolder = this.reactApplicationContext.javaScriptContextHolder!!.get()
-          if (contextHolder.toInt() == 0) {
-            promise.resolve(false)
-            return@runOnJSQueueThread
-          }
-          initialize(contextHolder)
-          Log.i(TAG, "successfully installed")
-          promise.resolve(true)
-        } catch (exception: java.lang.Exception) {
-          Log.e(TAG, "failed to install JSI", exception)
-          promise.reject(exception)
-        }
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun install(): Boolean {
+    Log.d(TAG, "installing")
+    try {
+      val contextHolder = this.reactApplicationContext.javaScriptContextHolder!!.get()
+      if (contextHolder.toInt() == 0) {
+        Log.d(TAG, "context not available")
+        return false
       }
-    }.start()
+      initialize(contextHolder)
+      Log.i(TAG, "successfully installed")
+      return true
+    } catch (exception: java.lang.Exception) {
+      Log.e(TAG, "failed to install JSI", exception)
+      return false
+    }
   }
 
   override fun getName(): String {
@@ -91,4 +87,3 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
     destruct();
   }
 }
-
