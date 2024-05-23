@@ -2,6 +2,7 @@
 
 import * as flatbuffers from 'flatbuffers';
 
+import { Entity } from '../model/entity';
 import { KeyOptions } from '../model/key-options';
 
 
@@ -56,8 +57,13 @@ options(obj?:KeyOptions):KeyOptions|null {
   return offset ? (obj || new KeyOptions()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
+signed(obj?:Entity):Entity|null {
+  const offset = this.bb!.__offset(this.bb_pos, 14);
+  return offset ? (obj || new Entity()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
+}
+
 static startDecryptFileRequest(builder:flatbuffers.Builder) {
-  builder.startObject(5);
+  builder.startObject(6);
 }
 
 static addInput(builder:flatbuffers.Builder, inputOffset:flatbuffers.Offset) {
@@ -78,6 +84,10 @@ static addPassphrase(builder:flatbuffers.Builder, passphraseOffset:flatbuffers.O
 
 static addOptions(builder:flatbuffers.Builder, optionsOffset:flatbuffers.Offset) {
   builder.addFieldOffset(4, optionsOffset, 0);
+}
+
+static addSigned(builder:flatbuffers.Builder, signedOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(5, signedOffset, 0);
 }
 
 static endDecryptFileRequest(builder:flatbuffers.Builder):flatbuffers.Offset {

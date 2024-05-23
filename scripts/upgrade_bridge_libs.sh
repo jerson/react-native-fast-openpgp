@@ -9,7 +9,7 @@
 
 REPO="jerson/openpgp-mobile"
 NAME="libopenpgp_bridge"
-PLATFORMS=("android" "ios" )
+PLATFORMS=("android" "ios_xcframework" )
 OUTPUT_DIRS=("android/src/main" "ios")
 OUTPUT_SUB_DIRS=("" "")
 OUTPUT_STRIP_DIRS=(1 1)
@@ -42,12 +42,12 @@ do
   OUTPUT_STRIP_DIR=${OUTPUT_STRIP_DIRS[$INDEX]}
 
   FILE_NAME="${NAME}_${PLATFORM}_${VERSION}.tar.gz"
-  TMP_FILE="$TMP_DIR/$FILE_NAME" 
+  TMP_FILE="$TMP_DIR/$FILE_NAME"
   FILE_URL="https://github.com/${REPO}/releases/download/${VERSION}/${FILE_NAME}"
 
   echo "Platform: $PLATFORM"
   echo "Downloading: $FILE_URL to $TMP_FILE"
-  curl -L -o $TMP_FILE "$FILE_URL" 
+  curl -L -o $TMP_FILE "$FILE_URL"
 
   echo "Extracting: $TMP_FILE to $OUTPUT_DIR"
   mkdir -p $OUTPUT_DIR
@@ -60,4 +60,3 @@ do
 done
 #
 echo "All updated"
-rm ios/libopenpgp_bridge.h || echo "."

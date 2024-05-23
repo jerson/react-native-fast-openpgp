@@ -2,7 +2,6 @@ require "json"
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
-shared_lib = File.join(__dir__, "ios/libopenpgp_bridge.a").gsub(/ /, '\ ')
 
 Pod::Spec.new do |s|
   s.name         = package["name"]
@@ -16,10 +15,8 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/jerson/react-native-fast-openpgp.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
-  s.vendored_libraries  = '*.a'
-  s.xcconfig = { 'OTHER_LDFLAGS' => "-force_load '#{shared_lib}'"}
-  s.pod_target_xcconfig = {  'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+  s.vendored_framework  = 'ios/Openpgp.xcframework'
+  s.pod_target_xcconfig = {  'DEFINES_MODULE' => 'YES' }
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
   # See https://github.com/facebook/react-native/blob/febf6b7f33fdb4904669f99d795eba4c0f95d7bf/scripts/cocoapods/new_architecture.rb#L79.
