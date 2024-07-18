@@ -166,5 +166,15 @@
   "dependencies": {
     "big-integer": "^1.6.51",
     "flatbuffers": "2.0.6"
+  },
+  "codegenConfig": {
+    "name": "RNFastOpenpgpSpec",
+    "type": "modules",
+    "jsSrcsDir": "src"
+  },
+  "create-react-native-library": {
+    "type": "module-mixed",
+    "languages": "cpp",
+    "version": "0.38.2"
   }
 }

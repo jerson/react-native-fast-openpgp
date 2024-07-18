@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "11.0" }
   s.source       = { :git => "https://github.com/jerson/react-native-fast-openpgp.git", :tag => "#{s.version}" }
 
-  s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
+  s.source_files = "ios/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
   s.vendored_framework  = 'ios/Openpgp.xcframework'
   s.pod_target_xcconfig = {  'DEFINES_MODULE' => 'YES' }
 
