@@ -31,10 +31,14 @@ jobs:
         id: setup-ndk
         with:
           ndk-version: r21d
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Set up Node
         run: |
           npm install -g detox-cli
           npm install -g yarn
+          npm install -g node-gyp
       - run: yarn
       - run: yarn example build:android
         env:
