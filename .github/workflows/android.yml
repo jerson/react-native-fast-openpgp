@@ -45,15 +45,9 @@ jobs:
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       - run: |
-          du -sch ./*
-          du -sch ./android/*
-          du -sch ./example/android/*
-          du -sch ./example/android/app/*
-          du -sch ~/.gradle
-          du -sch /usr/local/lib/android/*
-          du -sch /usr/local/lib/android/sdk/*
-          du -sch ~/*
+          du -sch /usr/local/lib/android/sdk/ndk/*
           rm -rf  ~/.gradle
+          rm -rf /usr/local/lib/android/sdk/ndk/
       - run: yarn example start &
         timeout-minutes: 10
       - name: Enable KVM
