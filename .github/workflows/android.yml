@@ -65,4 +65,5 @@ jobs:
           avd-name: PhoneAPI30
           arch: arm64-v8a
           disable-animations: true
+          channel: canary
           script: yarn example test:android
