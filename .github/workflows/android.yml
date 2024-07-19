@@ -63,5 +63,6 @@ jobs:
         with:
           api-level: 29
           avd-name: PhoneAPI30
+          arch: arm64-v8a
           disable-animations: true
           script: yarn example test:android
