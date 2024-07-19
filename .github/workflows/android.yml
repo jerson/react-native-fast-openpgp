@@ -52,6 +52,7 @@ jobs:
           du -sch ~/.gradle
           du -sch /usr/local/lib/android/*
           du -sch /usr/local/lib/android/sdk/*
+          du -sch ~/*
           rm -rf  ~/.gradle
       - run: yarn example start &
         timeout-minutes: 10
