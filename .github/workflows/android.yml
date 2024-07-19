@@ -44,7 +44,7 @@ jobs:
           ndk-version: r21d
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
       - name: Set up Node
         run: |
           npm install -g detox-cli
