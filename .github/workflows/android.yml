@@ -9,17 +9,10 @@ on:
 
 jobs:
   e2e:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle
-      - name: Cache dependencies
-        id: yarn-cache
+      - id: yarn-cache
         uses: actions/cache@v3
         with:
           path: |
@@ -34,10 +27,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - uses: android-actions/setup-android@v2
-      - name: Android Deps
-        run: |
-          rm -rf ~/Library/Android/sdk/ndk || echo "skipped"
-          rm -rf ~/Library/Android/sdk/ndk-bundle || echo "skipped"
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
@@ -45,25 +34,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      - name: Set up Node
-        run: |
+      - run: |
           npm install -g detox-cli
           npm install -g yarn
           npm install -g node-gyp
-      - name: Install dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
+      - if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
         shell: bash
       - run: yarn example build:android
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      - run: |
+          du -sch ./*
+          rm -rf  ~/.gradle
       - run: yarn example start &
         timeout-minutes: 10
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           avd-name: PhoneAPI30
-          arch: arm64-v8a
           disable-animations: true
-          channel: canary
           script: yarn example test:android
