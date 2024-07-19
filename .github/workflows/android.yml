@@ -9,61 +9,54 @@ on:
 
 jobs:
   e2e:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - id: yarn-cache
+        uses: actions/cache@v3
         with:
           path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle
-      - uses: actions/cache@v3
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd
+            **/node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}-${{ hashFiles('**/package.json', '!node_modules/**') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+            ${{ runner.os }}-yarn-
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
       - uses: android-actions/setup-android@v2
-      - name: Android Deps
-        run: |
-          rm -rf ~/Library/Android/sdk/ndk || echo "skipped"
-          rm -rf ~/Library/Android/sdk/ndk-bundle || echo "skipped"
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
           ndk-version: r21d
-      - name: Set up Node
-        run: |
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: |
           npm install -g detox-cli
           npm install -g yarn
-      - run: yarn
+          npm install -g node-gyp
+      - if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --immutable
+        shell: bash
       - run: yarn example build:android
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      - run: |
+          rm -rf  ~/.gradle
+          rm -rf /usr/local/lib/android/sdk/ndk/
       - run: yarn example start &
         timeout-minutes: 10
-      - if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          avd-name: PhoneAPI30
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           avd-name: PhoneAPI30
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: yarn example test:android
