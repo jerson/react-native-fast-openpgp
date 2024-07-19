@@ -69,7 +69,5 @@ jobs:
           api-level: 29
           avd-name: PhoneAPI30
           arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: yarn example test:android
