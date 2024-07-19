@@ -46,6 +46,11 @@ jobs:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       - run: |
           du -sch ./*
+          du -sch ./android/*
+          du -sch ./example/android/*
+          du -sch ./example/android/app/*
+          du -sch ~/.gradle
+          du -sch /usr/local/lib/android/sdk/system-images/
           rm -rf  ~/.gradle
       - run: yarn example start &
         timeout-minutes: 10
@@ -58,5 +63,6 @@ jobs:
         with:
           api-level: 29
           avd-name: PhoneAPI30
+          disk-size: 1024M
           disable-animations: true
           script: yarn example test:android
