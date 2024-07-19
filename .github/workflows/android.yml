@@ -50,7 +50,8 @@ jobs:
           du -sch ./example/android/*
           du -sch ./example/android/app/*
           du -sch ~/.gradle
-          du -sch /usr/local/lib/android/sdk/system-images/
+          du -sch /usr/local/lib/android/*
+          du -sch /usr/local/lib/android/sdk/*
           rm -rf  ~/.gradle
       - run: yarn example start &
         timeout-minutes: 10
