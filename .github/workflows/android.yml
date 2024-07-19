@@ -59,6 +59,5 @@ jobs:
         with:
           api-level: 29
           avd-name: PhoneAPI30
-          disk-size: 1024M
           disable-animations: true
           script: yarn example test:android
