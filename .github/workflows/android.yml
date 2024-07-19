@@ -45,7 +45,6 @@ jobs:
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       - run: |
-          du -sch /usr/local/lib/android/sdk/ndk/*
           rm -rf  ~/.gradle
           rm -rf /usr/local/lib/android/sdk/ndk/
       - run: yarn example start &
