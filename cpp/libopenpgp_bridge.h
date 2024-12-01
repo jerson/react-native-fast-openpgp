@@ -1,6 +1,10 @@
 #include <stdint.h>
 #include <stdlib.h>
-typedef struct  { void* message; int size; char* error; } BytesReturn;
+typedef struct {
+  void* message;
+  int size;
+  char* error;
+} BytesReturn;
 
 #ifdef __cplusplus
 extern "C" {

@@ -117,6 +117,7 @@ D4m65Neoc7DBEdvzgK9IUMpwG5N0t+0pfWLhs8AZdMxE7RbP
 -----END PGP PUBLIC KEY BLOCK-----`;
 
 OpenPGP.useJSI = true;
+
 const App = () => {
   return (
     <>

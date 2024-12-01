@@ -1,5 +1,5 @@
 import { NativeModules } from 'react-native';
-import * as model from './bridge';
+import * as model from './model';
 import * as flatbuffers from 'flatbuffers';
 import { BoolResponse } from './model/bool-response';
 import { DecryptRequest } from './model/decrypt-request';
@@ -215,7 +215,7 @@ export default class OpenPGP {
     privateKey: string,
     passphrase: string,
     options?: KeyOptions,
-    signedEntity?: Entity,
+    signedEntity?: Entity
   ): Promise<string> {
     const builder = new flatbuffers.Builder(0);
 
@@ -228,8 +228,8 @@ export default class OpenPGP {
     DecryptRequest.startDecryptRequest(builder);
     typeof optionsOffset !== 'undefined' &&
       DecryptRequest.addOptions(builder, optionsOffset);
-      typeof signedEntityOffset !== 'undefined' &&
-    DecryptRequest.addSigned(builder, signedEntityOffset);
+    typeof signedEntityOffset !== 'undefined' &&
+      DecryptRequest.addSigned(builder, signedEntityOffset);
     DecryptRequest.addMessage(builder, messageOffset);
     DecryptRequest.addPassphrase(builder, passphraseOffset);
     DecryptRequest.addPrivateKey(builder, privateKeyOffset);
@@ -246,7 +246,7 @@ export default class OpenPGP {
     privateKey: string,
     passphrase: string,
     options?: KeyOptions,
-    signedEntity?: Entity,
+    signedEntity?: Entity
   ): Promise<number> {
     const builder = new flatbuffers.Builder(0);
 
@@ -260,8 +260,8 @@ export default class OpenPGP {
     DecryptFileRequest.startDecryptFileRequest(builder);
     typeof optionsOffset !== 'undefined' &&
       DecryptFileRequest.addOptions(builder, optionsOffset);
-      typeof signedEntityOffset !== 'undefined' &&
-    DecryptFileRequest.addSigned(builder, signedEntityOffset);
+    typeof signedEntityOffset !== 'undefined' &&
+      DecryptFileRequest.addSigned(builder, signedEntityOffset);
     DecryptFileRequest.addInput(builder, inputOffset);
     DecryptFileRequest.addOutput(builder, outputOffset);
     DecryptFileRequest.addPassphrase(builder, passphraseOffset);
@@ -668,10 +668,7 @@ export default class OpenPGP {
             `(${name})`,
             'cant use JSI in debug mode, fallback to NativeModules'
           );
-          result = await FastOpenPGPNativeModules.callJSI(
-            name,
-            Array.from(bytes)
-          );
+          result = await FastOpenPGPNativeModules.call(name, Array.from(bytes));
         }
       } else {
         result = await FastOpenPGPNativeModules.call(name, Array.from(bytes));
