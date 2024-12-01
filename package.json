@@ -1,6 +1,6 @@
 {
   "name": "react-native-fast-openpgp",
-  "version": "2.7.4",
+  "version": "2.8.0",
   "description": "library for use openPGP",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -165,7 +165,8 @@
   },
   "dependencies": {
     "big-integer": "^1.6.51",
-    "flatbuffers": "2.0.6"
+    "flatbuffers": "24.3.25",
+    "text-encoding-polyfill": "^0.6.7"
   },
   "codegenConfig": {
     "name": "RNFastOpenpgpSpec",

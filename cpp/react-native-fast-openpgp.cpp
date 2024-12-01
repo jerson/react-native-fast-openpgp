@@ -1,170 +1,159 @@
 #import "react-native-fast-openpgp.h"
-#include "libopenpgp_bridge.h"
 
-#include <iostream>
-#include <sstream>
 #include <cstdlib>
 #include <cstring>
 #include <future>
 #include <iostream>
+#include <sstream>
+
+#include "libopenpgp_bridge.h"
 
 using namespace facebook;
 
 namespace fastOpenPGP {
-    jsi::Value call(jsi::Runtime &runtime, const jsi::String &nameValue,
-                    const jsi::Object &payloadObject) {
-        auto nameString = nameValue.utf8(runtime);
-        auto nameChar = nameString.c_str();
-        auto name = const_cast<char *>(nameChar);
+jsi::Value call(jsi::Runtime &runtime, const jsi::String &nameValue,
+                const jsi::Object &payloadObject) {
+  // Extract and validate name
+  std::string nameString = nameValue.utf8(runtime);
+  if (nameString.empty()) {
+    throw jsi::JSError(runtime, "Name string cannot be empty");
+  }
 
-        auto payload = payloadObject.getArrayBuffer(runtime);
-        auto size = (int) (payload.length(runtime));
-        auto data = payload.data(runtime);
+  // Create a mutable copy of the name string
+  std::vector<char> mutableName(nameString.begin(), nameString.end());
+  mutableName.push_back('\0');  // Ensure null termination
 
-        auto response = OpenPGPBridgeCall(name, data, size);
+  // Extract and validate payload
+  if (!payloadObject.isArrayBuffer(runtime)) {
+    throw jsi::JSError(runtime, "Payload must be an ArrayBuffer");
+  }
+  jsi::ArrayBuffer payload = payloadObject.getArrayBuffer(runtime);
+  int size = static_cast<int>(payload.length(runtime));
+  const uint8_t *data = payload.data(runtime);
 
-        if (response->error != nullptr) {
-            auto error = response->error;
-            free(response);
-            return jsi::Value(jsi::String::createFromAscii(runtime, error));
+  // Cast const uint8_t* to void*
+  void *dataPointer = const_cast<void *>(static_cast<const void *>(data));
+
+  // Call the OpenPGP bridge
+  auto response = OpenPGPBridgeCall(mutableName.data(), dataPointer, size);
+
+  // Handle errors from the bridge
+  if (response->error != nullptr) {
+    std::string errorMessage(response->error);
+    free(response);
+    throw jsi::JSError(runtime, errorMessage);
+  }
+
+  // Create and populate the ArrayBuffer result
+  auto arrayBufferConstructor = runtime.global().getPropertyAsFunction(runtime, "ArrayBuffer");
+  jsi::Object result = arrayBufferConstructor.callAsConstructor(runtime, response->size).getObject(runtime);
+  jsi::ArrayBuffer resultBuffer = result.getArrayBuffer(runtime);
+  memcpy(resultBuffer.data(runtime), response->message, response->size);
+
+  // Clean up and return the result
+  free(response);
+  return result;
+}
+
+void install(jsi::Runtime &jsiRuntime) {
+  std::cout << "Initializing react-native-fast-openpgp" << "\n";
+
+  auto bridgeCallSync = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forAscii(jsiRuntime, "callSync"),
+      2,
+      [](jsi::Runtime &runtime, const jsi::Value & /*thisValue*/, const jsi::Value *arguments, size_t count) -> jsi::Value {
+        // Validate argument count
+        if (count != 2) {
+          throw jsi::JSError(runtime, "callSync expects exactly 2 arguments: (string name, ArrayBuffer payload)");
         }
 
-        auto arrayBuffer = runtime.global().getPropertyAsFunction(
-                runtime,
-                "ArrayBuffer"
-        );
-        jsi::Object result = arrayBuffer.callAsConstructor(
-                runtime,
-                response->size
-        ).getObject(runtime);
-        jsi::ArrayBuffer buf = result.getArrayBuffer(runtime);
-        memcpy(buf.data(runtime), response->message, response->size);
-        free(response);
+        // Validate first argument: name (string)
+        if (!arguments[0].isString()) {
+          throw jsi::JSError(runtime, "First argument must be a string representing the name");
+        }
+        auto nameString = arguments[0].getString(runtime);
 
-        return result;
-    }
+        // Validate second argument: payload (ArrayBuffer)
+        if (!arguments[1].isObject() || !arguments[1].getObject(runtime).isArrayBuffer(runtime)) {
+          throw jsi::JSError(runtime, "Second argument must be an ArrayBuffer representing the payload");
+        }
+        auto payloadObject = arguments[1].getObject(runtime);
 
-    void install(jsi::Runtime &jsiRuntime) {
+        // Call the native function
+        auto response = call(runtime, nameString, payloadObject);
 
-        std::cout << "Initializing react-native-fast-openpgp" << "\n";
+        // Return the response (could be either an error or result)
+        return response;
+      });
 
-        auto bridgeCallSync = jsi::Function::createFromHostFunction(
-                jsiRuntime,
-                jsi::PropNameID::forAscii(jsiRuntime, "callSync"),
-                2,
-                [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments,
-                   size_t count) -> jsi::Value {
+  auto bridgeCallPromise = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forAscii(jsiRuntime, "callPromise"),
+      2,
+      [](jsi::Runtime &runtime, const jsi::Value & /*thisValue*/, const jsi::Value *arguments,
+         size_t count) -> jsi::Value {
+        // Validate argument count
+        if (count != 2) {
+          throw jsi::JSError(runtime, "callPromise expects exactly 2 arguments: (string name, ArrayBuffer payload)");
+        }
 
-                    if (!arguments[0].isString()) {
-                        return jsi::Value(
-                                jsi::String::createFromAscii(runtime, "name not an String"));
-                    }
-                    auto nameString = arguments[0].getString(runtime);
+        // Validate and extract 'name' argument
+        if (!arguments[0].isString()) {
+          throw jsi::JSError(runtime, "First argument must be a string representing the name");
+        }
+        auto name = arguments[0].getString(runtime);
 
-                    if (!arguments[1].isObject()) {
-                        return jsi::Value(
-                                jsi::String::createFromAscii(runtime, "payload not an Object"));
-                    }
-                    auto obj = arguments[1].getObject(runtime);
-                    if (!obj.isArrayBuffer(runtime)) {
-                        return jsi::Value(
-                                jsi::String::createFromAscii(runtime,
-                                                             "payload not an ArrayBuffer"));
-                    }
+        // Validate and extract 'payload' argument
+        if (!arguments[1].isObject() || !arguments[1].getObject(runtime).isArrayBuffer(runtime)) {
+          throw jsi::JSError(runtime, "Second argument must be an ArrayBuffer representing the payload");
+        }
+        auto payload = arguments[1].getObject(runtime).getArrayBuffer(runtime);
 
-                    auto response = call(runtime, nameString, obj);
-                    if (response.isString()) {
-                        // here in the future maybe we can throw an exception...
-                        return response;
-                    }
-                    return response;
-                }
-        );
+        // Create shared pointers for name and payload
+        auto namePtr = std::make_shared<jsi::String>(std::move(name));
+        auto payloadPtr = std::make_shared<jsi::ArrayBuffer>(std::move(payload));
 
-        auto bridgeCallPromise = jsi::Function::createFromHostFunction(
-                jsiRuntime,
-                jsi::PropNameID::forAscii(jsiRuntime, "callPromise"),
-                2,
-                [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments,
-                   size_t count) -> jsi::Value {
+        // Create the Promise executor function
+        auto promiseExecutor = jsi::Function::createFromHostFunction(
+            runtime,
+            jsi::PropNameID::forAscii(runtime, "executor"),
+            2,
+            [namePtr, payloadPtr](
+                jsi::Runtime &runtime,
+                const jsi::Value & /*thisValue*/,
+                const jsi::Value *executorArgs,
+                size_t executorArgCount) -> jsi::Value {
+              if (executorArgCount != 2) {
+                throw jsi::JSError(runtime, "Executor function expects exactly 2 arguments: (resolve, reject)");
+              }
 
-                    auto promise = runtime.global().getPropertyAsFunction(runtime, "Promise");
-                    auto rejecter = promise.getProperty(runtime, "reject").asObject(
-                            runtime).asFunction(runtime);
-                    if (!arguments[0].isString()) {
-                        return rejecter.call(
-                                runtime,
-                                jsi::JSError(runtime, "name not an String").value()
-                        );
-                    }
-                    auto name = arguments[0].getString(runtime);
+              auto resolve = executorArgs[0].asObject(runtime).asFunction(runtime);
+              auto reject = executorArgs[1].asObject(runtime).asFunction(runtime);
 
-                    if (!arguments[1].isObject()) {
-                        return rejecter.call(
-                                runtime,
-                                jsi::JSError(runtime, "payload not an Object").value()
-                        );
-                    }
-                    auto obj = arguments[1].getObject(runtime);
-                    if (!obj.isArrayBuffer(runtime)) {
-                        return rejecter.call(
-                                runtime,
-                                jsi::JSError(runtime, "payload not an ArrayBuffer").value()
-                        );
-                    }
-                    auto payload = obj.getArrayBuffer(runtime);
+              try {
+                auto response = call(runtime, *namePtr, *payloadPtr);
+                resolve.call(runtime, response);
+              } catch (const jsi::JSError &error) {
+                reject.call(runtime, error.value());
+              } catch (const std::exception &e) {
+                reject.call(runtime, jsi::String::createFromUtf8(runtime, e.what()));
+              }
 
-                    auto payloadFuture = std::make_shared<jsi::ArrayBuffer>(std::move(payload));
-                    auto nameFuture = std::make_shared<jsi::String>(std::move(name));
+              return jsi::Value::undefined();
+            });
 
-                    auto bridgeCallPromise = jsi::Function::createFromHostFunction(
-                            runtime,
-                            jsi::PropNameID::forAscii(runtime, "promise"),
-                            2,
-                            [nameFuture, payloadFuture](jsi::Runtime &runtime,
-                                                        const jsi::Value &thisValue,
-                                                        const jsi::Value *arguments,
-                                                        size_t count) -> jsi::Value {
+        // Construct and return the Promise
+        auto promiseConstructor = runtime.global().getPropertyAsFunction(runtime, "Promise");
+        auto promise = promiseConstructor.callAsConstructor(runtime, promiseExecutor);
 
-                                auto resolveFunction = arguments[0].getObject(runtime).asFunction(
-                                        runtime);
-                                auto rejectFunction = arguments[1].getObject(runtime).asFunction(
-                                        runtime);
+        return promise;
+      });
 
-                                auto response = call(runtime, *nameFuture, *payloadFuture);
-
-                                if (response.isString()) {
-                                    rejectFunction.call(runtime, response);
-                                } else {
-                                    resolveFunction.call(runtime, response);
-                                }
-
-                                return jsi::Value(0);
-                            }
-                    );
-
-
-                    jsi::Object o = promise.callAsConstructor(runtime, bridgeCallPromise.asFunction(
-                            runtime)).getObject(
-                            runtime);
-                    return o;
-                }
-        );
-
-
-        // for now im not sure why, but create an object don't work with hermes release, but debug yes
-//        auto object = jsi::Object(jsiRuntime);
-//        object.setProperty(jsiRuntime, "callPromise", std::move(bridgeCallPromise));
-//        object.setProperty(jsiRuntime, "callSync", std::move(bridgeCallSync));
-//        jsiRuntime.global().setProperty(jsiRuntime, "FastOpenPGP", std::move(object));
-        jsiRuntime.global().setProperty(jsiRuntime, "FastOpenPGPCallPromise",
-                                        std::move(bridgeCallPromise));
-        jsiRuntime.global().setProperty(jsiRuntime, "FastOpenPGPCallSync",
-                                        std::move(bridgeCallSync));
-
-    }
-
-    void cleanup() {
-
-    }
+  jsiRuntime.global().setProperty(jsiRuntime, "FastOpenPGPCallPromise", std::move(bridgeCallPromise));
+  jsiRuntime.global().setProperty(jsiRuntime, "FastOpenPGPCallSync", std::move(bridgeCallSync));
 }
+
+void cleanup() {
+}
+}  // namespace fastOpenPGP

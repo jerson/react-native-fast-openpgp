@@ -1,7 +1,6 @@
 /**
  * `Array`: returned by NativeModules due to lack of ByteArray support
  *
- * @see `FastOpenPGPNativeModules.callJSI`
  * @see `FastOpenPGPNativeModules.call`
  */
 type BridgeResponseNativeModules = Array<number>;
@@ -28,14 +27,6 @@ type BridgeResponse = BridgeResponseNativeModules | BridgeResponseJSI;
  */
 interface FastOpenPGPNativeModules {
   /**
-   * this method use `NativeModules` but also will send `JSI` reference to use same thread
-   * but it runs in a separated thread also.
-   */
-  callJSI(
-    name: string,
-    payload: Array<number>
-  ): Promise<BridgeResponseNativeModules>;
-  /**
    * this method use `NativeModules` in a more traditional way
    * using `JNI` on android in order to call shared a library.
    */
@@ -55,6 +46,7 @@ interface NativeModulesDef {
 
 interface Global {
   BigInt: any;
+  TextEncoder: any;
   // for now we are not going to use this way because of hermes on release mode only
   // FastOpenPGP:FastOpenPGPJSI
   /**

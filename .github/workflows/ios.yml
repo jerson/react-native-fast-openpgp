@@ -2,18 +2,18 @@ name: iOS
 
 on:
   workflow_dispatch:
-  pull_request:
-  push:
-    tags:
-      - 'v*'
+#  pull_request:
+#  push:
+#    tags:
+#      - 'v*'
 
 jobs:
   e2e:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: yarn-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/node_modules

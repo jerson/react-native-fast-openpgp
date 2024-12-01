@@ -10,109 +10,95 @@
 RCT_EXPORT_MODULE()
 
 
-RCT_REMAP_METHOD(call,call:(nonnull NSString*)name withPayload:(nonnull NSArray*)payload
+RCT_REMAP_METHOD(call,
+                 call:(nonnull NSString *)name
+                 withPayload:(nonnull NSArray *)payload
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withReject:(RCTPromiseRejectBlock)reject)
 {
-    auto bytesCopy = (Byte*)malloc(payload.count);
-    [payload enumerateObjectsUsingBlock:^(NSNumber* number, NSUInteger index, BOOL* stop){
+    // Allocate memory for the payload
+    auto bytesCopy = (Byte *)malloc(payload.count);
+    if (!bytesCopy) {
+        reject(@"E002", @"Memory allocation for payload failed", nil);
+        return;
+    }
+
+    // Convert NSArray to Byte array
+    [payload enumerateObjectsUsingBlock:^(NSNumber *number, NSUInteger index, BOOL *stop) {
         bytesCopy[index] = number.integerValue;
     }];
 
-    char *cname= strdup([name UTF8String]);
+    // Convert NSString to C-string
+    char *cname = strdup([name UTF8String]);
+    if (!cname) {
+        free(bytesCopy);
+        reject(@"E002", @"Memory allocation for name string failed", nil);
+        return;
+    }
+
+    // Call the OpenPGP bridge function
     auto response = OpenPGPBridgeCall(cname, bytesCopy, (int)payload.count);
     free(bytesCopy);
     free(cname);
 
-    if(response->error!=nil){
-        NSString * error = @(response->error);
-        if(![error isEqual:@""]){
-            reject(@"E001",error,nil);
+    if (!response) {
+        reject(@"E003", @"OpenPGPBridgeCall returned null response", nil);
+        return;
+    }
+
+    // Handle errors in the response
+    if (response->error != nil) {
+        NSString *error = @(response->error);
+        if (![error isEqualToString:@""]) {
+            reject(@"E001", error, nil);
             free(response);
             return;
         }
     }
 
-    auto bytesResult= (Byte*)malloc( response->size);
+    // Copy response message to a Byte array
+    auto bytesResult = (Byte *)malloc(response->size);
+    if (!bytesResult) {
+        free(response);
+        reject(@"E002", @"Memory allocation for response bytes failed", nil);
+        return;
+    }
     memcpy(bytesResult, response->message, response->size);
 
 
-    NSMutableArray* result = [[NSMutableArray alloc] init];
-    for (int i=0; i<response->size; i++) {
-        result[i]=[NSNumber numberWithInt:(int)bytesResult[i]];
+    // Convert Byte array to NSMutableArray
+    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:response->size];
+    for (int i = 0; i < response->size; i++) {
+        [result addObject:@(bytesResult[i])];
     }
+
+    // Free allocated resources
     free(response);
     free(bytesResult);
 
-    resolve(result);
-}
-
-RCT_REMAP_METHOD(callJSI,callJSI:(nonnull NSString*)name withPayload:(nonnull NSArray*)payload
-                 withResolver:(RCTPromiseResolveBlock)resolve
-                 withReject:(RCTPromiseRejectBlock)reject)
-{
-    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
-    if (!cxxBridge.runtime) {
-        [self call:name withPayload:payload withResolver:resolve withReject:reject];
-        return;
-    }
-
-    auto bytesCopy = (Byte*)malloc(payload.count);
-    [payload enumerateObjectsUsingBlock:^(NSNumber* number, NSUInteger index, BOOL* stop){
-        bytesCopy[index] = number.integerValue;
-    }];
-    char *cname= strdup([name UTF8String]);
-    int size = (int) payload.count;
-
-
-    jsi::Runtime * runtime = (jsi::Runtime *)cxxBridge.runtime;
-
-    auto nameValue = jsi::String::createFromAscii(*runtime, cname);
-    auto arrayBuffer = runtime->global().getPropertyAsFunction(*runtime, "ArrayBuffer");
-    jsi::Object o = arrayBuffer.callAsConstructor(*runtime, size).getObject(*runtime);
-    jsi::ArrayBuffer payloadValue = o.getArrayBuffer(*runtime);
-    memcpy(payloadValue.data(*runtime), bytesCopy, size);
-
-    auto response = fastOpenPGP::call(*runtime, nameValue, payloadValue);
-    free(bytesCopy);
-    free(cname);
-
-
-    if(response.isString()){
-        NSString * error =  [NSString stringWithUTF8String:response.asString(*runtime).utf8(*runtime).c_str()];
-        if(![error isEqual:@""]){
-            reject(@"E001",error,nil);
-            return;
-        }
-    }
-
-    auto byteResult = response.asObject(*runtime).getArrayBuffer(*runtime);
-    auto sizeResult = byteResult.size(*runtime);
-    auto dataResult = byteResult.data(*runtime);
-
-    NSMutableArray* result = [[NSMutableArray alloc] init];
-    for (int i=0; i<sizeResult; i++) {
-        result[i]=[NSNumber numberWithInt:(int)dataResult[i]];
-    }
-
+    // Resolve the promise with the result
     resolve(result);
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
+    // Ensure the bridge is valid and of the expected type
     RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
-    if (!cxxBridge.runtime) {
-        return @false;
+    if (!cxxBridge || !cxxBridge.runtime) {
+        return @false; // Bridge or runtime is not initialized
     }
-    using namespace facebook;
-    auto jsiRuntime = (jsi::Runtime *)cxxBridge.runtime;
-    if (jsiRuntime == nil) {
-        return @false;
-    }
-    auto &runtime = *jsiRuntime;
 
-    fastOpenPGP::install(runtime);
-    return @true;
+    // Obtain the JSI runtime
+    using facebook::jsi::Runtime;
+    Runtime *jsiRuntime = (Runtime *)cxxBridge.runtime;
+    if (!jsiRuntime) {
+        return @false; // JSI runtime is unavailable
+    }
+
+    // Install fastOpenPGP into the JSI runtime
+    fastOpenPGP::install(*jsiRuntime);
+
+    return @true; // Installation successful
 }
 
 + (BOOL)requiresMainQueueSetup {
