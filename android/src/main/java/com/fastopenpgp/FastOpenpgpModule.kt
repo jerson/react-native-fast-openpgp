@@ -12,6 +12,8 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
   external fun initialize(jsContext: Long)
   external fun destruct();
   external fun callNative(name: String, payload: ByteArray): ByteArray;
+  external fun encodeTextNative(input: String, encoding: String): ByteArray
+  external fun decodeTextNative(input: ByteArray, encoding: String, fatal: Int, ignoreBOM: Int, stream: Int): String
 
   companion object {
     init {
@@ -36,6 +38,32 @@ internal class FastOpenpgpModule(reactContext: ReactApplicationContext) :
         promise.reject("CALL_ERROR", "An error occurred during native call", e)
       }
     }.start()
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun encodeText(input: String, encoding: String): WritableArray {
+      return try {
+          val result = encodeTextNative(input, encoding) 
+          Arguments.createArray().apply {
+              result.forEach { byteValue: Byte -> pushInt(byteValue.toInt() and 0xFF) } 
+          }
+      } catch (e: Exception) {
+          Log.e(TAG, "Encoding error", e)
+          throw RuntimeException("ENCODE_ERROR: Failed to encode text")
+      }
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun decodeText(input: ReadableArray, encoding: String, fatal: Boolean, ignoreBOM: Boolean, stream: Boolean): String {
+      return try {
+          val bytes = ByteArray(input.size()) { index ->
+              input.getInt(index).toByte()
+          }
+          decodeTextNative(bytes, encoding, if (fatal) 1 else 0, if (ignoreBOM) 1 else 0, if (stream) 1 else 0)
+      } catch (e: Exception) {
+          Log.e(TAG, "Decoding error", e)
+          throw RuntimeException("DECODE_ERROR: Failed to decode text")
+      }
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)

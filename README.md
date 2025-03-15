@@ -27,9 +27,11 @@ if you need to use generate methods it is a good idea to disable it, because for
 import OpenPGP from "react-native-fast-openpgp";
 
 const encrypted = await OpenPGP.encrypt(message: string, publicKey: string, signedEntity?: Entity, fileHints?: FileHints, options?: KeyOptions ): Promise<string>;
+const encrypted = await OpenPGP.encryptBytes(message: Uint8Array, publicKey: string, signedEntity?: Entity, fileHints?: FileHints, options?: KeyOptions ): Promise<Uint8Array>;
 const outputFile = await OpenPGP.encryptFile(inputFile: string, outputFile: string, publicKey: string, signedEntity?: Entity, fileHints?: FileHints, options?: KeyOptions): Promise<number>;
 
 const encryptedSymmetric = await OpenPGP.encryptSymmetric(message: string, passphrase: string, fileHints?: FileHints, options?: KeyOptions ): Promise<string>;
+const encryptedSymmetric = await OpenPGP.encryptSymmetricBytes(message: Uint8Array, passphrase: string, fileHints?: FileHints, options?: KeyOptions ): Promise<Uint8Array>;
 const outputFile = await OpenPGP.encryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, fileHints?: FileHints, options?: KeyOptions ): Promise<number> ;
 ```
 
@@ -38,9 +40,11 @@ const outputFile = await OpenPGP.encryptSymmetricFile(inputFile: string, outputF
 import OpenPGP from "react-native-fast-openpgp";
 
 const decrypted = await OpenPGP.decrypt(message: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
+const decrypted = await OpenPGP.decryptBytes(message: Uint8Array, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<Uint8Array>;
 const outputFile = await OpenPGP.decryptFile(inputFile: string, outputFile: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<number>;
 
 const decryptedSymmetric = await OpenPGP.decryptSymmetric(message: string, passphrase: string, options?: KeyOptions ): Promise<string>;
+const decryptedSymmetric = await OpenPGP.decryptSymmetricBytes(message: Uint8Array, passphrase: string, options?: KeyOptions ): Promise<Uint8Array>;
 const outputFile = await OpenPGP.decryptSymmetricFile(inputFile: string, outputFile: string, passphrase: string, options?: KeyOptions ): Promise<number> ;
 ```
 
@@ -49,9 +53,12 @@ const outputFile = await OpenPGP.decryptSymmetricFile(inputFile: string, outputF
 import OpenPGP from "react-native-fast-openpgp";
 
 const signed = await OpenPGP.sign(message: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
+const signed = await OpenPGP.signBytes(message: Uint8Array, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<Uint8Array>;
+const signed = await OpenPGP.signBytesToString(message: Uint8Array, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
 const signed = await OpenPGP.signFile(inputFile: string, privateKey: string, passphrase: string, options?: KeyOptions ): Promise<string>;
 
 const verified = await OpenPGP.verify(signature: string, message: string, publicKey: string ): Promise<boolean>;
+const verified = await OpenPGP.verifyBytes(signature: string, message: Uint8Array, publicKey: string ): Promise<boolean>;
 const verified = await OpenPGP.verifyFile(signature: string, inputFile: string,publicKey: string): Promise<boolean>;
 ```
 

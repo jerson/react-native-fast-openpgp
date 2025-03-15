@@ -21,6 +21,7 @@ import SignVerifyFile from './modules/SignVerifyFile';
 import Metadata from './modules/Metadata';
 import Convert from './modules/Convert';
 import OpenPGP from 'react-native-fast-openpgp';
+import EncryptDecryptBytes from './modules/EncryptDecryptBytes';
 
 const passphrase = 'test';
 const privateKey = `-----BEGIN PGP PRIVATE KEY BLOCK-----
@@ -135,6 +136,11 @@ const App = () => {
           >
             <View style={styles.body}>
               <EncryptDecrypt
+                publicKey={publicKey}
+                privateKey={privateKey}
+                passphrase={passphrase}
+              />
+              <EncryptDecryptBytes
                 publicKey={publicKey}
                 privateKey={privateKey}
                 passphrase={passphrase}
