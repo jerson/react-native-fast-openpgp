@@ -13438,7 +13438,6 @@ __metadata:
     react-native: 0.72.6
     react-native-builder-bob: ^0.20.0
     release-it: ^15.0.0
-    text-encoding-polyfill: ^0.6.7
     turbo: ^1.10.7
     typescript: ^5.0.2
   peerDependencies:
@@ -15222,13 +15221,6 @@ __metadata:
     glob: ^7.1.4
     minimatch: ^3.0.4
   checksum: 3b34a3d77165a2cb82b34014b3aba93b1c4637a5011807557dc2f3da826c59975a5ccad765721c4648b39817e3472789f9b0fa98fc854c5c1c7a1e632aacdc28
-  languageName: node
-  linkType: hard
-
-"text-encoding-polyfill@npm:^0.6.7":
-  version: 0.6.7
-  resolution: "text-encoding-polyfill@npm:0.6.7"
-  checksum: 8e5b45154f3394cd29af01760ec2f728caba7cfc57fbcab60c073dc9c6db479d923efda3e074ae467379c4a0710c45e6427c6917a70da3059876924c190e03ed
   languageName: node
   linkType: hard
 

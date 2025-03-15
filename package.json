@@ -165,8 +165,7 @@
   },
   "dependencies": {
     "big-integer": "^1.6.51",
-    "flatbuffers": "24.3.25",
-    "text-encoding-polyfill": "^0.6.7"
+    "flatbuffers": "24.3.25"
   },
   "codegenConfig": {
     "name": "RNFastOpenpgpSpec",
