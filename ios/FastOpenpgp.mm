@@ -80,6 +80,75 @@ RCT_REMAP_METHOD(call,
     resolve(result);
 }
 
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(encodeText:(NSString *)input encoding:(NSString *)encoding) {
+    // Convert NSString to C-string
+    char *cInput = strdup([input UTF8String]);
+    char *cEncoding = strdup([encoding UTF8String]);
+
+    if (!cInput || !cEncoding) {
+        if (cInput) free(cInput);
+        if (cEncoding) free(cEncoding);
+        return nil;
+    }
+
+    // Call the native encoding function
+    BytesReturn *response = OpenPGPEncodeText(cInput, cEncoding);
+    free(cInput);
+    free(cEncoding);
+
+    if (!response) {
+        return nil;
+    }
+
+    if (response->error != NULL) {
+        free(response);
+        return nil;
+    }
+
+    // Convert response bytes to NSArray
+    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:response->size];
+    for (int i = 0; i < response->size; i++) {
+        [result addObject:@(((Byte*)response->message)[i])];
+    }
+
+    free(response);
+    return result;
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(decodeText:(NSArray *)input encoding:(NSString *)encoding fatal:(BOOL)fatal ignoreBOM:(BOOL)ignoreBOM stream:(BOOL)stream) {
+    // Convert NSArray to Byte array
+    Byte *bytesCopy = (Byte *)malloc(input.count);
+    if (!bytesCopy) {
+        return nil;
+    }
+
+    for (NSUInteger i = 0; i < input.count; i++) {
+        bytesCopy[i] = [input[i] intValue];
+    }
+
+    // Convert NSString to C-string
+    char *cEncoding = strdup([encoding UTF8String]);
+    if (!cEncoding) {
+        free(bytesCopy);
+        return nil;
+    }
+
+    // Call the native decoding function
+    char *decodedString = OpenPGPDecodeText(bytesCopy, (int)input.count, cEncoding, fatal ? 1 : 0, ignoreBOM ? 1 : 0, stream ? 1 : 0);
+    free(bytesCopy);
+    free(cEncoding);
+
+    if (!decodedString) {
+        return nil;
+    }
+
+    // Convert C-string to NSString
+    NSString *result = [NSString stringWithUTF8String:decodedString];
+    free(decodedString);
+    
+    return result;
+}
+
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
     // Ensure the bridge is valid and of the expected type
