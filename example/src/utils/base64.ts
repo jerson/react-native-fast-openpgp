@@ -36,7 +36,7 @@ export default {
 
     encodeFromByteArray: function (input: Uint8Array): string {
         const output: string[] = [];
-        let chr1: number, chr2: number, chr3: number;
+        let chr1: any, chr2: any, chr3: any;
         let enc1: number, enc2: number, enc3: number, enc4: number;
         let i = 0;
 
