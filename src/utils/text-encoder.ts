@@ -2,7 +2,8 @@ import { NativeModules } from 'react-native';
 
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
   .FastOpenpgp;
-const isDebuggingEnabled = typeof atob !== 'undefined';
+const isDebuggingEnabled =
+  typeof atob !== 'undefined' && typeof HermesInternal === 'undefined';
 
 typeof global.FastOpenPGPEncodeText === 'undefined' &&
   !isDebuggingEnabled &&

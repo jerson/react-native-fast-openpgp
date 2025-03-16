@@ -34,7 +34,8 @@ import './shim';
 
 const FastOpenPGPNativeModules = (NativeModules as NativeModulesDef)
   .FastOpenpgp;
-const isDebuggingEnabled = typeof atob !== 'undefined';
+const isDebuggingEnabled =
+  typeof atob !== 'undefined' && typeof HermesInternal === 'undefined';
 
 typeof global.FastOpenPGPCallPromise === 'undefined' &&
   !isDebuggingEnabled &&
