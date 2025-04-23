@@ -315,7 +315,7 @@ PODS:
   - React-jsinspector (0.72.6)
   - React-logger (0.72.6):
     - glog
-  - react-native-fast-openpgp (2.9.0):
+  - react-native-fast-openpgp (2.9.1):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-NativeModulesApple (0.72.6):
@@ -593,7 +593,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 5b6dd84e7461ae0bd999922cafe1fe3f98ced073
   React-jsinspector: 194e32c6aab382d88713ad3dd0025c5f5c4ee072
   React-logger: 39440454dfd719978689203a9d18b94e98de09eb
-  react-native-fast-openpgp: 0ce5bf02dcc392a03d285759f6ebdabd3d05cb9b
+  react-native-fast-openpgp: 8f41a15d5f787d5a7c3fff76e38b98dc4fb95030
   React-NativeModulesApple: 90508a0d94b0b66bb2ba14bc3bef65a00f5a8efb
   React-perflogger: e3596db7e753f51766bceadc061936ef1472edc3
   React-RCTActionSheet: 17ab132c748b4471012abbcdcf5befe860660485
