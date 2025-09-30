@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9.0)
 
 set (CMAKE_VERBOSE_MAKEFILE ON)
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 set (BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
 
 add_library(openpgp_bridge SHARED IMPORTED)
